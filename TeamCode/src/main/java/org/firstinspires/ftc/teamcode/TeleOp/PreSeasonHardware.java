@@ -34,10 +34,11 @@ public class PreSeasonHardware {
         rm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rm2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        resetMotorSpeeds();
+        resetMotorPowers();
     }
 
-    public void resetMotorSpeeds() {
+    public void resetMotorPowers() {
+        // Set motor powers to zero to stop moving
         lm1.setPower(0);
         lm2.setPower(0);
         rm1.setPower(0);

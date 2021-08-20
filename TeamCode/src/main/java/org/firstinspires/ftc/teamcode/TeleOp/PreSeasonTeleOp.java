@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+@TeleOp(name="Pre-Season Tele-Op", group="Iterative Opmode")
 public class PreSeasonTeleOp extends OpMode {
 
     private PreSeasonHardware robot = new PreSeasonHardware();
@@ -32,7 +34,7 @@ public class PreSeasonTeleOp extends OpMode {
 
     @Override
     public void stop() {
-        robot.resetMotorSpeeds();
+        robot.resetMotorPowers();
     }
 
 }
