@@ -6,11 +6,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name="Pre-Season Tele-Op", group="Iterative Opmode")
 public class PreSeasonTeleOp extends OpMode {
 
-    private PreSeasonHardware robot = new PreSeasonHardware();
+    private PreSeasonHardware robot = new PreSeasonHardware(this, this.telemetry);
 
     @Override
     public void init() {
         robot.init(hardwareMap);
+
+        telemetry.addData("Status", "Initialized (Version: v0.1)");
+        telemetry.update();
     }
 
     @Override
@@ -20,7 +23,8 @@ public class PreSeasonTeleOp extends OpMode {
 
     @Override
     public void start() {
-
+        telemetry.addData("Status", "Started (Version: v0.1)");
+        telemetry.update();
     }
 
     @Override
@@ -35,6 +39,9 @@ public class PreSeasonTeleOp extends OpMode {
     @Override
     public void stop() {
         robot.resetMotorPowers();
+
+        telemetry.addData("Status", "Stopped");
+        telemetry.update();
     }
 
 }

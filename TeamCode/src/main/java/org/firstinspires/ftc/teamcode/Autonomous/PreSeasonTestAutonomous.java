@@ -9,15 +9,27 @@ import org.firstinspires.ftc.teamcode.Autonomous.AutoUtils.PreSeasonHardware;
 
 public class PreSeasonTestAutonomous extends LinearOpMode {
 
-	private PreSeasonHardware robot = new PreSeasonHardware(this);
+	private PreSeasonHardware robot = new PreSeasonHardware(this, this.telemetry);
 
 	@Override
 	public void runOpMode() {
 		robot.init(hardwareMap);
+
+		telemetry.addData("Status", "Initialized (Version: v0.1)");
+		telemetry.update();
+
+		waitForStart();
 		if (!opModeIsActive()) return;
 
-		robot.driveStraight(24, 1, 1);
-		robot.turn(90, 2, 0.8);
-		robot.driveStraight(96, 1, 1.5);
+		telemetry.addData("Status", "Started (Version: v0.1)");
+		telemetry.update();
+
+		robot.driveStraight(24, 1, 1);   // Drive for 24 inches (1 tile)
+		robot.turn(90, 2, 0.8);          // Turn 90 degrees to the left
+		robot.driveStraight(96, 1, 1.5); // Drive for 96 inches (4 tiles)
+		robot.resetMotorPowers();
+		
+		telemetry.addData("Status", "Stopped");
+		telemetry.update();
 	}
 }

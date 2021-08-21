@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -13,7 +14,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class PreSeasonHardware {
 
-    LinearOpMode opMode;
+    private LinearOpMode opMode;
+    private Telemetry telemetry;
+    private HardwareMap hardwareMap = null;
 
     // Drive motors
     public DcMotor lm1 = null;
@@ -28,21 +31,21 @@ public class PreSeasonHardware {
     Orientation lastAngles = new Orientation();
     double globalAngle;
 
-    private HardwareMap hardwareMap = null;
-
     /**
-     * Sets the OpMode of the robot
+     * Sets the OpMode of the robot.
      *
-     * @param opMode The OpMode of the robot
+     * @param opMode    The OpMode of the robot.
+     * @param telemetry The telemetry of the robot.
      */
-    public PreSeasonHardware(LinearOpMode opMode) {
+    public PreSeasonHardware(LinearOpMode opMode, Telemetry telemetry) {
         this.opMode = opMode;
+        this.telemetry = telemetry;
     }
 
     /**
-     * Initializes the object with the hardware map
+     * Initializes the object with the hardware map.
      *
-     * @param _hardwareMap The hardware map that the robot uses
+     * @param _hardwareMap The hardware map that the robot uses.
      */
     public void init(HardwareMap _hardwareMap) {
         hardwareMap = _hardwareMap;
@@ -78,9 +81,9 @@ public class PreSeasonHardware {
     }
 
     /**
-     * Gets the angle in degrees of the robot
+     * Gets the angle in degrees of the robot.
      *
-     * @return Returns the angle in degrees of the robot
+     * @return Returns the angle in degrees of the robot.
      */
     public double getAngle() {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES); // Get the orientation of the robot
@@ -102,16 +105,16 @@ public class PreSeasonHardware {
     }
 
     /**
-     * Gets the angle in radians of the robot
+     * Gets the angle in radians of the robot.
      *
-     * @return Returns the angle in radians of the robot
+     * @return Returns the angle in radians of the robot.
      */
     public double getAngleRadians() {
         return Math.toRadians(getAngle());
     }
 
     /**
-     * Zero's the IMU of the robot
+     * Zero's the IMU of the robot.
      */
     public void resetAngle() {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
@@ -119,7 +122,7 @@ public class PreSeasonHardware {
     }
 
     /**
-     * Sets the power of the motors to zero
+     * Sets the power of the motors to zero.
      */
     public void resetMotorPowers() {
         // Set motor powers to zero to stop moving
@@ -132,9 +135,9 @@ public class PreSeasonHardware {
     /**
      * Drives with the parameters given.
      *
-     * @param drive  Drive
-     * @param strafe Strafe
-     * @param turn   Turn
+     * @param drive  Drive.
+     * @param strafe Strafe.
+     * @param turn   Turn.
      */
     public void drive(double drive, double strafe, double turn) {
         lm1.setPower(drive + strafe + turn);
@@ -144,9 +147,9 @@ public class PreSeasonHardware {
     }
 
     /**
-     * Sets the RunMode of the drive encoders.
+     * Sets the RunMode of the drive motors.
      *
-     * @param runMode
+     * @param runMode The RunMode the motors are being set to.
      */
     public void setRunMode(DcMotor.RunMode runMode) {
         lm1.setMode(runMode);
@@ -156,23 +159,24 @@ public class PreSeasonHardware {
     }
 
     /**
-     * Returns the average position of the drive motors.
+     * Gets the average position of the drive encoders.
      *
-     * @return
+     * @return Returns the average position of the drive encoders.
      */
     public double getDrivePosition() {
         return (Math.abs(lm1.getCurrentPosition()) + Math.abs(lm2.getCurrentPosition()) + Math.abs(rm1.getCurrentPosition()) + Math.abs(rm2.getCurrentPosition()))/4;
     }
 
     /**
-     * Drives the robot forward
+     * Drives the robot forward.
      *
-     * @param distance     The distance the robot will travel in inches
-     * @param powerMultiplier        The speed the robot will travel in motor power (0-1)
-     * @param acceleration The acceleration and deceleration the robot will use to drive (1+)
+     * @param distance        The distance the robot will travel in inches.
+     * @param powerMultiplier The speed the robot will travel in motor power (0-1).
+     * @param acceleration    The acceleration and deceleration the robot will use to drive (1+).
      */
     public void driveStraight(double distance, double powerMultiplier, double acceleration) {
-        int targetPos = (int) (distance * Constants.Drivetrain.ticksPerInch);
+        telemetry.addData("Status", "Driving for " + distance + " inches");
+        telemetry.update();
 
         setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -189,14 +193,17 @@ public class PreSeasonHardware {
     }
 
     /**
-     * Turns the robot to the specified angle
+     * Turns the robot to the specified angle.
      *
-     * @param degrees        The absolute angle the robot will turn to (Forwards from the starting position is 0°, and goes counterclockwise)
-     * @param timeoutSeconds The time the robot will turn for before stopping since the angle is close enough
-     * @param powerMultiplier          The speed the robot will go at
-     * @return               Returns the delta of the target angle and robot angle (error)
+     * @param degrees         The absolute angle the robot will turn to (Forwards from the starting position is 0°, and goes counterclockwise).
+     * @param timeoutSeconds  The time the robot will turn for before stopping since the angle is close enough.
+     * @param powerMultiplier The speed the robot will go at.
+     * @return                Returns the delta of the target angle and robot angle (error).
      */
     public double turn(double degrees, double timeoutSeconds, double powerMultiplier) {
+        telemetry.addData("Status", "Turning to " + degrees + " degrees");
+        telemetry.update();
+
         setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         PIDController pidController = new PIDController(Constants.Drivetrain.turningPIDkP, Constants.Drivetrain.turningPIDkI, Constants.Drivetrain.turningPIDkD);
@@ -217,4 +224,19 @@ public class PreSeasonHardware {
         }
         return degrees - getAngle();
     }
+
+    /**
+     * Makes a delay or pause for the robot to stop moving before doing something else
+     * @param seconds The delay of the OpMode
+     */
+    public void delay(double seconds) {
+        telemetry.addData("Status", "Paused for " + seconds + "seconds");
+        telemetry.update();
+
+        Timer timer = new Timer();
+        timer.start();
+        while(opMode.opModeIsActive() && !timer.hasElapsed(seconds)) {}
+        return;
+    }
+
 }
