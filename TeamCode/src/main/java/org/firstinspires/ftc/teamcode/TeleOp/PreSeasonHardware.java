@@ -8,7 +8,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class PreSeasonHardware {
-
+    /*
+     * NOTE FOR NEXT TIME I WORK ON THIS:
+     * Because EasyOpenCv depends on OpenCV-Repackaged, you will also need to copy libOpenCvNative.so
+     * from the /doc folder of that repo into the FIRST folder on the USB storage of the Robot
+     * Controller (i.e. connect the Robot Controller to your computer with a USB cable, put it into
+     * MTP mode, and drag 'n drop the file) .
+     */
     private OpMode opMode;
     private Telemetry telemetry;
     private HardwareMap hardwareMap = null;

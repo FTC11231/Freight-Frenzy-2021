@@ -13,7 +13,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class PreSeasonHardware {
-
+    /*
+     * NOTE FOR NEXT TIME I WORK ON THIS:
+     * Because EasyOpenCv depends on OpenCV-Repackaged, you will also need to copy libOpenCvNative.so
+     * from the /doc folder of that repo into the FIRST folder on the USB storage of the Robot
+     * Controller (i.e. connect the Robot Controller to your computer with a USB cable, put it into
+     * MTP mode, and drag 'n drop the file) .
+     */
     private LinearOpMode opMode;
     private Telemetry telemetry;
     private HardwareMap hardwareMap = null;
