@@ -33,8 +33,9 @@ public class PreSeasonTestAutonomous extends LinearOpMode {
 		telemetry.update();
 
 		robot.driveStraight(24, 1, 1);   // Drive for 24 inches (1 tile)
-		robot.turn(90, 2, 0.8);          // Turn 90 degrees to the left
+		robot.turn(90, 2, 1);            // Turn 90 ° to the left
 		robot.driveStraight(96, 1, 1.5); // Drive for 96 inches (4 tiles)
+		robot.turn(-166, 2, 1);          // Turn to -166° to the right to (try to) face back at the starting position, because why not
 		robot.resetMotorPowers();
 
 		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");

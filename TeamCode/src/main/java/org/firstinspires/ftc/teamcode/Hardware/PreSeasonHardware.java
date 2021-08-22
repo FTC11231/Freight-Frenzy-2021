@@ -44,7 +44,7 @@ public class PreSeasonHardware {
     double globalAngle;
 
     /**
-     * Sets the OpMode of the robot.
+     * Sets the LinearOpMode of the robot.
      *
      * @param linearOpMode The LinearOpMode of the robot.
      * @param telemetry    The telemetry of the robot.
@@ -148,7 +148,6 @@ public class PreSeasonHardware {
      * Sets the power of the motors to zero.
      */
     public void resetMotorPowers() {
-        // Set motor powers to zero to stop moving
         lm1.setPower(0);
         lm2.setPower(0);
         rm1.setPower(0);
@@ -187,7 +186,10 @@ public class PreSeasonHardware {
      * @return Returns the average position of the drive encoders.
      */
     public double getDrivePosition() {
-        return (Math.abs(lm1.getCurrentPosition()) + Math.abs(lm2.getCurrentPosition()) + Math.abs(rm1.getCurrentPosition()) + Math.abs(rm2.getCurrentPosition()))/4;
+        return (Math.abs(lm1.getCurrentPosition())
+                + Math.abs(lm2.getCurrentPosition())
+                + Math.abs(rm1.getCurrentPosition())
+                + Math.abs(rm2.getCurrentPosition())) / 4;
     }
 
     /**
