@@ -1,7 +1,8 @@
-package org.firstinspires.ftc.teamcode.Autonomous.AutoUtils;
+package org.firstinspires.ftc.teamcode.Hardware;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,6 +12,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.Autonomous.AutoUtils.Constants;
+import org.firstinspires.ftc.teamcode.Autonomous.AutoUtils.MathUtil;
+import org.firstinspires.ftc.teamcode.Autonomous.AutoUtils.PIDController;
+import org.firstinspires.ftc.teamcode.Autonomous.AutoUtils.Timer;
 
 public class PreSeasonHardware {
     /*
@@ -20,7 +25,8 @@ public class PreSeasonHardware {
      * Controller (i.e. connect the Robot Controller to your computer with a USB cable, put it into
      * MTP mode, and drag 'n drop the file) .
      */
-    private LinearOpMode opMode;
+    private LinearOpMode linearOpMode;
+    private OpMode opMode;
     private Telemetry telemetry;
     private HardwareMap hardwareMap = null;
 
@@ -40,10 +46,21 @@ public class PreSeasonHardware {
     /**
      * Sets the OpMode of the robot.
      *
+     * @param linearOpMode The LinearOpMode of the robot.
+     * @param telemetry    The telemetry of the robot.
+     */
+    public PreSeasonHardware(LinearOpMode linearOpMode, Telemetry telemetry) {
+        this.linearOpMode = linearOpMode;
+        this.telemetry = telemetry;
+    }
+
+    /**
+     * Sets the OpMode of the robot.
+     *
      * @param opMode    The OpMode of the robot.
      * @param telemetry The telemetry of the robot.
      */
-    public PreSeasonHardware(LinearOpMode opMode, Telemetry telemetry) {
+    public PreSeasonHardware(OpMode opMode, Telemetry telemetry) {
         this.opMode = opMode;
         this.telemetry = telemetry;
     }
@@ -187,7 +204,7 @@ public class PreSeasonHardware {
         setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        while (getDrivePosition() < distance && this.opMode.opModeIsActive()) {
+        while (getDrivePosition() < distance && this.linearOpMode.opModeIsActive()) {
             double percentage = getDrivePosition() / distance;
             // Put percentage into the normal distribution formula
             // To accelerate, multiply the result by acceleration, then clamp to 0 and 1
@@ -218,7 +235,7 @@ public class PreSeasonHardware {
         Timer timer = new Timer();
         timer.start();
 
-        while(opMode.opModeIsActive()) {
+        while(linearOpMode.opModeIsActive()) {
             double pidOutput = pidController.calculate(getAngle(), degrees);
             double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
             drive(0, 0, MathUtil.clamp(output, -powerMultiplier, powerMultiplier));
@@ -241,8 +258,7 @@ public class PreSeasonHardware {
 
         Timer timer = new Timer();
         timer.start();
-        while(opMode.opModeIsActive() && !timer.hasElapsed(seconds)) {}
+        while(linearOpMode.opModeIsActive() && !timer.hasElapsed(seconds)) {}
         return;
     }
-
 }

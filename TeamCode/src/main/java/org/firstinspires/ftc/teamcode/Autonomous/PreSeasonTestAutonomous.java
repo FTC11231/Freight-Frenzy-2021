@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Autonomous.AutoUtils.PreSeasonHardware;
+import org.firstinspires.ftc.teamcode.Hardware.PreSeasonHardware;
 
 @Autonomous(name="Pre-Season Auto Test", group="Linear Opmode")
 
