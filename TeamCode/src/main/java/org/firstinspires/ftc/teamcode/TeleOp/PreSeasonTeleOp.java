@@ -14,13 +14,15 @@ public class PreSeasonTeleOp extends OpMode {
     * Controller (i.e. connect the Robot Controller to your computer with a USB cable, put it into
     * MTP mode, and drag 'n drop the file) .
      */
+    private String versionNumber = "v0.1'";
+
     private PreSeasonHardware robot = new PreSeasonHardware(this, this.telemetry);
 
     @Override
     public void init() {
         robot.init(hardwareMap);
 
-        telemetry.addData("Status", "Initialized (Version: v0.1)");
+        telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
         telemetry.update();
     }
 
@@ -31,24 +33,21 @@ public class PreSeasonTeleOp extends OpMode {
 
     @Override
     public void start() {
-        telemetry.addData("Status", "Started (Version: v0.1)");
+        telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
         telemetry.update();
     }
 
     @Override
     public void loop() {
         // Drive with movement and turning
-        robot.lm1.setPower(-gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.right_stick_x);
-        robot.lm2.setPower(-gamepad1.left_stick_y - gamepad1.left_stick_x + gamepad1.right_stick_x);
-        robot.rm1.setPower(-gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.right_stick_x);
-        robot.rm2.setPower(-gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x);
+        robot.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
     }
 
     @Override
     public void stop() {
         robot.resetMotorPowers();
 
-        telemetry.addData("Status", "Stopped");
+        telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
         telemetry.update();
     }
 

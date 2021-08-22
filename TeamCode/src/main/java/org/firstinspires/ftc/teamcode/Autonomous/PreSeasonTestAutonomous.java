@@ -15,19 +15,21 @@ public class PreSeasonTestAutonomous extends LinearOpMode {
 	 * Controller (i.e. connect the Robot Controller to your computer with a USB cable, put it into
 	 * MTP mode, and drag 'n drop the file) .
 	 */
+	private String versionNumber = "v0.1'";
+
 	private PreSeasonHardware robot = new PreSeasonHardware(this, this.telemetry);
 
 	@Override
 	public void runOpMode() {
 		robot.init(hardwareMap);
 
-		telemetry.addData("Status", "Initialized (Version: v0.1)");
+		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
 
 		waitForStart();
 		if (!opModeIsActive()) return;
 
-		telemetry.addData("Status", "Started (Version: v0.1)");
+		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 		telemetry.update();
 
 		robot.driveStraight(24, 1, 1);   // Drive for 24 inches (1 tile)
@@ -35,7 +37,7 @@ public class PreSeasonTestAutonomous extends LinearOpMode {
 		robot.driveStraight(96, 1, 1.5); // Drive for 96 inches (4 tiles)
 		robot.resetMotorPowers();
 
-		telemetry.addData("Status", "Stopped");
+		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
 		telemetry.update();
 	}
 }
