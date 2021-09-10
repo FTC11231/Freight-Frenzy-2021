@@ -18,249 +18,252 @@ import org.firstinspires.ftc.teamcode.Autonomous.Utils.PIDController;
 import org.firstinspires.ftc.teamcode.Autonomous.Utils.Timer;
 
 public class PreSeasonHardware {
-    /*
-     * NOTE FOR NEXT TIME I WORK ON THIS:
-     * Because EasyOpenCv depends on OpenCV-Repackaged, you will also need to copy libOpenCvNative.so
-     * from the /doc folder of that repo into the FIRST folder on the USB storage of the Robot
-     * Controller (i.e. connect the Robot Controller to your computer with a USB cable, put it into
-     * MTP mode, and drag 'n drop the file) .
-     */
-    private LinearOpMode linearOpMode;
-    private OpMode opMode;
-    private Telemetry telemetry;
-    private HardwareMap hardwareMap = null;
+	/*
+	 * NOTE FOR NEXT TIME I WORK ON THIS:
+	 * Because EasyOpenCv depends on OpenCV-Repackaged, you will also need to copy libOpenCvNative.so
+	 * from the /doc folder of that repo into the FIRST folder on the USB storage of the Robot
+	 * Controller (i.e. connect the Robot Controller to your computer with a USB cable, put it into
+	 * MTP mode, and drag 'n drop the file) .
+	 */
+	private LinearOpMode linearOpMode;
+	private OpMode opMode;
+	private Telemetry telemetry;
+	private HardwareMap hardwareMap = null;
 
-    // Drive motors
-    public DcMotor lm1 = null;
-    public DcMotor lm2 = null;
-    public DcMotor rm1 = null;
-    public DcMotor rm2 = null;
+	// Drive motors
+	public DcMotor lm1 = null;
+	public DcMotor lm2 = null;
+	public DcMotor rm1 = null;
+	public DcMotor rm2 = null;
 
-    // Sensors
-    public BNO055IMU imu = null;
+	// Sensors
+	public BNO055IMU imu = null;
 
-    // Sensor related variables
-    Orientation lastAngles = new Orientation();
-    double globalAngle;
+	// Sensor related variables
+	Orientation lastAngles = new Orientation();
+	double globalAngle;
 
-    /**
-     * Sets the LinearOpMode of the robot.
-     *
-     * @param linearOpMode The LinearOpMode of the robot.
-     * @param telemetry    The telemetry of the robot.
-     */
-    public PreSeasonHardware(LinearOpMode linearOpMode, Telemetry telemetry) {
-        this.linearOpMode = linearOpMode;
-        this.telemetry = telemetry;
-    }
+	/**
+	 * Sets the LinearOpMode of the robot.
+	 *
+	 * @param linearOpMode The LinearOpMode of the robot.
+	 * @param telemetry    The telemetry of the robot.
+	 */
+	public PreSeasonHardware(LinearOpMode linearOpMode, Telemetry telemetry) {
+		this.linearOpMode = linearOpMode;
+		this.telemetry = telemetry;
+	}
 
-    /**
-     * Sets the OpMode of the robot.
-     *
-     * @param opMode    The OpMode of the robot.
-     * @param telemetry The telemetry of the robot.
-     */
-    public PreSeasonHardware(OpMode opMode, Telemetry telemetry) {
-        this.opMode = opMode;
-        this.telemetry = telemetry;
-    }
+	/**
+	 * Sets the OpMode of the robot.
+	 *
+	 * @param opMode    The OpMode of the robot.
+	 * @param telemetry The telemetry of the robot.
+	 */
+	public PreSeasonHardware(OpMode opMode, Telemetry telemetry) {
+		this.opMode = opMode;
+		this.telemetry = telemetry;
+	}
 
-    /**
-     * Initializes the object with the hardware map.
-     *
-     * @param _hardwareMap The hardware map that the robot uses.
-     */
-    public void init(HardwareMap _hardwareMap) {
-        hardwareMap = _hardwareMap;
+	/**
+	 * Initializes the object with the hardware map.
+	 *
+	 * @param hardwareMap The hardware map that the robot uses.
+	 */
+	public void init(HardwareMap hardwareMap) {
+		this.hardwareMap = hardwareMap;
 
-        // Initialize drive motors (names my change)
-        lm1 = hardwareMap.get(DcMotor.class, "lm1");
-        lm2 = hardwareMap.get(DcMotor.class, "lm2");
-        rm1 = hardwareMap.get(DcMotor.class, "lm3");
-        rm2 = hardwareMap.get(DcMotor.class, "lm4");
+		// Initialize drive motors (names my change)
+		lm1 = this.hardwareMap.get(DcMotor.class, "lm1");
+		lm2 = this.hardwareMap.get(DcMotor.class, "lm2");
+		rm1 = this.hardwareMap.get(DcMotor.class, "lm3");
+		rm2 = this.hardwareMap.get(DcMotor.class, "lm4");
 
-        // Set motor directions (since they are facing in directions, they go the wrong way)
-        lm1.setDirection(DcMotorSimple.Direction.FORWARD);
-        lm2.setDirection(DcMotorSimple.Direction.FORWARD);
-        rm1.setDirection(DcMotorSimple.Direction.REVERSE);
-        rm2.setDirection(DcMotorSimple.Direction.REVERSE);
+		// Set motor directions (since they are facing in directions, they go the wrong way)
+		lm1.setDirection(DcMotorSimple.Direction.FORWARD);
+		lm2.setDirection(DcMotorSimple.Direction.FORWARD);
+		rm1.setDirection(DcMotorSimple.Direction.REVERSE);
+		rm2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // Set the zero power behavior of the motors to brake to stop quicker
-        lm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lm2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rm2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		// Set the zero power behavior of the motors to brake to stop quicker
+		lm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		lm2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		rm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		rm2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        resetMotorPowers();
+		resetMotorPowers();
 
-        // Initialize sensors
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.loggingEnabled = false;
-        parameters.mode = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        imu.initialize(parameters);
-    }
+		// Initialize sensors
+		imu = hardwareMap.get(BNO055IMU.class, "imu");
+		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+		parameters.loggingEnabled = false;
+		parameters.mode = BNO055IMU.SensorMode.IMU;
+		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+		imu.initialize(parameters);
+	}
 
-    /**
-     * Gets the angle in degrees of the robot.
-     *
-     * @return Returns the angle in degrees of the robot.
-     */
-    public double getAngle() {
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES); // Get the orientation of the robot
+	/**
+	 * Gets the angle in degrees of the robot.
+	 *
+	 * @return Returns the angle in degrees of the robot.
+	 */
+	public double getAngle() {
+		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES); // Get the orientation of the robot
 
-        double deltaAngle = angles.thirdAngle - lastAngles.thirdAngle; // The difference between the current angle and the angle last update
+		double deltaAngle = angles.thirdAngle - lastAngles.thirdAngle; // The difference between the current angle and the angle last update
 
-        // Wrap the angle
-        if (deltaAngle < -180)
-            deltaAngle += 360;
-        else if (deltaAngle > 180)
-            deltaAngle -= 360;
+		// Wrap the angle
+		if (deltaAngle < -180)
+			deltaAngle += 360;
+		else if (deltaAngle > 180)
+			deltaAngle -= 360;
 
-        // Set the unwrapped angle
-        globalAngle += deltaAngle;
-        // Set the lastAngles variable before the next update
-        lastAngles = angles;
+		// Set the unwrapped angle
+		globalAngle += deltaAngle;
+		// Set the lastAngles variable before the next update
+		lastAngles = angles;
 
-        return globalAngle;
-    }
+		return globalAngle;
+	}
 
-    /**
-     * Gets the angle in radians of the robot.
-     *
-     * @return Returns the angle in radians of the robot.
-     */
-    public double getAngleRadians() {
-        return Math.toRadians(getAngle());
-    }
+	/**
+	 * Gets the angle in radians of the robot.
+	 *
+	 * @return Returns the angle in radians of the robot.
+	 */
+	public double getAngleRadians() {
+		return Math.toRadians(getAngle());
+	}
 
-    /**
-     * Zero's the IMU of the robot.
-     */
-    public void resetAngle() {
-        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        globalAngle = 0;
-    }
+	/**
+	 * Zero's the IMU of the robot.
+	 */
+	public void resetAngle() {
+		lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+		globalAngle = 0;
+	}
 
-    /**
-     * Sets the power of the motors to zero.
-     */
-    public void resetMotorPowers() {
-        lm1.setPower(0);
-        lm2.setPower(0);
-        rm1.setPower(0);
-        rm2.setPower(0);
-    }
+	/**
+	 * Sets the power of the motors to zero.
+	 */
+	public void resetMotorPowers() {
+		lm1.setPower(0);
+		lm2.setPower(0);
+		rm1.setPower(0);
+		rm2.setPower(0);
+	}
 
-    /**
-     * Drives with the parameters given.
-     *
-     * @param drive  Drive.
-     * @param strafe Strafe.
-     * @param turn   Turn.
-     */
-    public void drive(double drive, double strafe, double turn) {
-        lm1.setPower(drive + strafe + turn);
-        lm2.setPower(drive - strafe + turn);
-        rm1.setPower(drive - strafe - turn);
-        rm2.setPower(drive + strafe - turn);
-    }
+	/**
+	 * Drives with the parameters given.
+	 *
+	 * @param drive  Drive.
+	 * @param strafe Strafe.
+	 * @param turn   Turn.
+	 */
+	public void drive(double drive, double strafe, double turn) {
+		lm1.setPower(drive + strafe + turn);
+		lm2.setPower(drive - strafe + turn);
+		rm1.setPower(drive - strafe - turn);
+		rm2.setPower(drive + strafe - turn);
+	}
 
-    /**
-     * Sets the RunMode of the drive motors.
-     *
-     * @param runMode The RunMode the motors are being set to.
-     */
-    public void setRunMode(DcMotor.RunMode runMode) {
-        lm1.setMode(runMode);
-        lm2.setMode(runMode);
-        rm1.setMode(runMode);
-        rm2.setMode(runMode);
-    }
+	/**
+	 * Sets the RunMode of the drive motors.
+	 *
+	 * @param runMode The RunMode the motors are being set to.
+	 */
+	public void setRunMode(DcMotor.RunMode runMode) {
+		lm1.setMode(runMode);
+		lm2.setMode(runMode);
+		rm1.setMode(runMode);
+		rm2.setMode(runMode);
+	}
 
-    /**
-     * Gets the average position of the drive encoders.
-     *
-     * @return Returns the average position of the drive encoders.
-     */
-    public double getDrivePosition() {
-        return (Math.abs(lm1.getCurrentPosition())
-                + Math.abs(lm2.getCurrentPosition())
-                + Math.abs(rm1.getCurrentPosition())
-                + Math.abs(rm2.getCurrentPosition())) / 4;
-    }
+	/**
+	 * Gets the average position of the drive encoders.
+	 *
+	 * @return Returns the average position of the drive encoders.
+	 */
+	public double getDrivePosition() {
+		return (Math.abs(lm1.getCurrentPosition())
+				+ Math.abs(lm2.getCurrentPosition())
+				+ Math.abs(rm1.getCurrentPosition())
+				+ Math.abs(rm2.getCurrentPosition())) / 4;
+	}
 
-    /**
-     * Drives the robot forward.
-     *
-     * @param distance        The distance the robot will travel in inches.
-     * @param powerMultiplier The speed the robot will travel in motor power (0-1).
-     * @param acceleration    The acceleration and deceleration the robot will use to drive (1+).
-     */
-    public void driveStraight(double distance, double powerMultiplier, double acceleration) {
-        telemetry.addData("Status", "Driving for " + distance + " inches");
-        telemetry.update();
+	/**
+	 * Drives the robot forward.
+	 *
+	 * @param distance        The distance the robot will travel in inches.
+	 * @param powerMultiplier The speed the robot will travel in motor power (0-1).
+	 * @param acceleration    The acceleration and deceleration the robot will use to drive (1+).
+	 */
+	public void driveStraight(double distance, double powerMultiplier, double acceleration) {
+		telemetry.addData("Status", "Driving for " + distance + " inches");
+		telemetry.update();
+		distance *= Constants.Drivetrain.ticksPerInch;
 
-        setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        while (getDrivePosition() < distance && this.linearOpMode.opModeIsActive()) {
-            double percentage = getDrivePosition() / distance;
-            // Put percentage into the normal distribution formula
-            // To accelerate, multiply the result by acceleration, then clamp to 0 and 1
-            // To change the speed multiply by speed
-            double power = powerMultiplier * MathUtil.clamp(acceleration * Math.exp(-(Math.pow(percentage - 0.5, 2) / 2 * Math.pow(0.15, 2))), 0, 1);
+		while (getDrivePosition() < distance && this.linearOpMode.opModeIsActive()) {
+			double percentage = getDrivePosition() / distance;
+			// Put percentage into the normal distribution formula
+			// To accelerate, multiply the result by acceleration, then clamp to 0 and 1
+			// To change the speed multiply by speed
+			double power = powerMultiplier * MathUtil.clamp(acceleration * Math.exp(-(Math.pow(percentage - 0.5, 2) / 2 * Math.pow(0.15, 2))), 0, 1);
 
-            drive(power, 0, 0);
-        }
-    }
+			drive(power, 0, 0);
+		}
+	}
 
-    /**
-     * Turns the robot to the specified angle.
-     *
-     * @param degrees         The absolute angle the robot will turn to (Forwards from the starting position is 0°, and goes counterclockwise).
-     * @param timeoutSeconds  The time the robot will turn for before stopping since the angle is close enough.
-     * @param powerMultiplier The speed the robot will go at.
-     * @return                Returns the delta of the target angle and robot angle (error).
-     */
-    public double turn(double degrees, double timeoutSeconds, double powerMultiplier) {
-        telemetry.addData("Status", "Turning to " + degrees + " degrees");
-        telemetry.update();
+	/**
+	 * Turns the robot to the specified angle.
+	 *
+	 * @param degrees         The absolute angle the robot will turn to (Forwards from the starting position is 0°, and goes counterclockwise).
+	 * @param timeoutSeconds  The time the robot will turn for before stopping since the angle is close enough.
+	 * @param powerMultiplier The speed the robot will go at.
+	 * @return Returns the delta of the target angle and robot angle (error).
+	 */
+	public double turn(double degrees, double timeoutSeconds, double powerMultiplier) {
+		telemetry.addData("Status", "Turning to " + degrees + " degrees");
+		telemetry.update();
 
-        setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        PIDController pidController = new PIDController(Constants.Drivetrain.turningPIDkP, Constants.Drivetrain.turningPIDkI, Constants.Drivetrain.turningPIDkD);
-        pidController.setTolerance(1);
+		PIDController pidController = new PIDController(Constants.Drivetrain.turningPIDkP, Constants.Drivetrain.turningPIDkI, Constants.Drivetrain.turningPIDkD);
+		pidController.setTolerance(1);
 
-        Timer timer = new Timer();
-        timer.start();
+		Timer timer = new Timer();
+		timer.start();
 
-        while(linearOpMode.opModeIsActive()) {
-            double pidOutput = pidController.calculate(getAngle(), degrees);
-            double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
-            drive(0, 0, MathUtil.clamp(output, -powerMultiplier, powerMultiplier));
+		while (this.linearOpMode.opModeIsActive()) {
+			double pidOutput = pidController.calculate(getAngle(), degrees);
+			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
+			drive(0, 0, MathUtil.clamp(output, -powerMultiplier, powerMultiplier));
 
-            if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
-                drive(0, 0, 0);
-                return degrees - getAngle();
-            }
-        }
-        return degrees - getAngle();
-    }
+			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
+				drive(0, 0, 0);
+				return degrees - getAngle();
+			}
+		}
+		return degrees - getAngle();
+	}
 
-    /**
-     * Makes a delay or pause for the robot to stop moving before doing something else
-     * @param seconds The delay of the OpMode
-     */
-    public void delay(double seconds) {
-        telemetry.addData("Status", "Paused for " + seconds + "seconds");
-        telemetry.update();
+	/**
+	 * Makes a delay or pause for the robot to stop moving before doing something else
+	 *
+	 * @param seconds The delay of the OpMode
+	 */
+	public void delay(double seconds) {
+		telemetry.addData("Status", "Paused for " + seconds + "seconds");
+		telemetry.update();
 
-        Timer timer = new Timer();
-        timer.start();
-        while(linearOpMode.opModeIsActive() && !timer.hasElapsed(seconds)) {}
-        return;
-    }
+		Timer timer = new Timer();
+		timer.start();
+		while (linearOpMode.opModeIsActive() && !timer.hasElapsed(seconds)) {
+		}
+		return;
+	}
 }
