@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Hardware.PreSeasonHardware;
+import org.firstinspires.ftc.teamcode.Utils.PreSeasonHardware;
 
 @TeleOp(name = "Pre-Season Tele-Op", group = "Iterative Opmode")
 public class PreSeasonTeleOp extends OpMode {

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Autonomous.Utils;
+package org.firstinspires.ftc.teamcode.Utils;
 
 public class Timer {
 
