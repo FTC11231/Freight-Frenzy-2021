@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.PreSeason.Timer;
+import org.firstinspires.ftc.teamcode.PreSeason.Utils.Timer;
 
 public class PreSeasonHardware {
 	/*
@@ -77,10 +77,10 @@ public class PreSeasonHardware {
 		this.hardwareMap = hardwareMap;
 
 		// Initialize drive motors (names may change)
-		lm1 = this.hardwareMap.get(DcMotor.class, "LeftFrontDrive");
-		lm2 = this.hardwareMap.get(DcMotor.class, "LeftRearDrive");
-		rm1 = this.hardwareMap.get(DcMotor.class, "RightFrontDrive");
-		rm2 = this.hardwareMap.get(DcMotor.class, "RightRearDrive");
+		lm1 = this.hardwareMap.get(DcMotor.class, "LFrontDrive");
+		lm2 = this.hardwareMap.get(DcMotor.class, "LRearDrive");
+		rm1 = this.hardwareMap.get(DcMotor.class, "RFrontDrive");
+		rm2 = this.hardwareMap.get(DcMotor.class, "RRearDrive");
 
 		// Set motor directions (since they are facing in directions, they go the wrong way, so we
 		// reverse the right motors)
@@ -159,10 +159,7 @@ public class PreSeasonHardware {
 	 * Sets the power of the motors to zero.
 	 */
 	public void resetMotorPowers() {
-		lm1.setPower(0);
-		lm2.setPower(0);
-		rm1.setPower(0);
-		rm2.setPower(0);
+		drive(0, 0, 0);
 	}
 
 	/**
