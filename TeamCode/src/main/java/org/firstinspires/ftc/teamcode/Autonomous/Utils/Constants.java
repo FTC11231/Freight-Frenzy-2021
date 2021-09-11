@@ -6,7 +6,9 @@ public class Constants {
 
 	public static class Drivetrain {
 		public static final double gearRatio = 20 / 1; // 20 : 1
-		public static final double wheelDiameter = 75 / 25.4; // 75 mm to inches
+		// \/ Disabled because this is for the Ultimate Goal robot
+//		public static final double wheelDiameter = 75 / 25.4; // 75 mm to inches
+		public static final double wheelDiameter = 4;
 
 		public static final double ticksPerInch = -ticksPerRev * gearRatio / (wheelDiameter * Math.PI);
 
