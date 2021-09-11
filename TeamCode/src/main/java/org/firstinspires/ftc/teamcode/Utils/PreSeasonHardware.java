@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -31,6 +32,9 @@ public class PreSeasonHardware {
 	public DcMotor lm2 = null;
 	public DcMotor rm1 = null;
 	public DcMotor rm2 = null;
+
+	// Servos
+	public Servo servo = null;
 
 	// Sensors
 	public BNO055IMU imu = null;
@@ -70,10 +74,10 @@ public class PreSeasonHardware {
 		this.hardwareMap = hardwareMap;
 
 		// Initialize drive motors (names my change)
-		lm1 = this.hardwareMap.get(DcMotor.class, "lm1");
-		lm2 = this.hardwareMap.get(DcMotor.class, "lm2");
-		rm1 = this.hardwareMap.get(DcMotor.class, "lm3");
-		rm2 = this.hardwareMap.get(DcMotor.class, "lm4");
+		lm1 = this.hardwareMap.get(DcMotor.class, "LeftFrontDrive");
+		lm2 = this.hardwareMap.get(DcMotor.class, "LeftRearDrive");
+		rm1 = this.hardwareMap.get(DcMotor.class, "RightFrontDrive");
+		rm2 = this.hardwareMap.get(DcMotor.class, "RightRearDrive");
 
 		// Set motor directions (since they are facing in directions, they go the wrong way)
 		lm1.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -88,6 +92,10 @@ public class PreSeasonHardware {
 		rm2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 		resetMotorPowers();
+
+		// Initialize servos
+		servo = hardwareMap.get(Servo.class, "Blocker");
+		servo.setPosition(0);
 
 		// Initialize sensors
 		imu = hardwareMap.get(BNO055IMU.class, "imu");

@@ -41,6 +41,14 @@ public class PreSeasonTeleOp extends OpMode {
 	public void loop() {
 		// Drive with movement and turning
 		robot.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+
+		// Move the servo
+		robot.servo.setPosition(gamepad2.a ? 1 : 0); // 1 if pressed, 0 if not pressed
+		// Alternate method of doing it
+//		if (gamepad2.a)
+//			robot.servo.setPosition(1);
+//		else
+//			robot.servo.setPosition(0);
 	}
 
 	@Override
