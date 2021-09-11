@@ -22,6 +22,8 @@ public class PreSeasonHardware {
 	 * Controller (i.e. connect the Robot Controller to your computer with a USB cable, put it into
 	 * MTP mode, and drag 'n drop the file) .
 	 */
+
+	// Variables for output
 	private LinearOpMode linearOpMode;
 	private OpMode opMode;
 	private Telemetry telemetry;
@@ -73,28 +75,32 @@ public class PreSeasonHardware {
 	public void init(HardwareMap hardwareMap) {
 		this.hardwareMap = hardwareMap;
 
-		// Initialize drive motors (names my change)
+		// Initialize drive motors (names may change)
 		lm1 = this.hardwareMap.get(DcMotor.class, "LeftFrontDrive");
 		lm2 = this.hardwareMap.get(DcMotor.class, "LeftRearDrive");
 		rm1 = this.hardwareMap.get(DcMotor.class, "RightFrontDrive");
 		rm2 = this.hardwareMap.get(DcMotor.class, "RightRearDrive");
 
-		// Set motor directions (since they are facing in directions, they go the wrong way)
+		// Set motor directions (since they are facing in directions, they go the wrong way, so we
+		// reverse the right motors)
 		lm1.setDirection(DcMotorSimple.Direction.FORWARD);
 		lm2.setDirection(DcMotorSimple.Direction.FORWARD);
 		rm1.setDirection(DcMotorSimple.Direction.REVERSE);
 		rm2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-		// Set the zero power behavior of the motors to brake to stop quicker
+		// Set the zero power behavior of the motors to brake to stop quicker when released
 		lm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		lm2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		rm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		rm2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+		// Set the motor powers to 0
 		resetMotorPowers();
 
 		// Initialize servos
 		servo = hardwareMap.get(Servo.class, "Blocker");
+
+		// Set servo initial position
 		servo.setPosition(0);
 
 		// Initialize sensors
