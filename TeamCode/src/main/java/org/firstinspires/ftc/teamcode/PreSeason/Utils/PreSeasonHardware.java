@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Utils;
+package org.firstinspires.ftc.teamcode.PreSeason.Utils;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.PreSeason.Timer;
 
 public class PreSeasonHardware {
 	/*
@@ -212,7 +213,7 @@ public class PreSeasonHardware {
 	public void driveStraight(double distance, double powerMultiplier, double acceleration) {
 		telemetry.addData("Status", "Driving for " + distance + " inches");
 		telemetry.update();
-		distance *= Constants.Drivetrain.ticksPerInch;
+		distance *= org.firstinspires.ftc.teamcode.PreSeason.Utils.Constants.Drivetrain.ticksPerInch;
 
 		setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -222,7 +223,7 @@ public class PreSeasonHardware {
 			// Put percentage into the normal distribution formula
 			// To accelerate, multiply the result by acceleration, then clamp to 0 and 1
 			// To change the speed multiply by speed
-			double power = powerMultiplier * MathUtil.clamp(acceleration * Math.exp(-(Math.pow(percentage - 0.5, 2) / 2 * Math.pow(0.15, 2))), 0, 1);
+			double power = powerMultiplier * org.firstinspires.ftc.teamcode.PreSeason.Utils.MathUtil.clamp(acceleration * Math.exp(-(Math.pow(percentage - 0.5, 2) / 2 * Math.pow(0.15, 2))), 0, 1);
 
 			drive(power, 0, 0);
 		}
@@ -242,16 +243,16 @@ public class PreSeasonHardware {
 
 		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-		PIDController pidController = new PIDController(Constants.Drivetrain.turningPIDkP, Constants.Drivetrain.turningPIDkI, Constants.Drivetrain.turningPIDkD);
+		org.firstinspires.ftc.teamcode.PreSeason.Utils.PIDController pidController = new org.firstinspires.ftc.teamcode.PreSeason.Utils.PIDController(org.firstinspires.ftc.teamcode.PreSeason.Utils.Constants.Drivetrain.turningPIDkP, org.firstinspires.ftc.teamcode.PreSeason.Utils.Constants.Drivetrain.turningPIDkI, org.firstinspires.ftc.teamcode.PreSeason.Utils.Constants.Drivetrain.turningPIDkD);
 		pidController.setTolerance(1);
 
-		Timer timer = new Timer();
+		Timer timer = new org.firstinspires.ftc.teamcode.PreSeason.Utils.Timer();
 		timer.start();
 
 		while (this.linearOpMode.opModeIsActive()) {
 			double pidOutput = pidController.calculate(getAngle(), degrees);
-			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
-			drive(0, 0, MathUtil.clamp(output, -powerMultiplier, powerMultiplier));
+			double output = pidOutput + (Math.signum(pidOutput) * org.firstinspires.ftc.teamcode.PreSeason.Utils.Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
+			drive(0, 0, org.firstinspires.ftc.teamcode.PreSeason.Utils.MathUtil.clamp(output, -powerMultiplier, powerMultiplier));
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
 				drive(0, 0, 0);
@@ -270,7 +271,7 @@ public class PreSeasonHardware {
 		telemetry.addData("Status", "Paused for " + seconds + "seconds");
 		telemetry.update();
 
-		Timer timer = new Timer();
+		org.firstinspires.ftc.teamcode.PreSeason.Utils.Timer timer = new org.firstinspires.ftc.teamcode.PreSeason.Utils.Timer();
 		timer.start();
 		while (linearOpMode.opModeIsActive() && !timer.hasElapsed(seconds)) {
 		}

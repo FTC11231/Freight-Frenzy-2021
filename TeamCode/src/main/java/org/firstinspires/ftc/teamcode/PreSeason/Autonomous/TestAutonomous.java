@@ -1,13 +1,14 @@
-package org.firstinspires.ftc.teamcode.Autonomous;
+package org.firstinspires.ftc.teamcode.PreSeason.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Utils.PreSeasonHardware;
+import org.firstinspires.ftc.teamcode.PreSeason.Utils.PreSeasonHardware;
+import org.firstinspires.ftc.teamcode.PreSeason.Utils.PreSeasonHardware;
 
 @Autonomous(name = "Pre-Season Auto Test", group = "Linear Opmode")
 
-public class PreSeasonTestAutonomous extends LinearOpMode {
+public class TestAutonomous extends LinearOpMode {
 	/*
 	 * NOTE FOR NEXT TIME I WORK ON THIS:
 	 * Because EasyOpenCv depends on OpenCV-Repackaged, you will also need to copy libOpenCvNative.so
