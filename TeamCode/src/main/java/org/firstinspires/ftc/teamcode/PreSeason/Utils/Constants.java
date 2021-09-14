@@ -10,7 +10,7 @@ public class Constants {
 //		public static final double wheelDiameter = 75 / 25.4; // 75 mm to inches
 		public static final double wheelDiameter = 4;
 
-		public static final double ticksPerInch = -ticksPerRev * gearRatio / (wheelDiameter * Math.PI);
+		public static final double ticksPerInch = ticksPerRev * gearRatio / (wheelDiameter * Math.PI);
 
 		public static final double turningPIDkF = 0.18;
 		public static final double turningPIDkP = 0.008;
