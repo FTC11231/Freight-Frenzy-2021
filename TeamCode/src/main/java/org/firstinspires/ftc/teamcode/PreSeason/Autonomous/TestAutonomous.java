@@ -35,7 +35,7 @@ public class TestAutonomous extends LinearOpMode {
 
 		// Forward, right, down, right, up, left, down, left
 
-		robot.driveStraight(24, 0.4, 1);
+		robot.driveStraight(24, 1, 0.1);
 		robot.resetMotorPowers();
 
 		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");

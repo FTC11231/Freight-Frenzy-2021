@@ -217,24 +217,31 @@ public class PreSeasonHardware {
         setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         while (-getDrivePosition() < distance && this.linearOpMode.opModeIsActive()) {
-            double percentage = getDrivePosition() / distance;
+            double percentage = Math.abs(getDrivePosition()) / Math.abs(distance);
             // Ramp up for 10% of it, ramp down for the last 10%
             double power = 0;
+//            telemetry.addData("DrivePos", percentage);
+//            telemetry.addData("RampPercentage", rampPercentage);
             if (percentage <= rampPercentage) {
                 // Speed up
+//                telemetry.addData("Status", "Speeding up");
                 power = percentage * rampPercentage * 100 * speed;
-            } else if (percentage >= 1 - rampPercentage) {
+                power = MathUtil.clamp(power, 0.2, 1);
+            } else if (percentage >= (1 - rampPercentage)) {
+//                telemetry.addData("Status", "Slowing down");
                 // Slow down
                 power = (1 - percentage) * rampPercentage * 100 * speed;
+                power = MathUtil.clamp(power, 0.05, 1);
             } else {
+//                telemetry.addData("Status", "Full power AAAAAAAAAAAAAAAAAAAAAAAAA");
                 // Full power
                 power = speed;
+                power = MathUtil.clamp(power, 0.2, 1);
             }
 
-
-            telemetry.addData("Distance", distance);
-            telemetry.addData("Power", power);
-            telemetry.addData("Encoder Pos", getDrivePosition());
+//            telemetry.addData("Distance", distance);
+//            telemetry.addData("Power", power);
+//            telemetry.addData("Encoder Pos", getDrivePosition());
             telemetry.update();
 //            delay(5);
 
