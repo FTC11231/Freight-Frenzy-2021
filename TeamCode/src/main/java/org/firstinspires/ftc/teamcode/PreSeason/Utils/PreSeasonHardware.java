@@ -228,7 +228,7 @@ public class PreSeasonHardware {
 		double percentage;
 		double power;
 		// Stop if A is pressed for debugging incase it's really not good
-		while (getDrivePosition() < distance && this.linearOpMode.opModeIsActive() && !this.linearOpMode.gamepad1.a) {
+		while (Math.abs(getDrivePosition()) < distance && this.linearOpMode.opModeIsActive() && !this.linearOpMode.gamepad1.a) {
 			percentage = Math.abs(getDrivePosition() / distance);
 			power = 0;
 			if (forwards) {
