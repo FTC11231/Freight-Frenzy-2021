@@ -226,24 +226,17 @@ public class PreSeasonHardware {
 			double power;
 			if (percentage <= rampPercentage) {
 				// Speed up
-//                telemetry.addData("Status", "Speeding up");
-				power = percentage * rampPercentage * 100 * speed; // Always positive
-				power = MathUtil.clamp(power, 0.2, 1); // Always positive
+				power = (speed / rampPercentage) * percentage;
+				power = MathUtil.clamp(power, 0.2, 1);
 			} else if (percentage >= (1 - rampPercentage)) {
-//                telemetry.addData("Status", "Slowing down");
 				// Slow down
-				power = (1 - percentage) * rampPercentage * 100 * speed;
+				power = -(speed / rampPercentage) * (percentage - 1);
 				power = MathUtil.clamp(power, 0.05, 1);
 			} else {
-//                telemetry.addData("Status", "Full power AAAAAAAAAAAAAAAAAAAAAAAAA");
 				// Full power
 				power = speed;
 				power = MathUtil.clamp(power, 0.2, 1);
 			}
-
-//            telemetry.addData("Distance", distance);
-//            telemetry.addData("Power", power);
-//            telemetry.addData("Encoder Pos", getDrivePosition());
 			telemetry.update();
 //            delay(5);
 
