@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.PreSeason.Utils;
 
+import androidx.core.math.MathUtils;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -84,10 +86,10 @@ public class PreSeasonHardware {
 
 		// Set motor directions (since they are facing in directions, they go the wrong way, so we
 		// reverse the right motors)
-		lm1.setDirection(DcMotorSimple.Direction.FORWARD);
-		lm2.setDirection(DcMotorSimple.Direction.FORWARD);
-		rm1.setDirection(DcMotorSimple.Direction.REVERSE);
-		rm2.setDirection(DcMotorSimple.Direction.REVERSE);
+		lm1.setDirection(DcMotorSimple.Direction.REVERSE);
+		lm2.setDirection(DcMotorSimple.Direction.REVERSE);
+		rm1.setDirection(DcMotorSimple.Direction.FORWARD);
+		rm2.setDirection(DcMotorSimple.Direction.FORWARD);
 
 		// Set the zero power behavior of the motors to brake to stop quicker when released
 		lm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -159,7 +161,10 @@ public class PreSeasonHardware {
 	 * Sets the power of the motors to zero.
 	 */
 	public void resetMotorPowers() {
-		drive(0, 0, 0);
+		lm1.setPower(0);
+		lm2.setPower(0);
+		rm1.setPower(0);
+		rm2.setPower(0);
 	}
 
 	/**
@@ -204,43 +209,61 @@ public class PreSeasonHardware {
 	 * Drives the robot forward.
 	 *
 	 * @param distance       The distance the robot will travel in inches.
-	 * @param speed          The speed the robot will travel in motor power (0-1).
+	 * @param maxSpeed          The maxSpeed the robot will travel in motor power (0-1).
 	 * @param rampPercentage The percentage the distance will be at before starting to ramp up or down.
 	 */
-	public void driveStraight(double distance, double speed, double rampPercentage) {
+	public void driveStraight(double distance, double maxSpeed, double rampPercentage) {
 //        telemetry.addData("Status", "Driving for " + distance + " inches");
 //        telemetry.update();
 		rampPercentage = Math.abs(rampPercentage);
-		speed = Math.abs(speed);
+		maxSpeed = Math.abs(maxSpeed);
+		if (distance == 0) return;
+		boolean forwards = distance > 0;
 		distance *= Constants.Drivetrain.ticksPerInch; // Sets it to be the distance in ticks
+		distance = Math.abs(distance);
 
 		setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-		while (-getDrivePosition() < distance && this.linearOpMode.opModeIsActive()) {
-			double percentage = Math.abs(getDrivePosition()) / Math.abs(distance); // Always will be positive, will only increase, should be from 0 to 1
-			// Ramp up for 10% of it, ramp down for the last 10%
+		double percentage;
+		double power;
+		// Stop if A is pressed for debugging incase it's really not good
+		while (getDrivePosition() < distance && this.linearOpMode.opModeIsActive() && !this.linearOpMode.gamepad1.a) {
+			percentage = Math.abs(getDrivePosition() / distance);
+			power = 0;
+			if (forwards) {
+				// Drive forwards
+				if (percentage <= rampPercentage) {
+					// Speed up
+					power = (maxSpeed / rampPercentage) * percentage;
+				} else if (percentage >= 1 - rampPercentage) {
+					power = -(maxSpeed / rampPercentage) * percentage;
+					// Slow down
+				} else {
+					// Full power
+					power = maxSpeed;
+				}
+				MathUtils.clamp(power, 0.1, maxSpeed);
+			} else {
+				// Drive forwards
+				if (percentage <= rampPercentage) {
+					// Speed up
+					power = (maxSpeed / rampPercentage) * percentage;
+				} else if (percentage >= 1 - rampPercentage) {
+					power = -(maxSpeed / rampPercentage) * percentage;
+					// Slow down
+				} else {
+					// Full power
+					power = maxSpeed;
+				}
+				MathUtils.clamp(power, -maxSpeed, 0.1);
+			}
+			drive(power, 0, 0);
+
 			telemetry.addData("Percentage", percentage);
 			telemetry.addData("Ramp Percentage", rampPercentage);
 			telemetry.addData("Ramping Up?", percentage <= rampPercentage);
-			double power;
-			if (percentage <= rampPercentage) {
-				// Speed up
-				power = (speed / rampPercentage) * percentage;
-				power = MathUtil.clamp(power, 0.2, 1);
-			} else if (percentage >= (1 - rampPercentage)) {
-				// Slow down
-				power = -(speed / rampPercentage) * (percentage - 1);
-				power = MathUtil.clamp(power, 0.05, 1);
-			} else {
-				// Full power
-				power = speed;
-				power = MathUtil.clamp(power, 0.2, 1);
-			}
-			telemetry.update();
-//            delay(5);
 
-			drive(-power, 0, 0);
 		}
 	}
 
