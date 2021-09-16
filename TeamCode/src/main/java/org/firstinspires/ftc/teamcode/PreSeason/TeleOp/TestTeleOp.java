@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.PreSeason.TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.PreSeason.Utils.PreSeasonHardware;
 
 @TeleOp(name = "Pre-Season Tele-Op", group = "Iterative Opmode")
+@Disabled
 public class TestTeleOp extends OpMode {
 	/*
 	 * NOTE FOR NEXT TIME I WORK ON THIS:
