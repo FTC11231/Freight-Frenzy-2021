@@ -107,12 +107,12 @@ public class PreSeasonHardware {
 		servo.setPosition(0);
 
 		// Initialize sensors
-		imu = hardwareMap.get(BNO055IMU.class, "imu");
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 		parameters.loggingEnabled = false;
 		parameters.mode = BNO055IMU.SensorMode.IMU;
 		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
 		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+
 		imu.initialize(parameters);
 	}
 
@@ -122,19 +122,22 @@ public class PreSeasonHardware {
 	 * @return Returns the angle in degrees of the robot.
 	 */
 	public double getAngle() {
-		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES); // Get the orientation of the robot
+		// We experimentally determined the Z axis is the axis we want to use for heading angle.
+		// We have to process the angle because the imu works in euler angles so the Z axis is
+		// returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
+		// 180 degrees. We detect this transition and track the total cumulative angle of rotation.
 
-		double deltaAngle = angles.thirdAngle - lastAngles.thirdAngle; // The difference between the current angle and the angle last update
+		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-		// Wrap the angle
+		double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
+
 		if (deltaAngle < -180)
 			deltaAngle += 360;
 		else if (deltaAngle > 180)
 			deltaAngle -= 360;
 
-		// Set the unwrapped angle
 		globalAngle += deltaAngle;
-		// Set the lastAngles variable before the next update
+
 		lastAngles = angles;
 
 		return globalAngle;
@@ -153,7 +156,7 @@ public class PreSeasonHardware {
 	 * Zero's the IMU of the robot.
 	 */
 	public void resetAngle() {
-		lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+		lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 		globalAngle = 0;
 	}
 
@@ -210,12 +213,13 @@ public class PreSeasonHardware {
 	 *
 	 * @param distance       The distance the robot will travel in inches.
 	 * @param maxSpeed          The maxSpeed the robot will travel in motor power (0-1).
-	 * @param rampPercentage The percentage the distance will be at before starting to ramp up or down.
+	 * @param speedUpPercentage The percentage the distance will be at before starting to ramp up or down.
 	 */
-	public void driveStraight(double distance, double maxSpeed, double rampPercentage) {
+	public void driveStraight(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage) {
 //        telemetry.addData("Status", "Driving for " + distance + " inches");
 //        telemetry.update();
-		rampPercentage = Math.abs(rampPercentage);
+		speedUpPercentage = Math.abs(speedUpPercentage);
+		slowDownPercentage = Math.abs(slowDownPercentage);
 		maxSpeed = Math.abs(maxSpeed);
 		if (distance == 0) return;
 		boolean forwards = distance > 0;
@@ -229,42 +233,37 @@ public class PreSeasonHardware {
 		double power;
 		// Stop if A is pressed for debugging incase it's really not good
 		while (Math.abs(getDrivePosition()) < distance && this.linearOpMode.opModeIsActive() && !this.linearOpMode.gamepad1.a) {
+
+
 			percentage = Math.abs(getDrivePosition() / distance);
-			power = 0;
+			if (percentage <= speedUpPercentage) {
+			// Speed up
+				power = (maxSpeed / speedUpPercentage) * percentage;
+			} else if (percentage >= 1 - slowDownPercentage) {
+				// Slow down
+				power = -(maxSpeed / slowDownPercentage) * percentage;
+			} else {
+				// Full power
+				power = maxSpeed;
+			}
+			power = MathUtils.clamp(power, 0.1, maxSpeed);
 			if (forwards) {
 				// Drive forwards
-				if (percentage <= rampPercentage) {
-					// Speed up
-					power = (maxSpeed / rampPercentage) * percentage;
-				} else if (percentage >= 1 - rampPercentage) {
-					power = -(maxSpeed / rampPercentage) * percentage;
-					// Slow down
-				} else {
-					// Full power
-					power = maxSpeed;
-				}
-				MathUtils.clamp(power, 0.1, maxSpeed);
+				drive(power, 0, 0);
 			} else {
-				// Drive forwards
-				if (percentage <= rampPercentage) {
-					// Speed up
-					power = (maxSpeed / rampPercentage) * percentage;
-				} else if (percentage >= 1 - rampPercentage) {
-					power = -(maxSpeed / rampPercentage) * percentage;
-					// Slow down
-				} else {
-					// Full power
-					power = maxSpeed;
-				}
-				MathUtils.clamp(power, -maxSpeed, 0.1);
+				// Drive backwards
+				drive(-power, 0, 0);
 			}
-			drive(power, 0, 0);
 
+			telemetry.addData("DrivePosition", getDrivePosition());
+			telemetry.addData("Distance", distance);
 			telemetry.addData("Percentage", percentage);
-			telemetry.addData("Ramp Percentage", rampPercentage);
-			telemetry.addData("Ramping Up?", percentage <= rampPercentage);
+			telemetry.addData("Ramp Percentage", speedUpPercentage);
+			telemetry.addData("Ramping Up?", percentage <= speedUpPercentage);
+			telemetry.update();
 
 		}
+		drive(0, 0, 0);
 	}
 
 	/**
@@ -275,29 +274,28 @@ public class PreSeasonHardware {
 	 * @param powerMultiplier The speed the robot will go at.
 	 * @return Returns the delta of the target angle and robot angle (error).
 	 */
-	public double turn(double degrees, double timeoutSeconds, double powerMultiplier) {
-//		telemetry.addData("Status", "Turning to " + degrees + " degrees");
-//		telemetry.update();
+	public void turn(double degrees, double timeoutSeconds, double powerMultiplier) {
 
 		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-		PIDController pidController = new PIDController(org.firstinspires.ftc.teamcode.PreSeason.Utils.Constants.Drivetrain.turningPIDkP, org.firstinspires.ftc.teamcode.PreSeason.Utils.Constants.Drivetrain.turningPIDkI, org.firstinspires.ftc.teamcode.PreSeason.Utils.Constants.Drivetrain.turningPIDkD);
+		PIDController pidController = new PIDController(Constants.Drivetrain.turningPIDkP, Constants.Drivetrain.turningPIDkI,  Constants.Drivetrain.turningPIDkD);
 		pidController.setTolerance(1);
+
+		double targetAngle = degrees;
 
 		Timer timer = new Timer();
 		timer.start();
 
-		while (this.linearOpMode.opModeIsActive()) {
-			double pidOutput = pidController.calculate(getAngle(), degrees);
+		while (linearOpMode.opModeIsActive()) {
+			double pidOutput = pidController.calculate(getAngle(), targetAngle);
 			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
-			drive(0, 0, MathUtil.clamp(output, -powerMultiplier, powerMultiplier));
+			drive(0, 0,  MathUtils.clamp(output, -powerMultiplier, powerMultiplier));
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
 				drive(0, 0, 0);
-				return degrees - getAngle();
+				return;
 			}
 		}
-		return degrees - getAngle();
 	}
 
 	/**
