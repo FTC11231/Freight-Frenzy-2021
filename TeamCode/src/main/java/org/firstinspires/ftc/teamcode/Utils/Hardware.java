@@ -29,13 +29,16 @@ public class Hardware {
 	private LinearOpMode linearOpMode;
 	private OpMode opMode;
 	private Telemetry telemetry;
-	private com.qualcomm.robotcore.hardware.HardwareMap hardwareMap = null;
+	private HardwareMap hardwareMap = null;
 
 	// Drive motors
 	public DcMotor lm1 = null;
 	public DcMotor lm2 = null;
 	public DcMotor rm1 = null;
 	public DcMotor rm2 = null;
+
+	// Servos
+	public Servo servo = null;
 
 	// Sensors
 	public BNO055IMU imu = null;
@@ -71,7 +74,7 @@ public class Hardware {
 	 *
 	 * @param hardwareMap The hardware map that the robot uses.
 	 */
-	public void init(com.qualcomm.robotcore.hardware.HardwareMap hardwareMap) {
+	public void init(HardwareMap hardwareMap) {
 		this.hardwareMap = hardwareMap;
 
 		// Initialize drive motors (names may change)
@@ -95,6 +98,12 @@ public class Hardware {
 
 		// Set the motor powers to 0
 		resetMotorPowers();
+
+		// Initialize servos
+		servo = hardwareMap.get(Servo.class, "Blocker");
+
+		// Set servo initial position
+		servo.setPosition(0);
 
 		// Initialize sensors
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -206,8 +215,9 @@ public class Hardware {
 	 * @param speedUpPercentage The percentage the distance will be at before starting to ramp up or down.
 	 */
 	public void driveStraight(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage) {
-//        telemetry.addData("Status", "Driving for " + distance + " inches");
-//        telemetry.update();
+		telemetry.addData("Status", "Driving for " + distance + " inches");
+		telemetry.update();
+
 		speedUpPercentage = Math.abs(speedUpPercentage);
 		slowDownPercentage = Math.abs(slowDownPercentage);
 		maxSpeed = Math.abs(maxSpeed);
@@ -223,11 +233,9 @@ public class Hardware {
 		double power;
 		// Stop if A is pressed for debugging incase it's really not good
 		while (Math.abs(getDrivePosition()) < distance && this.linearOpMode.opModeIsActive() && !this.linearOpMode.gamepad1.a) {
-
-
 			percentage = Math.abs(getDrivePosition() / distance);
 			if (percentage <= speedUpPercentage) {
-			// Speed up
+				// Speed up
 				power = (maxSpeed / speedUpPercentage) * percentage;
 			} else if (percentage >= 1 - slowDownPercentage) {
 				// Slow down
@@ -244,14 +252,6 @@ public class Hardware {
 				// Drive backwards
 				drive(-power, 0, 0);
 			}
-
-			telemetry.addData("DrivePosition", getDrivePosition());
-			telemetry.addData("Distance", distance);
-			telemetry.addData("Percentage", percentage);
-			telemetry.addData("Ramp Percentage", speedUpPercentage);
-			telemetry.addData("Ramping Up?", percentage <= speedUpPercentage);
-			telemetry.update();
-
 		}
 		drive(0, 0, 0);
 	}
@@ -260,11 +260,13 @@ public class Hardware {
 	 * Turns the robot to the specified angle.
 	 *
 	 * @param degrees         The absolute angle the robot will turn to (Forwards from the starting position is 0°, and goes counterclockwise).
+	 * @param maxPower The speed the robot will go at.
 	 * @param timeoutSeconds  The time the robot will turn for before stopping since the angle is close enough.
-	 * @param powerMultiplier The speed the robot will go at.
 	 * @return Returns the delta of the target angle and robot angle (error).
 	 */
-	public void turn(double degrees, double timeoutSeconds, double powerMultiplier) {
+	public void turn(double degrees, double maxPower, double timeoutSeconds) {
+		telemetry.addData("Status", "Turning to " + degrees + "°");
+		telemetry.update();
 
 		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -279,7 +281,7 @@ public class Hardware {
 		while (linearOpMode.opModeIsActive()) {
 			double pidOutput = pidController.calculate(getAngle(), targetAngle);
 			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
-			drive(0, 0,  MathUtils.clamp(output, -powerMultiplier, powerMultiplier));
+			drive(0, 0,  MathUtils.clamp(-output, -maxPower, maxPower));
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
 				drive(0, 0, 0);

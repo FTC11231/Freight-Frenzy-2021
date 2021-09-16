@@ -15,7 +15,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.PreSeason.Utils.Timer;
 
 public class PreSeasonHardware {
 	/*
@@ -216,8 +215,9 @@ public class PreSeasonHardware {
 	 * @param speedUpPercentage The percentage the distance will be at before starting to ramp up or down.
 	 */
 	public void driveStraight(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage) {
-//        telemetry.addData("Status", "Driving for " + distance + " inches");
-//        telemetry.update();
+        telemetry.addData("Status", "Driving for " + distance + " inches");
+        telemetry.update();
+
 		speedUpPercentage = Math.abs(speedUpPercentage);
 		slowDownPercentage = Math.abs(slowDownPercentage);
 		maxSpeed = Math.abs(maxSpeed);
@@ -233,8 +233,6 @@ public class PreSeasonHardware {
 		double power;
 		// Stop if A is pressed for debugging incase it's really not good
 		while (Math.abs(getDrivePosition()) < distance && this.linearOpMode.opModeIsActive() && !this.linearOpMode.gamepad1.a) {
-
-
 			percentage = Math.abs(getDrivePosition() / distance);
 			if (percentage <= speedUpPercentage) {
 			// Speed up
@@ -254,14 +252,6 @@ public class PreSeasonHardware {
 				// Drive backwards
 				drive(-power, 0, 0);
 			}
-
-			telemetry.addData("DrivePosition", getDrivePosition());
-			telemetry.addData("Distance", distance);
-			telemetry.addData("Percentage", percentage);
-			telemetry.addData("Ramp Percentage", speedUpPercentage);
-			telemetry.addData("Ramping Up?", percentage <= speedUpPercentage);
-			telemetry.update();
-
 		}
 		drive(0, 0, 0);
 	}
@@ -270,11 +260,13 @@ public class PreSeasonHardware {
 	 * Turns the robot to the specified angle.
 	 *
 	 * @param degrees         The absolute angle the robot will turn to (Forwards from the starting position is 0°, and goes counterclockwise).
+	 * @param maxPower The speed the robot will go at.
 	 * @param timeoutSeconds  The time the robot will turn for before stopping since the angle is close enough.
-	 * @param powerMultiplier The speed the robot will go at.
 	 * @return Returns the delta of the target angle and robot angle (error).
 	 */
-	public void turn(double degrees, double timeoutSeconds, double powerMultiplier) {
+	public void turn(double degrees, double maxPower, double timeoutSeconds) {
+		telemetry.addData("Status", "Turning to " + degrees + "°");
+		telemetry.update();
 
 		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -289,7 +281,7 @@ public class PreSeasonHardware {
 		while (linearOpMode.opModeIsActive()) {
 			double pidOutput = pidController.calculate(getAngle(), targetAngle);
 			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
-			drive(0, 0,  MathUtils.clamp(output, -powerMultiplier, powerMultiplier));
+			drive(0, 0,  MathUtils.clamp(-output, -maxPower, maxPower));
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
 				drive(0, 0, 0);

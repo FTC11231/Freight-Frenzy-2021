@@ -40,9 +40,9 @@ public class TestAutonomous extends LinearOpMode {
 		robot.delay(0.5);
 		robot.driveStraight(-24, 0.6, 0.2, 0.3);
 		robot.delay(0.5);
-		robot.turn(90, 2, 0.5);
+		robot.turn(90, 0.5, 2);
 		robot.delay(0.5);
-		robot.turn(0, 2, 0.9);
+		robot.turn(0, 0.9, 2);
 		robot.resetMotorPowers();
 
 		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
