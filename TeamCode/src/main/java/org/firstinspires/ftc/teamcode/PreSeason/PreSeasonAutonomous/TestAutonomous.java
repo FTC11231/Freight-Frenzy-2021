@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode.PreSeason.TeleOp;
+package org.firstinspires.ftc.teamcode.PreSeason.PreSeasonAutonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.PreSeason.Utils.PreSeasonHardware;
+import org.firstinspires.ftc.teamcode.PreSeason.PreSeasonUtils.PreSeasonHardware;
 
-@TeleOp(name = "Pre-Season Tele-Op", group = "Iterative Opmode")
+@Autonomous(name = "Pre-Season Auto Test", group = "Linear Opmode")
 @Disabled
-public class TestTeleOp extends OpMode {
+public class TestAutonomous extends LinearOpMode {
 	/*
 	 * NOTE FOR NEXT TIME I WORK ON THIS:
 	 * Because EasyOpenCv depends on OpenCV-Repackaged, you will also need to copy libOpenCvNative.so
@@ -21,44 +21,30 @@ public class TestTeleOp extends OpMode {
 	private PreSeasonHardware robot = new PreSeasonHardware(this, this.telemetry);
 
 	@Override
-	public void init() {
+	public void runOpMode() {
 		robot.init(hardwareMap);
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
-	}
 
-	@Override
-	public void init_loop() {
+		waitForStart();
+		if (!opModeIsActive()) return;
 
-	}
-
-	@Override
-	public void start() {
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 		telemetry.update();
-	}
 
-	@Override
-	public void loop() {
-		// Drive with movement and turning
-		robot.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+		robot.resetAngle();
 
-		// Move the servo
-		robot.servo.setPosition(gamepad2.a ? 1 : 0); // 1 if pressed, 0 if not pressed
-		// Alternate method of doing it
-//		if (gamepad2.a)
-//			robot.servo.setPosition(1);
-//		else
-//			robot.servo.setPosition(0);
-	}
-
-	@Override
-	public void stop() {
+		robot.driveStraight(24, 0.6, 0.2, 0.3);
+		robot.delay(0.5);
+		robot.driveStraight(-24, 0.6, 0.2, 0.3);
+		robot.delay(0.5);
+		robot.turn(90, 0.5, 2);
+		robot.delay(0.5);
+		robot.turn(0, 0.9, 2);
 		robot.resetMotorPowers();
 
 		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
 		telemetry.update();
 	}
-
 }
