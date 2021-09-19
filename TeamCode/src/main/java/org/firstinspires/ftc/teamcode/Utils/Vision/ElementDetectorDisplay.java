@@ -145,10 +145,10 @@ public class ElementDetectorDisplay extends LinearOpMode {
 			inputToCb(input);
 
 			// Take average of red and green values, since (255, 255, 0) is yellow
-			avg1 = ((int) Core.mean(region1_Cb).val[0] + (int) Core.mean(region1_Cb).val[1]) / 2;
-			avg2 = ((int) Core.mean(region2_Cb).val[0] + (int) Core.mean(region2_Cb).val[1]) / 2;
-			avg3 = ((int) Core.mean(region3_Cb).val[0] + (int) Core.mean(region3_Cb).val[1]) / 2;
-			maxAvg = Math.max(Math.max(avg1, avg2), avg3);
+			avg1 = (int) getDist(Core.mean(region1_Cb), new Scalar(209, 222, 57));
+			avg2 = (int) getDist(Core.mean(region2_Cb), new Scalar(209, 222, 57));
+			avg3 = (int) getDist(Core.mean(region3_Cb), new Scalar(209, 222, 57));
+			maxAvg = Math.min(Math.min(avg1, avg2), avg3);
 
 			// Determine which rectangle has the highest yellow value, set the position, then create
 			// a rectangle representing it that is green if it was the highest yellow rectangle,
@@ -216,6 +216,14 @@ public class ElementDetectorDisplay extends LinearOpMode {
 			}
 
 			return input;
+		}
+
+		public double getDist(Scalar c1, Scalar c2) {
+			// Returns the distance between the colors
+			double rDist = Math.abs(c1.val[0] - c2.val[0]);
+			double gDist = Math.abs(c1.val[1] - c2.val[1]);
+			double bDist = Math.abs(c1.val[2] - c2.val[2]);
+			return Math.cbrt(rDist + gDist + bDist);
 		}
 
 	}
