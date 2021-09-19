@@ -1,4 +1,7 @@
-package org.firstinspires.ftc.teamcode.Utils;
+package org.firstinspires.ftc.teamcode.Utils.Vision;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
@@ -13,12 +16,14 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-public class ElementDetector {
+@TeleOp(name = "Vision", group = "Linear Opmode")
+public class ElementDetectorDisplay extends LinearOpMode {
 	private OpenCvWebcam webcam;
 	private FreightFrenzyDeterminationPipeline pipeline;
 
-	public ElementDetector(WebcamName webcam) {
-		this.webcam = OpenCvCameraFactory.getInstance().createWebcam(webcam);
+	@Override
+	public void runOpMode() {
+		this.webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "barcodeCam"));
 		this.pipeline = new FreightFrenzyDeterminationPipeline();
 
 		this.webcam.setPipeline(pipeline);
@@ -26,6 +31,18 @@ public class ElementDetector {
 		this.webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
 		startStreaming();
+
+		waitForStart();
+
+		while (opModeIsActive()) {
+			telemetry.addData("Position", pipeline.position);
+			telemetry.addData("Left Analysis", pipeline.avg1);
+			telemetry.addData("Center Analysis", pipeline.avg2);
+			telemetry.addData("Right Analysis", pipeline.avg3);
+			telemetry.update();
+
+			sleep(50);
+		}
 	}
 
 	private void startStreaming() {
@@ -49,13 +66,16 @@ public class ElementDetector {
 			RIGHT
 		}
 
+		// Colors
 		private static final Scalar BLUE = new Scalar(0, 0, 255);
 		private static final Scalar GREEN = new Scalar(0, 255, 0);
 
-		private static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(30, 100);
-		private static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(55, 100);
-		private static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(80, 100);
+		// Create top left anchor points for the rectangles we're checking
+		private static final Point REGION1_TOP_LEFT_ANCHOR_POINT = new Point(30, 100);
+		private static final Point REGION2_TOP_LEFT_ANCHOR_POINT = new Point(55, 100);
+		private static final Point REGION3_TOP_LEFT_ANCHOR_POINT = new Point(80, 100);
 
+		// Create widths/heights for the rectangles we're checking
 		private static int REGION1_WIDTH = 15;
 		private static int REGION1_HEIGHT = 30;
 
@@ -65,39 +85,41 @@ public class ElementDetector {
 		private static int REGION3_WIDTH = 15;
 		private static int REGION3_HEIGHT = 30;
 
+		// Declare points for the rectangles we're checking
 		private Point region1_pointA = new Point(
-				REGION1_TOPLEFT_ANCHOR_POINT.x,
-				REGION1_TOPLEFT_ANCHOR_POINT.y);
+				REGION1_TOP_LEFT_ANCHOR_POINT.x,
+				REGION1_TOP_LEFT_ANCHOR_POINT.y);
 
 		private Point region1_pointB = new Point(
-				REGION1_TOPLEFT_ANCHOR_POINT.x + REGION1_WIDTH,
-				REGION1_TOPLEFT_ANCHOR_POINT.y + REGION1_HEIGHT);
+				REGION1_TOP_LEFT_ANCHOR_POINT.x + REGION1_WIDTH,
+				REGION1_TOP_LEFT_ANCHOR_POINT.y + REGION1_HEIGHT);
 
 		private Point region2_pointA = new Point(
-				REGION2_TOPLEFT_ANCHOR_POINT.x,
-				REGION2_TOPLEFT_ANCHOR_POINT.y);
+				REGION2_TOP_LEFT_ANCHOR_POINT.x,
+				REGION2_TOP_LEFT_ANCHOR_POINT.y);
 
 		private Point region2_pointB = new Point(
-				REGION2_TOPLEFT_ANCHOR_POINT.x + REGION2_WIDTH,
-				REGION2_TOPLEFT_ANCHOR_POINT.y + REGION2_HEIGHT);
+				REGION2_TOP_LEFT_ANCHOR_POINT.x + REGION2_WIDTH,
+				REGION2_TOP_LEFT_ANCHOR_POINT.y + REGION2_HEIGHT);
 
 		private Point region3_pointA = new Point(
-				REGION3_TOPLEFT_ANCHOR_POINT.x,
-				REGION3_TOPLEFT_ANCHOR_POINT.y);
+				REGION3_TOP_LEFT_ANCHOR_POINT.x,
+				REGION3_TOP_LEFT_ANCHOR_POINT.y);
 
 		private Point region3_pointB = new Point(
-				REGION3_TOPLEFT_ANCHOR_POINT.x + REGION3_WIDTH,
-				REGION3_TOPLEFT_ANCHOR_POINT.y + REGION3_HEIGHT);
+				REGION3_TOP_LEFT_ANCHOR_POINT.x + REGION3_WIDTH,
+				REGION3_TOP_LEFT_ANCHOR_POINT.y + REGION3_HEIGHT);
 
-		private Mat region1_Cb;
-		private Mat region2_Cb;
-		private Mat region3_Cb;
+		// Vars to make this all work
+		private Mat region1_Cb; // Rectangle 1
+		private Mat region2_Cb; // Rectangle 2
+		private Mat region3_Cb; // Rectangle 3
 		private Mat YCrCb = new Mat();
 		private Mat Cb = new Mat();
-		private int avg1;
-		private int avg2;
-		private int avg3;
-		private int maxAvg;
+		public int avg1; // Average yellow value of rectangle 1 (Avg of R and G)
+		public int avg2; // Average yellow value of rectangle 2 (Avg of R and G)
+		public int avg3; // Average yellow value of rectangle 3 (Avg of R and G)
+		private int maxAvg; // Highest average of rectangles 1, 2, and 3
 
 		private volatile ElementPosition position = ElementPosition.LEFT;
 
@@ -122,11 +144,15 @@ public class ElementDetector {
 		public Mat processFrame(Mat input) {
 			inputToCb(input);
 
-			avg1 = (int) Core.mean(region1_Cb).val[0];
-			avg2 = (int) Core.mean(region2_Cb).val[0];
-			avg3 = (int) Core.mean(region3_Cb).val[0];
+			// Take average of red and green values, since (255, 255, 0) is yellow
+			avg1 = ((int) Core.mean(region1_Cb).val[0] + (int) Core.mean(region1_Cb).val[1]) / 2;
+			avg2 = ((int) Core.mean(region2_Cb).val[0] + (int) Core.mean(region2_Cb).val[1]) / 2;
+			avg3 = ((int) Core.mean(region3_Cb).val[0] + (int) Core.mean(region3_Cb).val[1]) / 2;
 			maxAvg = Math.max(Math.max(avg1, avg2), avg3);
 
+			// Determine which rectangle has the highest yellow value, set the position, then create
+			// a rectangle representing it that is green if it was the highest yellow rectangle,
+			// blue if not
 			if (maxAvg == avg1) {
 				position = ElementPosition.LEFT;
 				Imgproc.rectangle(
@@ -188,7 +214,6 @@ public class ElementDetector {
 						GREEN,
 						-1);
 			}
-
 
 			return input;
 		}
