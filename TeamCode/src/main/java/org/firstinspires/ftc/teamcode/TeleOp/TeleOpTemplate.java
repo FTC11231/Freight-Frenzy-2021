@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Utils.Hardware;
 
-@TeleOp(name = "Pre-Season Tele-Op", group = "Iterative Opmode")
+@TeleOp(name = "Template Tele-Op", group = "Iterative Opmode")
 @Disabled
 public class TeleOpTemplate extends OpMode {
 

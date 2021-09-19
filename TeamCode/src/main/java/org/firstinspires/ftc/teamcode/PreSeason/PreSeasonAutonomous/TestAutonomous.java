@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.PreSeason.PreSeasonUtils.PreSeasonHardware;
 
-@Autonomous(name = "Pre-Season Auto Test", group = "Linear Opmode")
+@Autonomous(name = "Template Autonomous", group = "Linear Opmode")
 @Disabled
 public class TestAutonomous extends LinearOpMode {
 	/*
