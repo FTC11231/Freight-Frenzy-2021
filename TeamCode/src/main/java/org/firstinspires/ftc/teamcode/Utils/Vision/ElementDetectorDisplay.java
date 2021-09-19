@@ -145,9 +145,10 @@ public class ElementDetectorDisplay extends LinearOpMode {
 			inputToCb(input);
 
 			// Take average of red and green values, since (255, 255, 0) is yellow
-			avg1 = (int) getDist(Core.mean(region1_Cb), new Scalar(209, 222, 57));
-			avg2 = (int) getDist(Core.mean(region2_Cb), new Scalar(209, 222, 57));
-			avg3 = (int) getDist(Core.mean(region3_Cb), new Scalar(209, 222, 57));
+			Scalar yellowColor = new Scalar(209, 222, 57);
+			avg1 = (int) getDist(Core.mean(region1_Cb), yellowColor);
+			avg2 = (int) getDist(Core.mean(region2_Cb), yellowColor);
+			avg3 = (int) getDist(Core.mean(region3_Cb), yellowColor);
 			maxAvg = Math.min(Math.min(avg1, avg2), avg3);
 
 			// Determine which rectangle has the highest yellow value, set the position, then create
