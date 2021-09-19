@@ -184,6 +184,23 @@ public class Hardware {
 	}
 
 	/**
+	 * Drives with the parameters given, relative to the driver.
+	 *
+	 * @param drive       Drive.
+	 * @param strafe      Strafe.
+	 * @param turn        Turn.
+	 * @param offsetAngle An offset angle to add to the joystick angle to make field-centric work. (Degrees)
+	 */
+	public void driveFieldCentric(double drive, double strafe, double turn, double offsetAngle) {
+		double joystickAngle = Math.atan2(drive, strafe);
+		joystickAngle -= this.getAngleRadians();
+		joystickAngle += offsetAngle;
+		double newDrive = Math.sin(joystickAngle);
+		double newStrafe = Math.cos(joystickAngle);
+		this.drive(newDrive, newStrafe, turn);
+	}
+
+	/**
 	 * Sets the RunMode of the drive motors.
 	 *
 	 * @param runMode The RunMode the motors are being set to.
@@ -210,7 +227,7 @@ public class Hardware {
 	/**
 	 * Drives the robot forward.
 	 *
-	 * @param distance       The distance the robot will travel in inches.
+	 * @param distance          The distance the robot will travel in inches.
 	 * @param maxSpeed          The maxSpeed the robot will travel in motor power (0-1).
 	 * @param speedUpPercentage The percentage the distance will be at before starting to ramp up or down.
 	 */
@@ -259,9 +276,9 @@ public class Hardware {
 	/**
 	 * Turns the robot to the specified angle.
 	 *
-	 * @param degrees         The absolute angle the robot will turn to (Forwards from the starting position is 0°, and goes counterclockwise).
-	 * @param maxPower The speed the robot will go at.
-	 * @param timeoutSeconds  The time the robot will turn for before stopping since the angle is close enough.
+	 * @param degrees        The absolute angle the robot will turn to (Forwards from the starting position is 0°, and goes counterclockwise).
+	 * @param maxPower       The speed the robot will go at.
+	 * @param timeoutSeconds The time the robot will turn for before stopping since the angle is close enough.
 	 * @return Returns the delta of the target angle and robot angle (error).
 	 */
 	public void turn(double degrees, double maxPower, double timeoutSeconds) {
@@ -270,7 +287,7 @@ public class Hardware {
 
 		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-		PIDController pidController = new PIDController(Constants.Drivetrain.turningPIDkP, Constants.Drivetrain.turningPIDkI,  Constants.Drivetrain.turningPIDkD);
+		PIDController pidController = new PIDController(Constants.Drivetrain.turningPIDkP, Constants.Drivetrain.turningPIDkI, Constants.Drivetrain.turningPIDkD);
 		pidController.setTolerance(1);
 
 		double targetAngle = degrees;
@@ -281,7 +298,7 @@ public class Hardware {
 		while (linearOpMode.opModeIsActive()) {
 			double pidOutput = pidController.calculate(getAngle(), targetAngle);
 			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
-			drive(0, 0,  MathUtils.clamp(-output, -maxPower, maxPower));
+			drive(0, 0, MathUtils.clamp(-output, -maxPower, maxPower));
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
 				drive(0, 0, 0);
