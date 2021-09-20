@@ -32,7 +32,12 @@ public class ElementDetector {
 		webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 			@Override
 			public void onOpened() {
-				webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+
+			}
+
+			@Override
+			public void onError(int errorCode) {
+
 			}
 		});
 	}
