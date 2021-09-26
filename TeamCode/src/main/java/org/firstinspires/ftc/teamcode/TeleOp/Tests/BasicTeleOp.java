@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Utils.Hardware;
 
-@TeleOp(name = "Field-Centric Tele-Op", group = "Iterative Opmode")
-public class TeleOpFieldCentric extends OpMode {
+@TeleOp(name = "Basic Tele-Op", group = "Iterative Opmode")
+public class BasicTeleOp extends OpMode {
 
 	private String versionNumber = "v0.1'";
 	private Hardware robot = new Hardware(this, this.telemetry);
@@ -32,7 +32,7 @@ public class TeleOpFieldCentric extends OpMode {
 
 	@Override
 	public void loop() {
-		robot.driveFieldCentric(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad2.right_stick_x, 0);
+		robot.drive(-gamepad1.left_stick_y, gamepad2.right_stick_x);
 		if (gamepad1.a)
 			robot.resetAngle();
 	}

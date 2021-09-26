@@ -35,7 +35,7 @@ public class ElementDetectorDisplay extends LinearOpMode {
 		waitForStart();
 
 		while (opModeIsActive()) {
-			telemetry.addData("Position", pipeline.position);
+			telemetry.addData("Position", getPosition());
 			telemetry.addData("Left Analysis", pipeline.avg1);
 			telemetry.addData("Center Analysis", pipeline.avg2);
 			telemetry.addData("Right Analysis", pipeline.avg3);

@@ -166,31 +166,13 @@ public class Hardware {
 	 * Drives with the parameters given.
 	 *
 	 * @param drive  Drive.
-	 * @param strafe Strafe.
 	 * @param turn   Turn.
 	 */
-	public void drive(double drive, double strafe, double turn) {
-		lm1.setPower(drive + strafe + turn);
-		lm2.setPower(drive - strafe + turn);
-		rm1.setPower(drive - strafe - turn);
-		rm2.setPower(drive + strafe - turn);
-	}
-
-	/**
-	 * Drives with the parameters given, relative to the driver.
-	 *
-	 * @param drive       Drive.
-	 * @param strafe      Strafe.
-	 * @param turn        Turn.
-	 * @param offsetAngle An offset angle to add to the joystick angle to make field-centric work. (Degrees)
-	 */
-	public void driveFieldCentric(double drive, double strafe, double turn, double offsetAngle) {
-		double joystickAngle = Math.atan2(drive, strafe);
-		joystickAngle -= this.getAngleRadians();
-		joystickAngle += offsetAngle;
-		double newDrive = Math.sin(joystickAngle);
-		double newStrafe = Math.cos(joystickAngle);
-		this.drive(newDrive, newStrafe, turn);
+	public void drive(double drive, double turn) {
+		lm1.setPower(drive + turn);
+		lm2.setPower(drive + turn);
+		rm1.setPower(drive - turn);
+		rm2.setPower(drive - turn);
 	}
 
 	/**
@@ -257,13 +239,13 @@ public class Hardware {
 			power = MathUtils.clamp(power, 0.1, maxSpeed);
 			if (forwards) {
 				// Drive forwards
-				drive(power, 0, 0);
+				drive(power, 0);
 			} else {
 				// Drive backwards
-				drive(-power, 0, 0);
+				drive(-power, 0);
 			}
 		}
-		drive(0, 0, 0);
+		drive(0, 0);
 	}
 
 	/**
@@ -291,10 +273,10 @@ public class Hardware {
 		while (linearOpMode.opModeIsActive()) {
 			double pidOutput = pidController.calculate(getAngle(), targetAngle);
 			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
-			drive(0, 0, MathUtils.clamp(-output, -maxPower, maxPower));
+			drive(0, MathUtils.clamp(-output, -maxPower, maxPower));
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
-				drive(0, 0, 0);
+				drive(0, 0);
 				return;
 			}
 		}
