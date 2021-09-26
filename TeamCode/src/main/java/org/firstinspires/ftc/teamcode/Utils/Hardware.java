@@ -93,19 +93,19 @@ public class Hardware {
 		resetMotorPowers();
 
 		// Initialize servos
-		servo = hardwareMap.get(Servo.class, "Blocker");
+//		servo = hardwareMap.get(Servo.class, "Blocker");
 
 		// Set servo initial position
-		servo.setPosition(0);
+//		servo.setPosition(0);
 
 		// Initialize sensors
-		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-		parameters.loggingEnabled = false;
-		parameters.mode = BNO055IMU.SensorMode.IMU;
-		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+//		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+//		parameters.loggingEnabled = false;
+//		parameters.mode = BNO055IMU.SensorMode.IMU;
+//		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+//		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
 
-		imu.initialize(parameters);
+//		imu.initialize(parameters);
 	}
 
 	/**
