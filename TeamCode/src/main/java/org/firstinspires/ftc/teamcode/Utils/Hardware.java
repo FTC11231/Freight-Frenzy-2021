@@ -92,20 +92,14 @@ public class Hardware {
 		// Set the motor powers to 0
 		resetMotorPowers();
 
-		// Initialize servos
-//		servo = hardwareMap.get(Servo.class, "Blocker");
-
-		// Set servo initial position
-//		servo.setPosition(0);
-
 		// Initialize sensors
-//		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//		parameters.loggingEnabled = false;
-//		parameters.mode = BNO055IMU.SensorMode.IMU;
-//		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-//		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+		parameters.loggingEnabled = false;
+		parameters.mode = BNO055IMU.SensorMode.IMU;
+		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
 
-//		imu.initialize(parameters);
+		imu.initialize(parameters);
 	}
 
 	/**
@@ -168,11 +162,11 @@ public class Hardware {
 	 * @param drive  Drive.
 	 * @param turn   Turn.
 	 */
-	public void drive(double drive, double turn) {
-		lm1.setPower(drive + turn);
-		lm2.setPower(drive + turn);
-		rm1.setPower(drive - turn);
-		rm2.setPower(drive - turn);
+	public void drive(double drive, double strafe, double turn) {
+		lm1.setPower(drive + strafe + turn);
+		lm2.setPower(drive - strafe + turn);
+		rm1.setPower(drive - strafe - turn);
+		rm2.setPower(drive + strafe - turn);
 	}
 
 	/**
@@ -239,13 +233,13 @@ public class Hardware {
 			power = MathUtils.clamp(power, 0.1, maxSpeed);
 			if (forwards) {
 				// Drive forwards
-				drive(power, 0);
+				drive(power, 0, 0);
 			} else {
 				// Drive backwards
-				drive(-power, 0);
+				drive(-power, 0, 0);
 			}
 		}
-		drive(0, 0);
+		drive(0, 0, 0);
 	}
 
 	/**
@@ -273,10 +267,10 @@ public class Hardware {
 		while (linearOpMode.opModeIsActive()) {
 			double pidOutput = pidController.calculate(getAngle(), targetAngle);
 			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
-			drive(0, MathUtils.clamp(-output, -maxPower, maxPower));
+			drive(0, 0, MathUtils.clamp(-output, -maxPower, maxPower));
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
-				drive(0, 0);
+				drive(0, 0, 0);
 				return;
 			}
 		}
