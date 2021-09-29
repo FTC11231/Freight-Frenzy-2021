@@ -93,6 +93,7 @@ public class Hardware {
 		resetMotorPowers();
 
 		// Initialize sensors
+		imu = this.hardwareMap.get(BNO055IMU.class, "imu");
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 		parameters.loggingEnabled = false;
 		parameters.mode = BNO055IMU.SensorMode.IMU;
