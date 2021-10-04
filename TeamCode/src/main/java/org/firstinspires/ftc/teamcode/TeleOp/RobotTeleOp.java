@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Utils.Hardware;
 
-@TeleOp(name = "Mecanum test", group = "Iterative Opmode")
+@TeleOp(name = "<REAL, WILL USE IN COMPETITION> Tele-Op", group = "Iterative Opmode")
 public class RobotTeleOp extends OpMode {
 
 	private String versionNumber = "v0.1'";
