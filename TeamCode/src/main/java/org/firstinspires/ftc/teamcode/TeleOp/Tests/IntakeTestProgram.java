@@ -39,7 +39,10 @@ public class IntakeTestProgram extends OpMode {
             robot.lm1.setPower(-1);
         else
             robot.lm1.setPower(0);
-
+        if (gamepad1.x)
+            robot.servo.setPosition(0);
+        else if (gamepad1.y)
+            robot.servo.setPosition(1);
     }
 
     @Override

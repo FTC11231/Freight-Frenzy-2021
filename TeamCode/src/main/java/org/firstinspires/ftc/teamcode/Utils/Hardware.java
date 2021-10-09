@@ -92,6 +92,10 @@ public class Hardware {
 		// Set the motor powers to 0
 		resetMotorPowers();
 
+		// Servos
+		servo = this.hardwareMap.get(Servo.class, "gripper");
+
+
 		// Initialize sensors
 		imu = this.hardwareMap.get(BNO055IMU.class, "imu");
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
