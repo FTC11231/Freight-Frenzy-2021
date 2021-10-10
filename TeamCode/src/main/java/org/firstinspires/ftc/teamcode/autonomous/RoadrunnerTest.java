@@ -2,12 +2,10 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleTankDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 
@@ -28,14 +26,6 @@ public class RoadrunnerTest extends LinearOpMode {
 				.waitSeconds(0.25)
 				.setReversed(true)
 				.splineTo(new Vector2d(-54, -54), Math.toRadians(225))
-				.waitSeconds(0.3)
-				.setReversed(false)
-				.splineTo(new Vector2d(-10, -45), Math.toRadians(0))
-				.splineTo(new Vector2d(10, -40), Math.toRadians(0))
-				.waitSeconds(0.3)
-				.splineTo(new Vector2d(45, -40), Math.toRadians(0))
-				.splineTo(new Vector2d(58, -39), Math.toRadians(0))
-				.waitSeconds(5)
 				.build();
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
