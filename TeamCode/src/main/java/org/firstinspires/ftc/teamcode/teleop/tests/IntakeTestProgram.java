@@ -2,18 +2,21 @@ package org.firstinspires.ftc.teamcode.teleop.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.util.Hardware;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "Intake Test", group = "Iterative Opmode")
 public class IntakeTestProgram extends OpMode {
 
     private String versionNumber = "v0.1'";
-    private Hardware robot = new Hardware(this, this.telemetry);
+
+    private DcMotor intake;
+    private Servo gripper;
 
     @Override
     public void init() {
-        robot.init(hardwareMap);
+        intake = hardwareMap.get(DcMotor.class, "lm1");
+        gripper = hardwareMap.get(Servo.class, "gripper");
 
         telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
         telemetry.update();
@@ -33,15 +36,15 @@ public class IntakeTestProgram extends OpMode {
     @Override
     public void loop() {
         if (gamepad1.a)
-            robot.lm1.setPower(1);
+            intake.setPower(1);
         else if (gamepad1.b)
-            robot.lm1.setPower(-1);
+            intake.setPower(-1);
         else
-            robot.lm1.setPower(0);
+            intake.setPower(0);
         if (gamepad1.x)
-            robot.servo.setPosition(0);
+            gripper.setPosition(0);
         else if (gamepad1.y)
-            robot.servo.setPosition(1);
+            gripper.setPosition(1);
     }
 
     @Override

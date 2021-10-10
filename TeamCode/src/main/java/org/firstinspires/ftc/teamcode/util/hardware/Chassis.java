@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.hardware;
 
 import androidx.core.math.MathUtils;
 
@@ -8,103 +8,79 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.util.Constants;
+import org.firstinspires.ftc.teamcode.util.PIDController;
+import org.firstinspires.ftc.teamcode.util.Timer;
 
-public class Hardware {
+public class Chassis {
 
-	// Variables for output
-	private LinearOpMode linearOpMode;
-	private OpMode opMode;
-	private Telemetry telemetry;
-	private HardwareMap hardwareMap = null;
-
-	// Drive motors
-	public DcMotor lm1 = null;
-	public DcMotor lm2 = null;
-	public DcMotor rm1 = null;
-	public DcMotor rm2 = null;
-
-	// Servos
-	public Servo servo = null;
-
-	// Sensors
-	public BNO055IMU imu = null;
+	public DcMotor lm1, lm2, rm1, rm2;
+	public BNO055IMU imu;
+	public LinearOpMode linearOpMode;
+	public OpMode opMode;
 
 	// Sensor related variables
 	Orientation lastAngles = new Orientation();
 	double globalAngle;
 
 	/**
-	 * Sets the LinearOpMode of the robot.
+	 * Initializes the chassis
 	 *
-	 * @param linearOpMode The LinearOpMode of the robot.
-	 * @param telemetry    The telemetry of the robot.
+	 * @param linearOpMode OpMode for telemetry
 	 */
-	public Hardware(LinearOpMode linearOpMode, Telemetry telemetry) {
+	public Chassis(LinearOpMode linearOpMode) {
 		this.linearOpMode = linearOpMode;
-		this.telemetry = telemetry;
+
+		this.lm1 = this.linearOpMode.hardwareMap.get(DcMotor.class, "lm1");
+		this.lm2 = this.linearOpMode.hardwareMap.get(DcMotor.class, "lm2");
+		this.rm1 = this.linearOpMode.hardwareMap.get(DcMotor.class, "rm1");
+		this.rm2 = this.linearOpMode.hardwareMap.get(DcMotor.class, "rm2");
+
+		this.lm1.setDirection(DcMotorSimple.Direction.REVERSE);
+		this.lm2.setDirection(DcMotorSimple.Direction.REVERSE);
+		this.rm1.setDirection(DcMotorSimple.Direction.FORWARD);
+		this.rm2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+		drive(0, 0, 0);
 	}
 
 	/**
-	 * Sets the OpMode of the robot.
+	 * Initializes the chassis
 	 *
-	 * @param opMode    The OpMode of the robot.
-	 * @param telemetry The telemetry of the robot.
+	 * @param opMode      OpMode for telemetry
 	 */
-	public Hardware(OpMode opMode, Telemetry telemetry) {
+	public Chassis(OpMode opMode) {
 		this.opMode = opMode;
-		this.telemetry = telemetry;
+
+		this.lm1 = this.linearOpMode.hardwareMap.get(DcMotor.class, "lm1");
+		this.lm2 = this.linearOpMode.hardwareMap.get(DcMotor.class, "lm2");
+		this.rm1 = this.linearOpMode.hardwareMap.get(DcMotor.class, "rm1");
+		this.rm2 = this.linearOpMode.hardwareMap.get(DcMotor.class, "rm2");
+
+		this.lm1.setDirection(DcMotorSimple.Direction.REVERSE);
+		this.lm2.setDirection(DcMotorSimple.Direction.REVERSE);
+		this.rm1.setDirection(DcMotorSimple.Direction.FORWARD);
+		this.rm2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+		drive(0, 0, 0);
 	}
 
 	/**
-	 * Initializes the object with the hardware map.
+	 * Drives with the parameters given.
 	 *
-	 * @param hardwareMap The hardware map that the robot uses.
+	 * @param drive Drive.
+	 * @param turn  Turn.
 	 */
-	public void init(HardwareMap hardwareMap) {
-		this.hardwareMap = hardwareMap;
-
-		// Initialize drive motors (names may change)
-		lm1 = this.hardwareMap.get(DcMotor.class, "lm1");
-		lm2 = this.hardwareMap.get(DcMotor.class, "lm2");
-		rm1 = this.hardwareMap.get(DcMotor.class, "rm1");
-		rm2 = this.hardwareMap.get(DcMotor.class, "rm2");
-
-		// Set motor directions (since they are facing in directions, they go the wrong way, so we
-		// reverse the right motors)
-		lm1.setDirection(DcMotorSimple.Direction.REVERSE);
-		lm2.setDirection(DcMotorSimple.Direction.REVERSE);
-		rm1.setDirection(DcMotorSimple.Direction.FORWARD);
-		rm2.setDirection(DcMotorSimple.Direction.FORWARD);
-
-		// Set the zero power behavior of the motors to brake to stop quicker when released
-		lm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-		lm2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-		rm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-		rm2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-		// Set the motor powers to 0
-		resetMotorPowers();
-
-		// Servos
-		servo = this.hardwareMap.get(Servo.class, "gripper");
-
-
-		// Initialize sensors
-		imu = this.hardwareMap.get(BNO055IMU.class, "imu");
-		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-		parameters.loggingEnabled = false;
-		parameters.mode = BNO055IMU.SensorMode.IMU;
-		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-
-		imu.initialize(parameters);
+	public void drive(double drive, double strafe, double turn) {
+		lm1.setPower(drive + strafe + turn);
+		lm2.setPower(drive - strafe + turn);
+		rm1.setPower(drive - strafe - turn);
+		rm2.setPower(drive + strafe - turn);
 	}
 
 	/**
@@ -152,34 +128,11 @@ public class Hardware {
 	}
 
 	/**
-	 * Sets the power of the motors to zero.
-	 */
-	public void resetMotorPowers() {
-		lm1.setPower(0);
-		lm2.setPower(0);
-		rm1.setPower(0);
-		rm2.setPower(0);
-	}
-
-	/**
-	 * Drives with the parameters given.
-	 *
-	 * @param drive  Drive.
-	 * @param turn   Turn.
-	 */
-	public void drive(double drive, double strafe, double turn) {
-		lm1.setPower(drive + strafe + turn);
-		lm2.setPower(drive - strafe + turn);
-		rm1.setPower(drive - strafe - turn);
-		rm2.setPower(drive + strafe - turn);
-	}
-
-	/**
 	 * Sets the RunMode of the drive motors.
 	 *
 	 * @param runMode The RunMode the motors are being set to.
 	 */
-	public void setRunMode(DcMotor.RunMode runMode) {
+	private void setRunMode(DcMotor.RunMode runMode) {
 		lm1.setMode(runMode);
 		lm2.setMode(runMode);
 		rm1.setMode(runMode);
@@ -191,7 +144,7 @@ public class Hardware {
 	 *
 	 * @return Returns the average position of the drive encoders.
 	 */
-	public double getDrivePosition() {
+	private double getDrivePosition() {
 		return (Math.abs(lm1.getCurrentPosition())
 				+ Math.abs(lm2.getCurrentPosition())
 				+ Math.abs(rm1.getCurrentPosition())
@@ -206,8 +159,8 @@ public class Hardware {
 	 * @param speedUpPercentage The percentage the distance will be at before starting to ramp up or down.
 	 */
 	public void driveStraight(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage) {
-		telemetry.addData("Status", "Driving for " + distance + " inches");
-		telemetry.update();
+		linearOpMode.telemetry.addData("Status", "Driving for " + distance + " inches");
+		linearOpMode.telemetry.update();
 
 		speedUpPercentage = Math.abs(speedUpPercentage);
 		slowDownPercentage = Math.abs(slowDownPercentage);
@@ -253,11 +206,10 @@ public class Hardware {
 	 * @param degrees        The absolute angle the robot will turn to (Forwards from the starting position is 0°, and goes counterclockwise).
 	 * @param maxPower       The speed the robot will go at.
 	 * @param timeoutSeconds The time the robot will turn for before stopping since the angle is close enough.
-	 * @return Returns the delta of the target angle and robot angle (error).
 	 */
 	public void turn(double degrees, double maxPower, double timeoutSeconds) {
-		telemetry.addData("Status", "Turning to " + degrees + "°");
-		telemetry.update();
+		linearOpMode.telemetry.addData("Status", "Turning to " + degrees + "°");
+		linearOpMode.telemetry.update();
 
 		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -269,6 +221,7 @@ public class Hardware {
 		Timer timer = new Timer();
 		timer.start();
 
+		loop:
 		while (linearOpMode.opModeIsActive()) {
 			double pidOutput = pidController.calculate(getAngle(), targetAngle);
 			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
@@ -276,24 +229,9 @@ public class Hardware {
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
 				drive(0, 0, 0);
-				return;
+				break loop;
 			}
 		}
 	}
 
-	/**
-	 * Makes a delay or pause for the robot to stop moving before doing something else
-	 *
-	 * @param seconds The delay of the OpMode
-	 */
-	public void delay(double seconds) {
-		telemetry.addData("Status", "Paused for " + seconds + "seconds");
-		telemetry.update();
-
-		Timer timer = new Timer();
-		timer.start();
-		while (linearOpMode.opModeIsActive() && !timer.hasElapsed(seconds)) {
-		}
-		return;
-	}
 }
