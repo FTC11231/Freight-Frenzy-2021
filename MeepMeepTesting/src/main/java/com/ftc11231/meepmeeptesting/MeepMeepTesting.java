@@ -12,7 +12,7 @@ public class MeepMeepTesting {
 
 		// Declare a MeepMeep instance
 		// With a field size of 800 pixels
-		MeepMeep mm = new MeepMeep(900)
+		MeepMeep mm = new MeepMeep(700)
 				// Set field image
 				.setBackground(MeepMeep.Background.FIELD_FREIGHT_FRENZY)
 				// Set theme
