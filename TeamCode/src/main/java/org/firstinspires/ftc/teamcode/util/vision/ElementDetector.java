@@ -47,6 +47,10 @@ public class ElementDetector {
 
 	public static class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 
+		public ElementPosition getPosition() {
+			return this.position;
+		}
+
 		public enum ElementPosition {
 			LEFT,
 			CENTER,
@@ -54,22 +58,22 @@ public class ElementDetector {
 		}
 
 		// Colors
-		private static final Scalar BLUE = new Scalar(0, 0, 255);
-		private static final Scalar GREEN = new Scalar(0, 255, 0);
+		private static final Scalar RED = new Scalar(255, 0, 0, 100);
+		private static final Scalar GREEN = new Scalar(0, 255, 0, 100);
 
 		// Create top left anchor points for the rectangles we're checking
-		private static final Point REGION1_TOP_LEFT_ANCHOR_POINT = new Point(30, 100);
-		private static final Point REGION2_TOP_LEFT_ANCHOR_POINT = new Point(55, 100);
-		private static final Point REGION3_TOP_LEFT_ANCHOR_POINT = new Point(80, 100);
+		private static final Point REGION1_TOP_LEFT_ANCHOR_POINT = new Point(32, 60);
+		private static final Point REGION2_TOP_LEFT_ANCHOR_POINT = new Point(158, 70);
+		private static final Point REGION3_TOP_LEFT_ANCHOR_POINT = new Point(262, 74);
 
 		// Create widths/heights for the rectangles we're checking
-		private static int REGION1_WIDTH = 15;
+		private static int REGION1_WIDTH = 29;
 		private static int REGION1_HEIGHT = 30;
 
-		private static int REGION2_WIDTH = 15;
-		private static int REGION2_HEIGHT = 30;
+		private static int REGION2_WIDTH = 29;
+		private static int REGION2_HEIGHT = 29;
 
-		private static int REGION3_WIDTH = 15;
+		private static int REGION3_WIDTH = 28;
 		private static int REGION3_HEIGHT = 30;
 
 		// Declare points for the rectangles we're checking
@@ -136,82 +140,72 @@ public class ElementDetector {
 			avg1 = (int) getDist(Core.mean(region1_Cb), yellowColor);
 			avg2 = (int) getDist(Core.mean(region2_Cb), yellowColor);
 			avg3 = (int) getDist(Core.mean(region3_Cb), yellowColor);
-			maxAvg = Math.min(Math.min(avg1, avg2), avg3);
+			maxAvg = Math.max(Math.max(avg1, avg2), avg3);
 
 			// Determine which rectangle has the highest yellow value, set the position, then create
 			// a rectangle representing it that is green if it was the highest yellow rectangle,
-			// blue if not
+			// RED if not
+			int lineThickness = 2;
 			if (maxAvg == avg1) {
 				position = ElementPosition.LEFT;
-				Imgproc.rectangle(
-						input,
-						region1_pointA,
-						region1_pointB,
-						GREEN,
-						-1);
-				Imgproc.rectangle(
-						input,
-						region2_pointA,
-						region2_pointB,
-						BLUE,
-						-1);
-				Imgproc.rectangle(
-						input,
-						region3_pointA,
-						region3_pointB,
-						BLUE,
-						-1);
+				drawRectOutline(input, region1_pointA, region1_pointB, GREEN, lineThickness);
+				drawRectOutline(input, region2_pointA, region2_pointB, RED, lineThickness);
+				drawRectOutline(input, region3_pointA, region3_pointB, RED, lineThickness);
 			} else if (maxAvg == avg2) {
 				position = ElementPosition.CENTER;
-				Imgproc.rectangle(
-						input,
-						region1_pointA,
-						region1_pointB,
-						BLUE,
-						-1);
-				Imgproc.rectangle(
-						input,
-						region2_pointA,
-						region2_pointB,
-						GREEN,
-						-1);
-				Imgproc.rectangle(
-						input,
-						region3_pointA,
-						region3_pointB,
-						BLUE,
-						-1);
+				drawRectOutline(input, region1_pointA, region1_pointB, RED, lineThickness);
+				drawRectOutline(input, region2_pointA, region2_pointB, GREEN, lineThickness);
+				drawRectOutline(input, region3_pointA, region3_pointB, RED, lineThickness);
 			} else {
 				position = ElementPosition.RIGHT;
-				Imgproc.rectangle(
-						input,
-						region1_pointA,
-						region1_pointB,
-						BLUE,
-						-1);
-				Imgproc.rectangle(
-						input,
-						region2_pointA,
-						region2_pointB,
-						BLUE,
-						-1);
-				Imgproc.rectangle(
-						input,
-						region3_pointA,
-						region3_pointB,
-						GREEN,
-						-1);
+				drawRectOutline(input, region1_pointA, region1_pointB, RED, lineThickness);
+				drawRectOutline(input, region2_pointA, region2_pointB, RED, lineThickness);
+				drawRectOutline(input, region3_pointA, region3_pointB, GREEN, lineThickness);
 			}
 
 			return input;
 		}
 
+		public void drawRectOutline(Mat input, Point p1, Point p2, Scalar color, int thickness) {
+			Imgproc.line(
+					input,
+					new Point(p1.x, p1.y),
+					new Point(p2.x, p1.y),
+					color,
+					thickness
+			);
+			Imgproc.line(
+					input,
+					new Point(p1.x, p1.y),
+					new Point(p1.x, p2.y),
+					color,
+					thickness
+			);
+			Imgproc.line(
+					input,
+					new Point(p1.x, p2.y),
+					new Point(p2.x, p2.y),
+					color,
+					thickness
+			);
+			Imgproc.rectangle(
+					input,
+					new Point(p2.x, p1.y),
+					new Point(p2.x, p2.y),
+					color,
+					thickness
+			);
+		}
+
 		public double getDist(Scalar c1, Scalar c2) {
 			// Returns the distance between the colors
-			double rDist = Math.abs(c1.val[0] - c2.val[0]);
-			double gDist = Math.abs(c1.val[1] - c2.val[1]);
-			double bDist = Math.abs(c1.val[2] - c2.val[2]);
-			return Math.cbrt(rDist + gDist + bDist);
+//			double distOne = Math.abs((double) c1.val[0] - (double) c2.val[0]);
+//			double distTwo = Math.abs((double) c1.val[1] - (double) c2.val[1]);
+//			double distThree = Math.abs((double) c1.val[2] - (double) c2.val[2]);
+//			double distFour = Math.abs((double) c1.val[3] - (double) c2.val[3]);
+			// telemetry.update();
+			// return Math.cbrt(distOne + distTwo + distThree + distFour);
+			return c1.val[0];
 		}
 
 	}
