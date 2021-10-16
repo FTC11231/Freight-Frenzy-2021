@@ -27,9 +27,9 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
     private final Scalar RED = new Scalar(255, 0, 0, 100);
     private final Scalar GREEN = new Scalar(0, 255, 0, 100);
     // Create top left anchor points for the rectangles we're checking
-    private static final Point REGION1_TOP_LEFT_ANCHOR_POINT = new Point(38, 80);
-    private static final Point REGION2_TOP_LEFT_ANCHOR_POINT = new Point(140, 93);
-    private static final Point REGION3_TOP_LEFT_ANCHOR_POINT = new Point(232, 100);
+    private static Point REGION1_TOP_LEFT_ANCHOR_POINT = new Point(38, 80);
+    private static Point REGION2_TOP_LEFT_ANCHOR_POINT = new Point(140, 93);
+    private static Point REGION3_TOP_LEFT_ANCHOR_POINT = new Point(232, 100);
     // Create widths/heights for the rectangles we're checking
     private static int REGION1_WIDTH = 33;
     private static int REGION1_HEIGHT = 34;
