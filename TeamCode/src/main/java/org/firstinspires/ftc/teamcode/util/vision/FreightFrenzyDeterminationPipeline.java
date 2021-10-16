@@ -38,22 +38,22 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
     private static int REGION3_WIDTH = 35;
     private static int REGION3_HEIGHT = 35;
     // Declare points for the rectangles we're checking
-    private Point region1_pointA = new Point(
+    public Point region1_pointA = new Point(
             REGION1_TOP_LEFT_ANCHOR_POINT.x,
             REGION1_TOP_LEFT_ANCHOR_POINT.y);
-    private Point region1_pointB = new Point(
+    public Point region1_pointB = new Point(
             REGION1_TOP_LEFT_ANCHOR_POINT.x + REGION1_WIDTH,
             REGION1_TOP_LEFT_ANCHOR_POINT.y + REGION1_HEIGHT);
-    private Point region2_pointA = new Point(
+    public Point region2_pointA = new Point(
             REGION2_TOP_LEFT_ANCHOR_POINT.x,
             REGION2_TOP_LEFT_ANCHOR_POINT.y);
-    private Point region2_pointB = new Point(
+    public Point region2_pointB = new Point(
             REGION2_TOP_LEFT_ANCHOR_POINT.x + REGION2_WIDTH,
             REGION2_TOP_LEFT_ANCHOR_POINT.y + REGION2_HEIGHT);
-    private Point region3_pointA = new Point(
+    public Point region3_pointA = new Point(
             REGION3_TOP_LEFT_ANCHOR_POINT.x,
             REGION3_TOP_LEFT_ANCHOR_POINT.y);
-    private Point region3_pointB = new Point(
+    public Point region3_pointB = new Point(
             REGION3_TOP_LEFT_ANCHOR_POINT.x + REGION3_WIDTH,
             REGION3_TOP_LEFT_ANCHOR_POINT.y + REGION3_HEIGHT);
     // Vars to make this all work
@@ -90,31 +90,13 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
         region2_Cb = input.submat(new Rect(region2_pointA, region2_pointB));
         region3_Cb = input.submat(new Rect(region3_pointA, region3_pointB));
         // Take average of red and green values, since (255, 255, 0) is yellow
-        Scalar yellowColor = new Scalar(209, 222, 57);
+        Scalar yellowColor = new Scalar(220, 175, 31);
+        // Scalar yellowColor = new Scalar(184, 193, 15);
         avg1 = (int) getDist(Core.mean(region1_Cb), yellowColor);
         avg2 = (int) getDist(Core.mean(region2_Cb), yellowColor);
         avg3 = (int) getDist(Core.mean(region3_Cb), yellowColor);
         maxAvg = Math.min(Math.min(avg1, avg2), avg3);
-        // Determine which rectangle has the highest yellow value, set the position, then create
-        // a rectangle representing it that is green if it was the highest yellow rectangle,
-        // RED if not
-        int lineThickness = 2;
-        if (maxAvg == avg1) {
-            position = ElementPosition.LEFT;
-            drawRectOutline(input, region1_pointA, region1_pointB, GREEN, lineThickness);
-            drawRectOutline(input, region2_pointA, region2_pointB, RED, lineThickness);
-            drawRectOutline(input, region3_pointA, region3_pointB, RED, lineThickness);
-        } else if (maxAvg == avg2) {
-            position = ElementPosition.CENTER;
-            drawRectOutline(input, region1_pointA, region1_pointB, RED, lineThickness);
-            drawRectOutline(input, region2_pointA, region2_pointB, GREEN, lineThickness);
-            drawRectOutline(input, region3_pointA, region3_pointB, RED, lineThickness);
-        } else {
-            position = ElementPosition.RIGHT;
-            drawRectOutline(input, region1_pointA, region1_pointB, RED, lineThickness);
-            drawRectOutline(input, region2_pointA, region2_pointB, RED, lineThickness);
-            drawRectOutline(input, region3_pointA, region3_pointB, GREEN, lineThickness);
-        }
+
 
         Imgproc.rectangle(
                 input,
@@ -144,6 +126,27 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
                 yellowColor,
                 -1
         );
+
+        // Determine which rectangle has the highest yellow value, set the position, then create
+        // a rectangle representing it that is green if it was the highest yellow rectangle,
+        // RED if not
+        int lineThickness = 2;
+        if (maxAvg == avg1) {
+            position = ElementPosition.LEFT;
+            drawRectOutline(input, region1_pointA, region1_pointB, GREEN, lineThickness);
+            drawRectOutline(input, region2_pointA, region2_pointB, RED, lineThickness);
+            drawRectOutline(input, region3_pointA, region3_pointB, RED, lineThickness);
+        } else if (maxAvg == avg2) {
+            position = ElementPosition.CENTER;
+            drawRectOutline(input, region1_pointA, region1_pointB, RED, lineThickness);
+            drawRectOutline(input, region2_pointA, region2_pointB, GREEN, lineThickness);
+            drawRectOutline(input, region3_pointA, region3_pointB, RED, lineThickness);
+        } else {
+            position = ElementPosition.RIGHT;
+            drawRectOutline(input, region1_pointA, region1_pointB, RED, lineThickness);
+            drawRectOutline(input, region2_pointA, region2_pointB, RED, lineThickness);
+            drawRectOutline(input, region3_pointA, region3_pointB, GREEN, lineThickness);
+        }
 
         return input;
     }
@@ -207,6 +210,6 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
         double distTwo = Math.abs((double) c1.val[1] - (double) c2.val[1]);
         double distThree = Math.abs((double) c1.val[2] - (double) c2.val[2]);
         double distFour = Math.abs((double) c1.val[3] - (double) c2.val[3]);
-        return Math.cbrt(distOne + distTwo + distThree + distFour);
+        return distOne + distTwo + distThree + distFour;
     }
 }
