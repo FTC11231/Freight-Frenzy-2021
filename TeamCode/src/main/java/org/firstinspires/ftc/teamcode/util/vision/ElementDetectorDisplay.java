@@ -18,12 +18,12 @@ import org.openftc.easyopencv.OpenCvWebcam;
 @TeleOp(name = "Vision", group = "Linear Opmode")
 public class ElementDetectorDisplay extends LinearOpMode {
 	private OpenCvWebcam webcam;
-	private ElementDetector.FreightFrenzyDeterminationPipeline pipeline;
+	private FreightFrenzyDeterminationPipeline pipeline;
 
 	@Override
 	public void runOpMode() {
 		this.webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "barcodeCam"));
-		this.pipeline = new ElementDetector.FreightFrenzyDeterminationPipeline();
+		this.pipeline = new FreightFrenzyDeterminationPipeline();
 
 		this.webcam.setPipeline(pipeline);
 
@@ -34,10 +34,10 @@ public class ElementDetectorDisplay extends LinearOpMode {
 		waitForStart();
 
 		while (opModeIsActive()) {
-			telemetry.addData("Position", pipeline.getPosition());
-			telemetry.addData("Left Analysis", pipeline.avg1);
-			telemetry.addData("Center Analysis", pipeline.avg2);
-			telemetry.addData("Right Analysis", pipeline.avg3);
+			telemetry.addData("[POSITION]", pipeline.getPosition());
+			telemetry.addData("[LEFT]", pipeline.avg1);
+			telemetry.addData("[CENTER]", pipeline.avg2);
+			telemetry.addData("[RIGHT]", pipeline.avg3);
 			telemetry.update();
 
 			sleep(50);
