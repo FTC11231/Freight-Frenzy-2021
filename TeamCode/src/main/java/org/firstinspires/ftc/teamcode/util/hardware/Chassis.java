@@ -57,10 +57,10 @@ public class Chassis {
 	public Chassis(OpMode opMode) {
 		this.opMode = opMode;
 
-		this.lm1 = this.linearOpMode.hardwareMap.get(DcMotor.class, "lm1");
-		this.lm2 = this.linearOpMode.hardwareMap.get(DcMotor.class, "lm2");
-		this.rm1 = this.linearOpMode.hardwareMap.get(DcMotor.class, "rm1");
-		this.rm2 = this.linearOpMode.hardwareMap.get(DcMotor.class, "rm2");
+		this.lm1 = this.opMode.hardwareMap.get(DcMotor.class, "lm1");
+		this.lm2 = this.opMode.hardwareMap.get(DcMotor.class, "lm2");
+		this.rm1 = this.opMode.hardwareMap.get(DcMotor.class, "rm1");
+		this.rm2 = this.opMode.hardwareMap.get(DcMotor.class, "rm2");
 
 		this.lm1.setDirection(DcMotorSimple.Direction.REVERSE);
 		this.lm2.setDirection(DcMotorSimple.Direction.REVERSE);
