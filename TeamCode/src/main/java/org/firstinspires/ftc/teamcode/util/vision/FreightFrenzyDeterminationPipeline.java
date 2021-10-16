@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.vision;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -8,6 +10,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+@Config
 public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 
     public ElementPosition getPosition() {
@@ -21,8 +24,8 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
     }
 
     // Colors
-    private static final Scalar RED = new Scalar(255, 0, 0, 100);
-    private static final Scalar GREEN = new Scalar(0, 255, 0, 100);
+    private final Scalar RED = new Scalar(255, 0, 0, 100);
+    private final Scalar GREEN = new Scalar(0, 255, 0, 100);
     // Create top left anchor points for the rectangles we're checking
     private static final Point REGION1_TOP_LEFT_ANCHOR_POINT = new Point(38, 80);
     private static final Point REGION2_TOP_LEFT_ANCHOR_POINT = new Point(140, 93);
@@ -81,6 +84,7 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
+//        updatePoints();
         inputToCb(input);
         region1_Cb = input.submat(new Rect(region1_pointA, region1_pointB));
         region2_Cb = input.submat(new Rect(region2_pointA, region2_pointB));
@@ -143,6 +147,29 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 
         return input;
     }
+
+    public void updatePoints() {
+        // Used because of FTC Dashboard, so we can change the values in real time
+        region1_pointA = new Point(
+                REGION1_TOP_LEFT_ANCHOR_POINT.x,
+                REGION1_TOP_LEFT_ANCHOR_POINT.y);
+        region1_pointB = new Point(
+                REGION1_TOP_LEFT_ANCHOR_POINT.x + REGION1_WIDTH,
+                REGION1_TOP_LEFT_ANCHOR_POINT.y + REGION1_HEIGHT);
+        region2_pointA = new Point(
+                REGION2_TOP_LEFT_ANCHOR_POINT.x,
+                REGION2_TOP_LEFT_ANCHOR_POINT.y);
+        region2_pointB = new Point(
+                REGION2_TOP_LEFT_ANCHOR_POINT.x + REGION2_WIDTH,
+                REGION2_TOP_LEFT_ANCHOR_POINT.y + REGION2_HEIGHT);
+        region3_pointA = new Point(
+                REGION3_TOP_LEFT_ANCHOR_POINT.x,
+                REGION3_TOP_LEFT_ANCHOR_POINT.y);
+        region3_pointB = new Point(
+                REGION3_TOP_LEFT_ANCHOR_POINT.x + REGION3_WIDTH,
+                REGION3_TOP_LEFT_ANCHOR_POINT.y + REGION3_HEIGHT);
+    }
+
     public void drawRectOutline(Mat input, Point p1, Point p2, Scalar color, int thickness) {
         Imgproc.line(
                 input,
