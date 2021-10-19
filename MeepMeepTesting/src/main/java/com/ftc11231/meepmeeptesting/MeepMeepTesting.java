@@ -20,7 +20,7 @@ public class MeepMeepTesting {
 				// Background opacity from 0-1
 				.setBackgroundAlpha(1f)
 				// Set constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-				.setConstraints(90, 90, Math.toRadians(360), Math.toRadians(360), 15)
+				.setConstraints(41.065033847087705, 41.065033847087705, Math.toRadians(130.71406249999998), Math.toRadians(130.71406249999998), 8.5)
 				.followTrajectorySequence(drive ->
 						drive.trajectorySequenceBuilder(new Pose2d(-38, -63, Math.toRadians(90)))
 								.addDisplacementMarker(2, () -> {
