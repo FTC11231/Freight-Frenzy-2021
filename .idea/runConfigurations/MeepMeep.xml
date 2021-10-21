@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MeepMeep" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.ftc11231.meepmeeptesting.MeepMeepTesting" />
+    <module name="Freight-Frenzy-2021.MeepMeepTesting" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
