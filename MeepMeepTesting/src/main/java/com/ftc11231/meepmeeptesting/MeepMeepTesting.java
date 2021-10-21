@@ -6,7 +6,7 @@ import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueLight;
 
 public class MeepMeepTesting {
-	public static void main(String[] args) {
+	public static void main(String args[]) {
 		// TODO: If you experience poor performance, enable this flag
 		 System.setProperty("sun.java2d.opengl", "true");
 
