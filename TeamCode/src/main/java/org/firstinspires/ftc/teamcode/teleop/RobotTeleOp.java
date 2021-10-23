@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 
@@ -39,12 +40,12 @@ public class RobotTeleOp extends OpMode {
 
 	private String versionNumber = "v0.1'";
 	private Chassis chassis;
-//	private CRServo carousel;
+	private DcMotor turret;
 
 	@Override
 	public void init() {
 		chassis = new Chassis(this);
-//		carousel = hardwareMap.get(CRServo.class, "S");
+		turret = hardwareMap.get(DcMotor.class, "turret");
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
@@ -64,12 +65,7 @@ public class RobotTeleOp extends OpMode {
 	@Override
 	public void loop() {
 		chassis.drive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
-//		if (gamepad1.a)
-//			carousel.setPower(1);
-//		else if (gamepad1.b)
-//			carousel.setPower(-1);
-//		else
-//			carousel.setPower(0);
+		turret.setPower(gamepad2.left_stick_x);
 	}
 
 	@Override
