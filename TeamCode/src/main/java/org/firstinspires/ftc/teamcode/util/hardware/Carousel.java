@@ -9,28 +9,48 @@ import org.firstinspires.ftc.teamcode.util.Constants;
 
 public class Carousel {
 
-    public DcMotorEx motor;
-    public OpMode opMode;
-    public LinearOpMode linearOpMode;
+	public DcMotorEx motor;
+	public OpMode opMode;
+	public LinearOpMode linearOpMode;
 
-    public Carousel(OpMode opMode) {
-        this.opMode = opMode;
-        this.motor = opMode.hardwareMap.get(DcMotorEx.class, "carousel");
-        this.motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, Constants.Carousel.pidfCoefficients);
-    }
+	/**
+	 * Initializes the carousel.
+	 *
+	 * @param opMode OpMode for telemetry.
+	 */
+	public Carousel(OpMode opMode) {
+		this.opMode = opMode;
+		this.motor = opMode.hardwareMap.get(DcMotorEx.class, "carousel");
+		this.motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, Constants.Carousel.pidfCoefficients);
+	}
 
-    public Carousel(LinearOpMode linearOpMode) {
-        this.linearOpMode = linearOpMode;
-        this.motor = this.linearOpMode.hardwareMap.get(DcMotorEx.class, "carousel");
-        this.motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, Constants.Carousel.pidfCoefficients);
-    }
+	/**
+	 * Initializes the carousel.
+	 *
+	 * @param linearOpMode LinearOpMode for telemetry.
+	 */
+	public Carousel(LinearOpMode linearOpMode) {
+		this.linearOpMode = linearOpMode;
+		this.motor = this.linearOpMode.hardwareMap.get(DcMotorEx.class, "carousel");
+		this.motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, Constants.Carousel.pidfCoefficients);
+	}
 
-    public void setVelocity(double rpm) {
-        this.motor.setVelocity(rpm * Constants.Carousel.rpmToTicks);
-    }
+	/**
+	 * Sets the velocity of the carousel wheel.
+	 *
+	 * @param rpm RPM that the wheel should spin at.
+	 */
+	public void setVelocity(double rpm) {
+		this.motor.setVelocity(rpm * Constants.Carousel.rpmToTicks);
+	}
 
-    public double getVelocity() {
-        return this.motor.getVelocity();
-    }
+	/**
+	 * Gets the velocity of the carousel wheel.
+	 *
+	 * @return The velocity of the wheel.
+	 */
+	public double getVelocity() {
+		return this.motor.getVelocity();
+	}
 
 }

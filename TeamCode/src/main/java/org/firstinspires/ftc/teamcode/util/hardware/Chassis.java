@@ -29,9 +29,9 @@ public class Chassis {
 	double globalAngle;
 
 	/**
-	 * Initializes the chassis
+	 * Initializes the chassis.
 	 *
-	 * @param linearOpMode OpMode for telemetry
+	 * @param linearOpMode OpMode for telemetry.
 	 */
 	public Chassis(LinearOpMode linearOpMode) {
 		this.linearOpMode = linearOpMode;
@@ -41,18 +41,18 @@ public class Chassis {
 		this.rm1 = this.linearOpMode.hardwareMap.get(DcMotor.class, "rm1");
 		this.rm2 = this.linearOpMode.hardwareMap.get(DcMotor.class, "rm2");
 
-		this.lm1.setDirection(DcMotorSimple.Direction.REVERSE);
-		this.lm2.setDirection(DcMotorSimple.Direction.REVERSE);
-		this.rm1.setDirection(DcMotorSimple.Direction.FORWARD);
-		this.rm2.setDirection(DcMotorSimple.Direction.FORWARD);
+		this.lm1.setDirection(DcMotorSimple.Direction.FORWARD);
+		this.lm2.setDirection(DcMotorSimple.Direction.FORWARD);
+		this.rm1.setDirection(DcMotorSimple.Direction.REVERSE);
+		this.rm2.setDirection(DcMotorSimple.Direction.REVERSE);
 
 		drive(0, 0, 0);
 	}
 
 	/**
-	 * Initializes the chassis
+	 * Initializes the chassis.
 	 *
-	 * @param opMode      OpMode for telemetry
+	 * @param opMode LinearOpMode for telemetry.
 	 */
 	public Chassis(OpMode opMode) {
 		this.opMode = opMode;
@@ -62,10 +62,10 @@ public class Chassis {
 		this.rm1 = this.opMode.hardwareMap.get(DcMotor.class, "rm1");
 		this.rm2 = this.opMode.hardwareMap.get(DcMotor.class, "rm2");
 
-		this.lm1.setDirection(DcMotorSimple.Direction.REVERSE);
-		this.lm2.setDirection(DcMotorSimple.Direction.REVERSE);
-		this.rm1.setDirection(DcMotorSimple.Direction.FORWARD);
-		this.rm2.setDirection(DcMotorSimple.Direction.FORWARD);
+		this.lm1.setDirection(DcMotorSimple.Direction.FORWARD);
+		this.lm2.setDirection(DcMotorSimple.Direction.FORWARD);
+		this.rm1.setDirection(DcMotorSimple.Direction.REVERSE);
+		this.rm2.setDirection(DcMotorSimple.Direction.REVERSE);
 
 		drive(0, 0, 0);
 	}
@@ -73,8 +73,9 @@ public class Chassis {
 	/**
 	 * Drives with the parameters given.
 	 *
-	 * @param drive Drive.
-	 * @param turn  Turn.
+	 * @param drive  Forwards.
+	 * @param strafe Right.
+	 * @param turn   Clockwise.
 	 */
 	public void drive(double drive, double strafe, double turn) {
 		lm1.setPower(drive + strafe + turn);
@@ -158,7 +159,7 @@ public class Chassis {
 	 * @param maxSpeed          The maxSpeed the robot will travel in motor power (0-1).
 	 * @param speedUpPercentage The percentage the distance will be at before starting to ramp up or down.
 	 */
-	public void driveStraight(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage) {
+	public void driveForward(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage) {
 		linearOpMode.telemetry.addData("Status", "Driving for " + distance + " inches");
 		linearOpMode.telemetry.update();
 

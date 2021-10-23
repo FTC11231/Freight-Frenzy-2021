@@ -31,21 +31,30 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.util.hardware.Arm;
+import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
+import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
+import org.firstinspires.ftc.teamcode.util.hardware.Turret;
 
-@TeleOp(name = "Tele-Op", group = "Iterative Opmode")
-public class RobotTeleOp extends OpMode {
+@TeleOp(name = "Tele-Op (RED)", group = "Iterative Opmode")
+public class RedTeleOp extends OpMode {
 
 	private String versionNumber = "v0.1'";
 	private Chassis chassis;
-	private DcMotor turret;
+	private Turret turret;
+	private Arm arm;
+	private Carousel carousel;
+	private Gripper gripper;
 
 	@Override
 	public void init() {
 		chassis = new Chassis(this);
-		turret = hardwareMap.get(DcMotor.class, "turret");
+		turret = new Turret(this, true);
+		arm = new Arm(this);
+		carousel = new Carousel(this);
+		gripper = new Gripper(this);
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
@@ -64,8 +73,59 @@ public class RobotTeleOp extends OpMode {
 
 	@Override
 	public void loop() {
-		chassis.drive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
-		turret.setPower(gamepad2.left_stick_x);
+		// Chassis (Base)
+		if (gamepad1.right_bumper || gamepad1.left_bumper) {
+			chassis.drive(-gamepad1.left_stick_y * 0.4, gamepad1.left_stick_x * 0.4, gamepad1.right_stick_x * 0.6);
+		} else {
+			chassis.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+		}
+
+		// Reset turret (Base)
+		if (gamepad1.a && gamepad1.b) {
+			turret.resetEncoder(); // Reset the encoder for the turret
+		}
+
+		// Turret (Operator)
+		double toleranceOff = 0.2; // Tolerance for how off the joystick position can be (such as slightly right when pointing up)
+		double toleranceDown = 0.8; // Tolerance for how much the joystick must be pressed in a direction
+		if (gamepad2.left_stick_x >= toleranceDown && Math.abs(gamepad2.left_stick_x) <= toleranceOff) {
+			turret.turn(0); // Turn to right
+		}
+		if (-gamepad2.left_stick_y >= toleranceDown && Math.abs(gamepad2.left_stick_x) <= toleranceOff) {
+			turret.turn(90); // Turn to forward
+		}
+		if (gamepad2.left_stick_x <= -toleranceDown && Math.abs(gamepad2.left_stick_x) <= toleranceOff) {
+			turret.turn(180); // Turn to left
+		}
+		if (-gamepad2.left_stick_y <= -toleranceDown && Math.abs(gamepad2.left_stick_x) <= toleranceOff) {
+			if (turret.getRotation() <= 90) {
+				turret.turn(-90); // Turn to backward (going right)
+			} else {
+				turret.turn(270); // Turn to backward (going left)
+			}
+		}
+
+		// Arm (Operator)
+		double armPower = 0.5;
+		if (gamepad2.dpad_up) {
+			arm.setPower(armPower); // Move the arm up
+		}
+		if (gamepad2.dpad_down) {
+			arm.setPower(-armPower); // Move the arm down
+		}
+
+		// Gripper (Operator)
+		if (gamepad2.a) {
+			gripper.setPosition(1); // Close the gripper
+		}
+		if (gamepad2.b) {
+			gripper.setPosition(0); // Open the gripper
+		}
+
+		// Carousel (Operator)
+		if (gamepad2.x) {
+			carousel.setVelocity(125); // Set the velocity of the carousel wheel to 125 RPM
+		}
 	}
 
 	@Override
