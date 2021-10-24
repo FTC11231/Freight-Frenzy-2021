@@ -119,6 +119,12 @@ public class RedTeleOp extends OpMode {
 		if (gamepad2.dpad_down) {
 			armPoseIndex--;
 		}
+		if (gamepad2.dpad_left) {
+			armPoseIndex = 0;
+		}
+		if (gamepad2.dpad_right) {
+			armPoseIndex = armPoses.length - 1;
+		}
 		armPoseIndex = MathUtils.clamp(armPoseIndex, 0, armPoses.length - 1);
 		arm.turn(armPoses[armPoseIndex]);
 
