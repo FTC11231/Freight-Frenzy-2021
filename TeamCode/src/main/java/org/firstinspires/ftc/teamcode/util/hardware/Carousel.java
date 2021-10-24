@@ -21,7 +21,7 @@ public class Carousel {
 	public Carousel(OpMode opMode) {
 		this.opMode = opMode;
 		this.motor = opMode.hardwareMap.get(DcMotorEx.class, "carousel");
-		this.motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, Constants.Carousel.pidfCoefficients);
+		this.motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, Constants.Carousel.PIDF_COEFFICIENTS);
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class Carousel {
 	public Carousel(LinearOpMode linearOpMode) {
 		this.linearOpMode = linearOpMode;
 		this.motor = this.linearOpMode.hardwareMap.get(DcMotorEx.class, "carousel");
-		this.motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, Constants.Carousel.pidfCoefficients);
+		this.motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, Constants.Carousel.PIDF_COEFFICIENTS);
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class Carousel {
 	 * @param rpm RPM that the wheel should spin at.
 	 */
 	public void setVelocity(double rpm) {
-		this.motor.setVelocity(rpm * Constants.Carousel.rpmToTicks);
+		this.motor.setVelocity(rpm * Constants.Carousel.RPM_TO_TICKS);
 	}
 
 	/**

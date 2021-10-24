@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -168,7 +167,7 @@ public class Chassis {
 		maxSpeed = Math.abs(maxSpeed);
 		if (distance == 0) return;
 		boolean forwards = distance > 0;
-		distance *= Constants.Drivetrain.ticksPerInch; // Sets it to be the distance in ticks
+		distance *= Constants.Drivetrain.TICKS_PER_INCH; // Sets it to be the distance in ticks
 		distance = Math.abs(distance);
 
 		setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -214,7 +213,7 @@ public class Chassis {
 
 		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-		PIDController pidController = new PIDController(Constants.Drivetrain.turningPIDkP, Constants.Drivetrain.turningPIDkI, Constants.Drivetrain.turningPIDkD);
+		PIDController pidController = new PIDController(Constants.Drivetrain.TURNING_PID_KP, Constants.Drivetrain.TURNING_PID_KI, Constants.Drivetrain.TURNING_PID_KD);
 		pidController.setTolerance(1);
 
 		double targetAngle = degrees;
@@ -225,7 +224,7 @@ public class Chassis {
 		loop:
 		while (linearOpMode.opModeIsActive()) {
 			double pidOutput = pidController.calculate(getAngle(), targetAngle);
-			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.turningPIDkF * (pidController.atSetpoint() ? 0 : 1));
+			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.TURNING_PID_KF * (pidController.atSetpoint() ? 0 : 1));
 			drive(0, 0, MathUtils.clamp(-output, -maxPower, maxPower));
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {

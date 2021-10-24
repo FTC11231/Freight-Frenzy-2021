@@ -29,8 +29,12 @@
 
 package org.firstinspires.ftc.teamcode.teleop;
 
+import androidx.core.math.MathUtils;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
@@ -48,11 +52,14 @@ public class BlueTeleOp extends OpMode {
 	private Carousel carousel;
 	private Gripper gripper;
 
+	private double[] armPoses = {137.0, 124.0, 86.0, 50};
+	private int armPoseIndex;
+
 	@Override
 	public void init() {
 		chassis = new Chassis(this);
 		turret = new Turret(this, true);
-		arm = new Arm(this);
+		arm = new Arm(this, true);
 		carousel = new Carousel(this);
 		gripper = new Gripper(this);
 
@@ -106,13 +113,14 @@ public class BlueTeleOp extends OpMode {
 		}
 
 		// Arm (Operator)
-		double armPower = 0.5;
 		if (gamepad2.dpad_up) {
-			arm.setPower(armPower); // Move the arm up
+			armPoseIndex++;
 		}
 		if (gamepad2.dpad_down) {
-			arm.setPower(-armPower); // Move the arm down
+			armPoseIndex--;
 		}
+		armPoseIndex = MathUtils.clamp(armPoseIndex, 0, armPoses.length - 1);
+		arm.turn(armPoses[armPoseIndex]);
 
 		// Gripper (Operator)
 		if (gamepad2.a) {
