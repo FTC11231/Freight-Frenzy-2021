@@ -29,12 +29,14 @@
 
 package org.firstinspires.ftc.teamcode.teleop.tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 
 @TeleOp(name = "Field-Centric Tele-Op", group = "Iterative Opmode")
+@Disabled
 public class FieldCentricTeleOp extends OpMode {
 
     private String versionNumber = "v0.1'";

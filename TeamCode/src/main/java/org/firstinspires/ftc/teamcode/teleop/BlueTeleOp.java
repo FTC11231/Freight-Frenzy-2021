@@ -140,7 +140,7 @@ public class BlueTeleOp extends OpMode {
 
 		// Carousel (Operator)
 		if (gamepad2.x) {
-			carousel.setVelocity(125); // Set the velocity of the carousel wheel to 125 RPM
+			carousel.setVelocity(1000); // Set the velocity of the carousel wheel to 125 RPM
 			telemetry.addData("Reminder", "To tune PIDF: Start with F, keep going higher until it's good or something, then do P");
 		} else {
 			carousel.setVelocity(0);
