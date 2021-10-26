@@ -48,9 +48,9 @@ public class RedTeleOp extends OpMode {
 	private String versionNumber = "v0.1'";
 	private Chassis chassis;
 	private Turret turret;
-	private Arm arm;
+	//	private Arm arm;
 	private Carousel carousel;
-	private Gripper gripper;
+//	private Gripper gripper;
 
 	private double[] armPoses = {137.0, 124.0, 86.0, 50};
 	private int armPoseIndex;
@@ -59,9 +59,9 @@ public class RedTeleOp extends OpMode {
 	public void init() {
 		chassis = new Chassis(this);
 		turret = new Turret(this, true);
-		arm = new Arm(this, true);
+//		arm = new Arm(this, true);
 		carousel = new Carousel(this);
-		gripper = new Gripper(this);
+//		gripper = new Gripper(this);
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
@@ -80,6 +80,8 @@ public class RedTeleOp extends OpMode {
 
 	@Override
 	public void loop() {
+		telemetry.addData("Status", "Running (Version: " + versionNumber + ")");
+
 		// Chassis (Base)
 		if (gamepad1.right_bumper || gamepad1.left_bumper) {
 			chassis.drive(-gamepad1.left_stick_y * 0.4, gamepad1.left_stick_x * 0.4, gamepad1.right_stick_x * 0.6);
@@ -93,53 +95,63 @@ public class RedTeleOp extends OpMode {
 		}
 
 		// Turret (Operator)
-		double toleranceOff = 0.2; // Tolerance for how off the joystick position can be (such as slightly right when pointing up)
+//		if (gamepad1.a)
+//			turret.motor.setPower(gamepad2.left_stick_x);
+		telemetry.addData("LEFT X", gamepad2.left_stick_x);
+		telemetry.addData("LEFT Y", gamepad2.left_stick_y);
+		telemetry.addData("Current", turret.motor.getCurrentPosition());
+		telemetry.addData("Target", turret.motor.getTargetPosition());
+		double toleranceOff = 0.4; // Tolerance for how off the joystick position can be (such as slightly right when pointing up)
 		double toleranceDown = 0.8; // Tolerance for how much the joystick must be pressed in a direction
-		if (gamepad2.left_stick_x >= toleranceDown && Math.abs(gamepad2.left_stick_x) <= toleranceOff) {
+		if (gamepad2.left_stick_x >= toleranceDown && Math.abs(gamepad2.left_stick_y) <= toleranceOff) {
 			turret.turn(0); // Turn to right
 		}
 		if (-gamepad2.left_stick_y >= toleranceDown && Math.abs(gamepad2.left_stick_x) <= toleranceOff) {
 			turret.turn(90); // Turn to forward
 		}
-		if (gamepad2.left_stick_x <= -toleranceDown && Math.abs(gamepad2.left_stick_x) <= toleranceOff) {
+		if (gamepad2.left_stick_x <= -toleranceDown && Math.abs(gamepad2.left_stick_y) <= toleranceOff) {
 			turret.turn(180); // Turn to left
 		}
 		if (-gamepad2.left_stick_y <= -toleranceDown && Math.abs(gamepad2.left_stick_x) <= toleranceOff) {
-			if (turret.getRotation() <= 90) {
+			if (turret.getRotation() <= 70) {
 				turret.turn(-90); // Turn to backward (going right)
 			} else {
 				turret.turn(270); // Turn to backward (going left)
 			}
 		}
 
-		// Arm (Operator)
-		if (gamepad2.dpad_up) {
-			armPoseIndex++;
-		}
-		if (gamepad2.dpad_down) {
-			armPoseIndex--;
-		}
-		if (gamepad2.dpad_left) {
-			armPoseIndex = 0;
-		}
-		if (gamepad2.dpad_right) {
-			armPoseIndex = armPoses.length - 1;
-		}
-		armPoseIndex = MathUtils.clamp(armPoseIndex, 0, armPoses.length - 1);
-		arm.turn(armPoses[armPoseIndex]);
+//		// Arm (Operator)
+//		if (gamepad2.dpad_up) {
+//			armPoseIndex++;
+//		}
+//		if (gamepad2.dpad_down) {
+//			armPoseIndex--;
+//		}
+//		armPoseIndex = MathUtils.clamp(armPoseIndex, 0, armPoses.length - 1);
+//		arm.turn(armPoses[armPoseIndex]);
 
-		// Gripper (Operator)
-		if (gamepad2.a) {
-			gripper.setPosition(1); // Close the gripper
-		}
-		if (gamepad2.b) {
-			gripper.setPosition(0); // Open the gripper
-		}
+//		// Gripper (Operator)
+//		if (gamepad2.a) {
+//			gripper.setPosition(1); // Close the gripper
+//		}
+//		if (gamepad2.b) {
+//			gripper.setPosition(0); // Open the gripper
+//		}
 
 		// Carousel (Operator)
 		if (gamepad2.x) {
-			carousel.setVelocity(125); // Set the velocity of the carousel wheel to 125 RPM
+			carousel.setVelocity(-125); // Set the velocity of the carousel wheel to 125 RPM
+			telemetry.addData("Reminder", "To tune PIDF: Start with F, keep going higher until it's good or something, then do P");
+		} else {
+			carousel.setVelocity(0);
 		}
+		// TEST
+		if (gamepad2.y) {
+			carousel.motor.setPower(-0.5);
+		} else {
+			carousel.motor.setPower(0);
+		}
+		telemetry.update();
 	}
 
 	@Override

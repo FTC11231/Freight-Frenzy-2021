@@ -45,15 +45,15 @@ public class Chassis {
 		this.rm1.setDirection(DcMotorSimple.Direction.REVERSE);
 		this.rm2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-		// Initialize IMU
-		this.imu = this.opMode.hardwareMap.get(BNO055IMU.class, "imu");
-		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-		parameters.loggingEnabled = false;
-		parameters.mode = BNO055IMU.SensorMode.IMU;
-		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-
-		this.imu.initialize(parameters);
+//		// Initialize IMU
+//		this.imu = this.opMode.hardwareMap.get(BNO055IMU.class, "imu");
+//		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+//		parameters.loggingEnabled = false;
+//		parameters.mode = BNO055IMU.SensorMode.IMU;
+//		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+//		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+//
+//		this.imu.initialize(parameters);
 
 		drive(0, 0, 0);
 	}
@@ -61,7 +61,7 @@ public class Chassis {
 	/**
 	 * Initializes the chassis.
 	 *
-	 * @param opMode LinearOpMode for telemetry.
+	 * @param opMode OpMode for telemetry.
 	 */
 	public Chassis(OpMode opMode) {
 		this.opMode = opMode;
@@ -75,16 +75,16 @@ public class Chassis {
 		this.lm2.setDirection(DcMotorSimple.Direction.FORWARD);
 		this.rm1.setDirection(DcMotorSimple.Direction.REVERSE);
 		this.rm2.setDirection(DcMotorSimple.Direction.REVERSE);
-
-		// Initialize IMU
-		this.imu = this.linearOpMode.hardwareMap.get(BNO055IMU.class, "imu");
-		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-		parameters.loggingEnabled = false;
-		parameters.mode = BNO055IMU.SensorMode.IMU;
-		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-
-		this.imu.initialize(parameters);
+//
+//		// Initialize IMU
+//		this.imu = this.linearOpMode.hardwareMap.get(BNO055IMU.class, "imu");
+//		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+//		parameters.loggingEnabled = false;
+//		parameters.mode = BNO055IMU.SensorMode.IMU;
+//		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+//		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+//
+//		this.imu.initialize(parameters);
 
 		drive(0, 0, 0);
 	}
