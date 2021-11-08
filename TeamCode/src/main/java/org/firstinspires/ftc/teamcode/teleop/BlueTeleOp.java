@@ -29,39 +29,45 @@
 
 package org.firstinspires.ftc.teamcode.teleop;
 
-import androidx.core.math.MathUtils;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
+import org.firstinspires.ftc.teamcode.util.hardware.TurretArm;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
 import org.firstinspires.ftc.teamcode.util.hardware.Turret;
 
 @TeleOp(name = "Tele-Op (BLUE)", group = "Iterative Opmode")
 public class BlueTeleOp extends OpMode {
 
-	private String versionNumber = "v0.1'";
+	private final String versionNumber = "v0.5";
 	private Chassis chassis;
-	private Turret turret;
-//	private Arm arm;
+//	private Turret turret;
+	private Arm arm;
 	private Carousel carousel;
-//	private Gripper gripper;
+	private Gripper gripper;
+//	private TurretArm turretArm;
 
-	private double[] armPoses = {137.0, 124.0, 86.0, 50};
-	private int armPoseIndex;
+	private DcMotor turretMotor;
+
+	private double armTargetPos;
 
 	@Override
 	public void init() {
 		chassis = new Chassis(this);
-		turret = new Turret(this, true);
-//		arm = new Arm(this, true);
+//		turret = new Turret(this, true);
+		arm = new Arm(this, true);
 		carousel = new Carousel(this);
-//		gripper = new Gripper(this);
+		gripper = new Gripper(this);
+//		turretArm = new TurretArm(this);
+
+		turretMotor = hardwareMap.get(DcMotor.class, "turret");
+
+		gripper.openGripper();
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
@@ -83,74 +89,97 @@ public class BlueTeleOp extends OpMode {
 		telemetry.addData("Status", "Running (Version: " + versionNumber + ")");
 
 		// Chassis (Base)
-		if (gamepad1.right_bumper || gamepad1.left_bumper) {
-			chassis.drive(-gamepad1.left_stick_y * 0.4, gamepad1.left_stick_x * 0.4, gamepad1.right_stick_x * 0.6);
+		double driveMultiplier = (gamepad1.right_bumper || gamepad1.left_bumper) ? 0.6 : 1; // If pressing a bumper, slow down
+		chassis.drive(-gamepad1.left_stick_y * driveMultiplier,
+				gamepad1.left_stick_x * driveMultiplier,
+				gamepad1.right_stick_x * driveMultiplier);
+
+		// Carousel (Base)
+		if (gamepad1.x) {
+			carousel.motor.setPower(1); // Turn the carousel
 		} else {
-			chassis.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+			carousel.motor.setPower(0); // Don't turn the carousel
 		}
 
-		// Reset turret (Base)
-		if (gamepad1.a && gamepad1.b) {
-			turret.resetEncoder(); // Reset the encoder for the turret
+		// Resetting arm (at 0) (Base)
+		if (gamepad1.a) {
+			arm.motorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+			arm.motorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+			armTargetPos = 0;
 		}
 
 		// Turret (Operator)
-//		if (gamepad1.a)
-//			turret.motor.setPower(gamepad2.left_stick_x);
-		telemetry.addData("LEFT X", gamepad2.left_stick_x);
-		telemetry.addData("LEFT Y", gamepad2.left_stick_y);
-		telemetry.addData("Current", turret.motor.getCurrentPosition());
-		telemetry.addData("Target", turret.motor.getTargetPosition());
-		double toleranceOff = 0.4; // Tolerance for how off the joystick position can be (such as slightly right when pointing up)
-		double toleranceDown = 0.8; // Tolerance for how much the joystick must be pressed in a direction
-		if (gamepad2.left_stick_x >= toleranceDown && Math.abs(gamepad2.left_stick_y) <= toleranceOff) {
-			turret.turn(0); // Turn to right
-		}
-		if (-gamepad2.left_stick_y >= toleranceDown && Math.abs(gamepad2.left_stick_x) <= toleranceOff) {
-			turret.turn(90); // Turn to forward
-		}
-		if (gamepad2.left_stick_x <= -toleranceDown && Math.abs(gamepad2.left_stick_y) <= toleranceOff) {
-			turret.turn(180); // Turn to left
-		}
-		if (-gamepad2.left_stick_y <= -toleranceDown && Math.abs(gamepad2.left_stick_x) <= toleranceOff) {
-			if (turret.getRotation() <= 110) {
-				turret.turn(-90); // Turn to backward (going right)
+//		telemetry.addData("Turret degrees", turret.getRotation());
+//		telemetry.addData("Turret Target Degrees", (turret.motor.getTargetPosition() / Constants.Turret.TICKS_PER_DEGREE));
+//		telemetry.addData("Turret Current Position", turret.motor.getCurrentPosition());
+//		telemetry.addData("Turret Target Position", turret.motor.getTargetPosition());
+//		telemetry.addData("Turret Power Output", turret.motor.getPower());
+////		if (gamepad2.dpad_right) {
+//			turret.setPosition(Turret.Position.RIGHT); // Turn to right
+//		}
+//		if (gamepad2.dpad_up) {
+//			turret.setPosition(Turret.Position.FRONT); //  Turn to forward
+//		}
+//		if (gamepad2.dpad_left) {
+//			turret.setPosition(Turret.Position.LEFT); // Turn to left
+//		}
+//		if (gamepad2.dpad_down) {
+//			turret.setPosition(Turret.Position.BACK); // Turn to back
+//		}
+
+//		turret.motor.setPower(gamepad2.left_stick_y);
+
+		turretMotor.setPower(gamepad2.right_stick_x * 0.5);
+
+		// Arm (Operator)
+//		armTargetPos += -gamepad2.left_stick_y * 0.2;
+//		arm.setPosition(armTargetPos);
+
+//		arm.setPower(100 * arm.getRotation() - gamepad2.left_stick_y);
+
+		if (-gamepad2.left_stick_y >= 0) {
+			double multiplier = 0.3;
+			arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
+			if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
+				arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
 			} else {
-				turret.turn(270); // Turn to backward (going left)
+				arm.motorTwo.setPower(0.1);
+			}
+		} else {
+			double multiplier = 0.15;
+			arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
+			if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
+				arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
+			} else {
+				arm.motorTwo.setPower(0.1);
 			}
 		}
 
-//		// Arm (Operator)
-//		if (gamepad2.dpad_up) {
-//			armPoseIndex++;
+//		if (gamepad2.x) {
+//			arm.setPosition(Arm.Position.INTAKE);
+//		} else if (gamepad2.y) {
+//			arm.setPosition(Arm.Position.LEVEL_THREE);
+//		} else if (gamepad2.b) {
+//			arm.setPosition(Arm.Position.LEVEL_TWO);
+//		} else if (gamepad2.a) {
+//			arm.setPosition(Arm.Position.LEVEL_ONE);
 //		}
-//		if (gamepad2.dpad_down) {
-//			armPoseIndex--;
-//		}
-//		armPoseIndex = MathUtils.clamp(armPoseIndex, 0, armPoses.length - 1);
-//		arm.turn(armPoses[armPoseIndex]);
+//		telemetry.addData("Arm power", arm.motorOne.getPower());
+//		telemetry.addData("Arm position", arm.getRotation());
+//		telemetry.addData("m1 pos", arm.motorOne.getCurrentPosition());
+//		telemetry.addData("m2 pos", arm.motorTwo.getCurrentPosition());
+//		telemetry.addData("Arm target position", arm.motorOne.getTargetPosition());
 
-//		// Gripper (Operator)
-//		if (gamepad2.a) {
-//			gripper.setPosition(1); // Close the gripper
-//		}
-//		if (gamepad2.b) {
-//			gripper.setPosition(0); // Open the gripper
-//		}
+		// Gripper (Operator)
+		if (gamepad2.right_bumper) {
+			gripper.closeGripper(); // Close the gripper
+		}
+		if (gamepad2.left_bumper) {
+			gripper.openGripper(); // Open the gripper
+		}
 
-		// Carousel (Operator)
-		if (gamepad2.x) {
-			carousel.setVelocity(1000); // Set the velocity of the carousel wheel to 125 RPM
-			telemetry.addData("Reminder", "To tune PIDF: Start with F, keep going higher until it's good or something, then do P");
-		} else {
-			carousel.setVelocity(0);
-		}
-		// TEST
-		if (gamepad2.y) {
-			carousel.motor.setPower(0.5);
-		} else {
-			carousel.motor.setPower(0);
-		}
+//		arm.update();
+
 		telemetry.update();
 	}
 

@@ -21,21 +21,23 @@ public class Constants {
 		public static final double TICKS_PER_REV = 28.0;
 		public static final double GEAR_RATIO = 1.0 / 1.0;
 		public static final double RPM_TO_TICKS = (TICKS_PER_REV * GEAR_RATIO) / 60.0;
-		public static final PIDFCoefficients PIDF_COEFFICIENTS = new PIDFCoefficients(20.0, 0.0, 0.0, 14.08, MotorControlAlgorithm.PIDF);
 	}
 
 	public static class Turret {
-		public static final double TICKS_PER_REV = 28.0;
-		public static final double GEAR_RATIO = 20.0 / 1.0;
+		public static final double TICKS_PER_REV = 288.0;
+		public static final double GEAR_RATIO = 1.0 / 1.0;
 		public static final double TICKS_PER_DEGREE = TICKS_PER_REV * GEAR_RATIO / 360.0;
-		public static final PIDFCoefficients PIDF_COEFFICIENTS = new PIDFCoefficients(1.0, 0.0, 0.0, 0.0, MotorControlAlgorithm.PIDF);
+		public static final PIDFCoefficients PIDF_COEFFICIENTS = new PIDFCoefficients(0.01, 0.0, 0.1, 0.0, MotorControlAlgorithm.PIDF);
 	}
 
 	public static class Arm {
-		public static final double TICKS_PER_REV = 228.0;
-		public static final double GEAR_RATIO = 1;
-		public static final double TICKS_PER_DEGREE = TICKS_PER_REV * GEAR_RATIO / 360.0;
-		public static final PIDFCoefficients PIDF_COEFFICIENTS = new PIDFCoefficients(20.0, 0.0, 0.0, 14.08, MotorControlAlgorithm.PIDF);
+		public static final double TICKS_PER_REV = 288.0;
+		public static final double GEAR_RATIO = 1.0 / 1.0;
+		public static final double TICKS_PER_DEGREE = TICKS_PER_REV * GEAR_RATIO / 360.0; // D was -30
+		public static final PIDFCoefficients MOTOR_ONE_PIDF = new PIDFCoefficients(35.0, 0.0, 0.0, 150.0, MotorControlAlgorithm.PIDF);
+		public static final PIDFCoefficients MOTOR_TWO_PIDF = new PIDFCoefficients(0.0, 0.0, 0.0, 150.0, MotorControlAlgorithm.PIDF);
+		public static final double CHANGE_RATE_LOWER_LIMIT = 2.5;
+		public static final double CHANGE_RATE_UPPER_LIMIT = 2.5;
 	}
 
 }

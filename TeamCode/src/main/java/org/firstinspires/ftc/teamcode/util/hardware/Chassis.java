@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.util.hardware;
 import androidx.core.math.MathUtils;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,43 +19,11 @@ public class Chassis {
 
 	public DcMotor lm1, lm2, rm1, rm2;
 	public BNO055IMU imu;
-	public LinearOpMode linearOpMode;
 	public OpMode opMode;
 
 	// Sensor related variables
 	Orientation lastAngles = new Orientation();
 	double globalAngle;
-
-	/**
-	 * Initializes the chassis.
-	 *
-	 * @param linearOpMode OpMode for telemetry.
-	 */
-	public Chassis(LinearOpMode linearOpMode) {
-		this.linearOpMode = linearOpMode;
-
-		this.lm1 = this.linearOpMode.hardwareMap.get(DcMotor.class, "lm1");
-		this.lm2 = this.linearOpMode.hardwareMap.get(DcMotor.class, "lm2");
-		this.rm1 = this.linearOpMode.hardwareMap.get(DcMotor.class, "rm1");
-		this.rm2 = this.linearOpMode.hardwareMap.get(DcMotor.class, "rm2");
-
-		this.lm1.setDirection(DcMotorSimple.Direction.FORWARD);
-		this.lm2.setDirection(DcMotorSimple.Direction.FORWARD);
-		this.rm1.setDirection(DcMotorSimple.Direction.REVERSE);
-		this.rm2.setDirection(DcMotorSimple.Direction.REVERSE);
-
-//		// Initialize IMU
-//		this.imu = this.opMode.hardwareMap.get(BNO055IMU.class, "imu");
-//		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//		parameters.loggingEnabled = false;
-//		parameters.mode = BNO055IMU.SensorMode.IMU;
-//		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-//		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-//
-//		this.imu.initialize(parameters);
-
-		drive(0, 0, 0);
-	}
 
 	/**
 	 * Initializes the chassis.
@@ -179,8 +146,8 @@ public class Chassis {
 	 * @param speedUpPercentage The percentage the distance will be at before starting to ramp up or down.
 	 */
 	public void driveForward(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage) {
-		linearOpMode.telemetry.addData("Status", "Driving for " + distance + " inches");
-		linearOpMode.telemetry.update();
+		opMode.telemetry.addData("Status", "Driving for " + distance + " inches");
+		opMode.telemetry.update();
 
 		speedUpPercentage = Math.abs(speedUpPercentage);
 		slowDownPercentage = Math.abs(slowDownPercentage);
@@ -196,7 +163,7 @@ public class Chassis {
 		double percentage;
 		double power;
 		// Stop if A is pressed for debugging incase it's really not good
-		while (Math.abs(getDrivePosition()) < distance && this.linearOpMode.opModeIsActive() && !this.linearOpMode.gamepad1.a) {
+		while (Math.abs(getDrivePosition()) < distance && !this.opMode.gamepad1.a) {
 			percentage = Math.abs(getDrivePosition() / distance);
 			if (percentage <= speedUpPercentage) {
 				// Speed up
@@ -228,8 +195,8 @@ public class Chassis {
 	 * @param timeoutSeconds The time the robot will turn for before stopping since the angle is close enough.
 	 */
 	public void turn(double degrees, double maxPower, double timeoutSeconds) {
-		linearOpMode.telemetry.addData("Status", "Turning to " + degrees + "°");
-		linearOpMode.telemetry.update();
+		opMode.telemetry.addData("Status", "Turning to " + degrees + "°");
+		opMode.telemetry.update();
 
 		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -242,7 +209,7 @@ public class Chassis {
 		timer.start();
 
 		loop:
-		while (linearOpMode.opModeIsActive()) {
+		while (true) {
 			double pidOutput = pidController.calculate(getAngle(), targetAngle);
 			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.TURNING_PID_KF * (pidController.atSetpoint() ? 0 : 1));
 			drive(0, 0, MathUtils.clamp(-output, -maxPower, maxPower));

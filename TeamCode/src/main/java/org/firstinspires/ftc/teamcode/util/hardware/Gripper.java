@@ -17,17 +17,7 @@ public class Gripper {
 	 */
 	public Gripper(OpMode opMode) {
 		this.opMode = opMode;
-		this.servo = opMode.hardwareMap.get(Servo.class, "carousel");
-	}
-
-	/**
-	 * Initializes the gripper.
-	 *
-	 * @param linearOpMode LinearOpMode for telemetry.
-	 */
-	public Gripper(LinearOpMode linearOpMode) {
-		this.linearOpMode = linearOpMode;
-		this.servo = this.linearOpMode.hardwareMap.get(Servo.class, "carousel");
+		this.servo = opMode.hardwareMap.get(Servo.class, "gripper");
 	}
 
 	/**
@@ -37,6 +27,20 @@ public class Gripper {
 	 */
 	public void setPosition(double position) {
 		servo.setPosition(position);
+	}
+
+	/**
+	 * Closes the gripper.
+	 */
+	public void closeGripper() {
+		servo.setPosition(0);
+	}
+
+	/**
+	 * Closes the gripper.
+	 */
+	public void openGripper() {
+		servo.setPosition(1);
 	}
 
 }
