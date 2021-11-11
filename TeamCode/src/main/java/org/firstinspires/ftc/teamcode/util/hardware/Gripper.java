@@ -33,7 +33,7 @@ public class Gripper {
 	 * Closes the gripper.
 	 */
 	public void closeGripper() {
-		servo.setPosition(0);
+		servo.setPosition(0.15);
 	}
 
 	/**

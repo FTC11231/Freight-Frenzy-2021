@@ -12,9 +12,9 @@ public class Constants {
 		public static final double TICKS_PER_INCH = TICKS_PER_REV * GEAR_RATIO / (WHEEL_DIAMETER * Math.PI);
 
 		public static final double TURNING_PID_KF = 0.1;
-		public static final double TURNING_PID_KP = 0.0;
+		public static final double TURNING_PID_KP = 0.008; //0.008
 		public static final double TURNING_PID_KI = 0.0;
-		public static final double TURNING_PID_KD = 0.0;
+		public static final double TURNING_PID_KD = 0.0; //0.0009
 	}
 
 	public static class Carousel {

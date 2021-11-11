@@ -33,6 +33,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
@@ -41,8 +45,8 @@ import org.firstinspires.ftc.teamcode.util.hardware.TurretArm;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
 import org.firstinspires.ftc.teamcode.util.hardware.Turret;
 
-@TeleOp(name = "Tele-Op (BLUE)", group = "Iterative Opmode")
-public class BlueTeleOp extends OpMode {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Tele-Op", group = "Iterative Opmode")
+public class RobotTeleOp extends OpMode {
 
 	private final String versionNumber = "v0.5";
 	private Chassis chassis;
@@ -75,7 +79,11 @@ public class BlueTeleOp extends OpMode {
 
 	@Override
 	public void init_loop() {
-
+		Orientation angles = chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+		telemetry.addData("axis 1", angles.firstAngle);
+		telemetry.addData("axis 2", angles.secondAngle);
+		telemetry.addData("axis 3", angles.thirdAngle);
+		telemetry.update();
 	}
 
 	@Override
@@ -87,58 +95,31 @@ public class BlueTeleOp extends OpMode {
 	@Override
 	public void loop() {
 		telemetry.addData("Status", "Running (Version: " + versionNumber + ")");
+//		telemetry.addData("Final angle", chassis.getAngle());
+//		telemetry.addData("Axis 1", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).firstAngle);
+//		telemetry.addData("Axis 2", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).secondAngle);
+//		telemetry.addData("Axis 3", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
 
 		// Chassis (Base)
-		double driveMultiplier = (gamepad1.right_bumper || gamepad1.left_bumper) ? 0.6 : 1; // If pressing a bumper, slow down
-		chassis.drive(-gamepad1.left_stick_y * driveMultiplier,
+		double throttleDrive = gamepad1.right_trigger - gamepad1.left_trigger;
+		double driveMultiplier = gamepad1.a ? 1 : 0.75; // If pressing a bumper, slow down
+		chassis.drive(throttleDrive * driveMultiplier,
 				gamepad1.left_stick_x * driveMultiplier,
 				gamepad1.right_stick_x * driveMultiplier);
 
 		// Carousel (Base)
-		if (gamepad1.x) {
-			carousel.motor.setPower(1); // Turn the carousel
+		if (gamepad1.b) {
+			carousel.motor.setPower(1); // Turn the carousel (Red side, B is red)
+		} else if (gamepad1.x) {
+			carousel.motor.setPower(-1);
 		} else {
 			carousel.motor.setPower(0); // Don't turn the carousel
 		}
 
-		// Resetting arm (at 0) (Base)
-		if (gamepad1.a) {
-			arm.motorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-			arm.motorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-			armTargetPos = 0;
-		}
-
-		// Turret (Operator)
-//		telemetry.addData("Turret degrees", turret.getRotation());
-//		telemetry.addData("Turret Target Degrees", (turret.motor.getTargetPosition() / Constants.Turret.TICKS_PER_DEGREE));
-//		telemetry.addData("Turret Current Position", turret.motor.getCurrentPosition());
-//		telemetry.addData("Turret Target Position", turret.motor.getTargetPosition());
-//		telemetry.addData("Turret Power Output", turret.motor.getPower());
-////		if (gamepad2.dpad_right) {
-//			turret.setPosition(Turret.Position.RIGHT); // Turn to right
-//		}
-//		if (gamepad2.dpad_up) {
-//			turret.setPosition(Turret.Position.FRONT); //  Turn to forward
-//		}
-//		if (gamepad2.dpad_left) {
-//			turret.setPosition(Turret.Position.LEFT); // Turn to left
-//		}
-//		if (gamepad2.dpad_down) {
-//			turret.setPosition(Turret.Position.BACK); // Turn to back
-//		}
-
-//		turret.motor.setPower(gamepad2.left_stick_y);
-
-		turretMotor.setPower(gamepad2.right_stick_x * 0.5);
-
-		// Arm (Operator)
-//		armTargetPos += -gamepad2.left_stick_y * 0.2;
-//		arm.setPosition(armTargetPos);
-
-//		arm.setPower(100 * arm.getRotation() - gamepad2.left_stick_y);
+		turretMotor.setPower(gamepad2.right_stick_x * 0.75  );
 
 		if (-gamepad2.left_stick_y >= 0) {
-			double multiplier = 0.3;
+			double multiplier = 0.2;
 			arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
 			if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
 				arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
@@ -146,7 +127,7 @@ public class BlueTeleOp extends OpMode {
 				arm.motorTwo.setPower(0.1);
 			}
 		} else {
-			double multiplier = 0.15;
+			double multiplier = 0.08;
 			arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
 			if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
 				arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
@@ -155,24 +136,10 @@ public class BlueTeleOp extends OpMode {
 			}
 		}
 
-//		if (gamepad2.x) {
-//			arm.setPosition(Arm.Position.INTAKE);
-//		} else if (gamepad2.y) {
-//			arm.setPosition(Arm.Position.LEVEL_THREE);
-//		} else if (gamepad2.b) {
-//			arm.setPosition(Arm.Position.LEVEL_TWO);
-//		} else if (gamepad2.a) {
-//			arm.setPosition(Arm.Position.LEVEL_ONE);
-//		}
-//		telemetry.addData("Arm power", arm.motorOne.getPower());
-//		telemetry.addData("Arm position", arm.getRotation());
-//		telemetry.addData("m1 pos", arm.motorOne.getCurrentPosition());
-//		telemetry.addData("m2 pos", arm.motorTwo.getCurrentPosition());
-//		telemetry.addData("Arm target position", arm.motorOne.getTargetPosition());
-
 		// Gripper (Operator)
 		if (gamepad2.right_bumper) {
 			gripper.closeGripper(); // Close the gripper
+//			gamepad1.rumble(1000);
 		}
 		if (gamepad2.left_bumper) {
 			gripper.openGripper(); // Open the gripper

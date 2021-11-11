@@ -27,49 +27,71 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.teleop.tests;
+package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.util.Timer;
+import org.firstinspires.ftc.teamcode.util.hardware.Arm;
+import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
+import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
+import org.firstinspires.ftc.teamcode.util.hardware.Turret;
 
-@TeleOp(name = "Tank Drive", group = "Iterative Opmode")
-@Disabled
-public class TankDriveTeleOp extends OpMode {
+@Autonomous(name = "Blue Storage", group = "Linear Opmode")
+public class BlueStorage extends LinearOpMode {
 
-	private String versionNumber = "v0.1'";
+	private String versionNumber = "v0.1";
+
 	private Chassis chassis;
+	private Turret turret;
+	private Arm arm;
+	private Gripper gripper;
+	private Carousel carousel;
 
 	@Override
-	public void init() {
+	public void runOpMode() {
+		// Initialization code goes here
 		chassis = new Chassis(this);
+		turret = new Turret(this, true);
+		arm = new Arm(this, true);
+		gripper = new Gripper(this);
+		carousel = new Carousel(this);
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
-	}
 
-	@Override
-	public void init_loop() {
+		waitForStart();
+		if (!opModeIsActive()) return;
 
-	}
-
-	@Override
-	public void start() {
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
+
+		// Autonomous code goes here
+		gripper.closeGripper();
+		Timer.delay(2);
+		arm.motorOne.setPower(-0.2);
+		arm.motorTwo.setPower(0.2);
+		Timer.delay(0.25);
+		arm.motorOne.setPower(0);
+		arm.motorTwo.setPower(0.1);
+
+		chassis.driveForward(24, 1, 0.1, 0.1, 5);
+		chassis.turnWithEncoder(8.8, 1, 0.1, 0.1, 5);
+		chassis.driveForward(-20, 1, 0.3, 0.05, 5);
+		chassis.driveForward(-5, 0.6, 0.05, 0.1, 5);
+		carousel.motor.setPower(-0.8);
+		Timer.delay(10);
+		carousel.motor.setPower(0);
+		chassis.driveForward(5, 0.7, 0.05, 0.05, 5);
+		chassis.turnWithEncoder(-10, -7.5, 0.1, 0.1, 5);
+		chassis.driveForward(12, 0.9, 0.1, 0.1, 5);
+
+		arm.setPower(0);
+		Timer.delay(2);
+
+		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
 		telemetry.update();
 	}
-
-	@Override
-	public void loop() {
-		chassis.drive(gamepad1.left_stick_y, 0, -gamepad1.right_stick_x);
-	}
-
-	@Override
-	public void stop() {
-		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
-		telemetry.update();
-	}
-
 }

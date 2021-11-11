@@ -42,16 +42,24 @@ public class Chassis {
 		this.lm2.setDirection(DcMotorSimple.Direction.FORWARD);
 		this.rm1.setDirection(DcMotorSimple.Direction.REVERSE);
 		this.rm2.setDirection(DcMotorSimple.Direction.REVERSE);
-//
-//		// Initialize IMU
-//		this.imu = this.linearOpMode.hardwareMap.get(BNO055IMU.class, "imu");
+
+		// Initialize IMU
+		this.imu = this.opMode.hardwareMap.get(BNO055IMU.class, "imu");
+
+
+
+
 //		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 //		parameters.loggingEnabled = false;
+		parameters.loggingEnabled = false;
 //		parameters.mode = BNO055IMU.SensorMode.IMU;
+		parameters.mode = BNO055IMU.SensorMode.IMU;
 //		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
 //		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-//
-//		this.imu.initialize(parameters);
+		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+		this.imu.initialize(parameters);
 
 		drive(0, 0, 0);
 	}
@@ -70,20 +78,29 @@ public class Chassis {
 		rm2.setPower(drive + strafe - turn);
 	}
 
+	public void setTargetPosition(int position) {
+		lm1.setTargetPosition(position);
+		lm2.setTargetPosition(position);
+		rm1.setTargetPosition(position);
+		rm2.setTargetPosition(position);
+	}
+
 	/**
 	 * Gets the angle in degrees of the robot.
 	 *
 	 * @return Returns the angle in degrees of the robot.
 	 */
 	public double getAngle() {
-		// We experimentally determined the Z axis is the axis we want to use for heading angle.
-		// We have to process the angle because the imu works in euler angles so the Z axis is
+		// We experimentally determined the Y axis is the axis we want to use for heading angle.
+		// We have to process the angle because the imu works in euler angles so the Y axis is
 		// returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
 		// 180 degrees. We detect this transition and track the total cumulative angle of rotation.
 
-		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
 
-		double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
+		double deltaAngle = angles.secondAngle - lastAngles.secondAngle;
+
+		opMode.telemetry.addData("deltaAngle", deltaAngle);
 
 		if (deltaAngle < -180)
 			deltaAngle += 360;
@@ -138,6 +155,33 @@ public class Chassis {
 				+ Math.abs(rm2.getCurrentPosition())) / 4;
 	}
 
+	public  void encoderDriveForward(double speed, double inches) {
+
+		int targetPos = (int)(inches * Constants.Drivetrain.TICKS_PER_INCH);
+
+		setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+		setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+		setTargetPosition(targetPos);
+
+		drive(Math.abs(speed), 0, 0);
+
+		while (lm1.isBusy() && lm2.isBusy() && rm1.isBusy() && rm2.isBusy()) {
+			opMode.telemetry.addData("LM1", lm1.getCurrentPosition());
+			opMode.telemetry.addData("LM2", lm2.getCurrentPosition());
+			opMode.telemetry.addData("RM1", rm1.getCurrentPosition());
+			opMode.telemetry.addData("RM2", rm2.getCurrentPosition());
+//			opMode.telemetry.addData("LM1", lm1.());
+//			opMode.telemetry.addData("LM2", lm2.getTargetPosition());
+//			opMode.telemetry.addData("RM1", rm1.getTargetPosition());
+//			opMode.telemetry.addData("RM2", rm2.getTargetPosition());
+			opMode.telemetry.update();
+		}
+
+		drive(0, 0, 0);
+	}
+
 	/**
 	 * Drives the robot forward.
 	 *
@@ -145,7 +189,7 @@ public class Chassis {
 	 * @param maxSpeed          The maxSpeed the robot will travel in motor power (0-1).
 	 * @param speedUpPercentage The percentage the distance will be at before starting to ramp up or down.
 	 */
-	public void driveForward(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage) {
+	public void driveForward(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage, double timeout) {
 		opMode.telemetry.addData("Status", "Driving for " + distance + " inches");
 		opMode.telemetry.update();
 
@@ -158,12 +202,23 @@ public class Chassis {
 		distance = Math.abs(distance);
 
 		setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+		setTargetPosition((int) distance * (forwards ? 1 : -1));
 
 		double percentage;
 		double power;
-		// Stop if A is pressed for debugging incase it's really not good
-		while (Math.abs(getDrivePosition()) < distance && !this.opMode.gamepad1.a) {
+		Timer timer = new Timer();
+		timer.start();
+		while (Math.abs(getDrivePosition()) < distance && !this.opMode.gamepad1.a && !timer.hasElapsed(timeout)) {
+			opMode.telemetry.addData("LM1", lm1.getCurrentPosition());
+			opMode.telemetry.addData("LM2", lm2.getCurrentPosition());
+			opMode.telemetry.addData("RM1", rm1.getCurrentPosition());
+			opMode.telemetry.addData("RM2", rm2.getCurrentPosition());
+//			opMode.telemetry.addData("LM1", lm1.());
+//			opMode.telemetry.addData("LM2", lm2.getTargetPosition());
+//			opMode.telemetry.addData("RM1", rm1.getTargetPosition());
+//			opMode.telemetry.addData("RM2", rm2.getTargetPosition());
+			opMode.telemetry.update();
 			percentage = Math.abs(getDrivePosition() / distance);
 			if (percentage <= speedUpPercentage) {
 				// Speed up
@@ -181,7 +236,7 @@ public class Chassis {
 				drive(power, 0, 0);
 			} else {
 				// Drive backwards
-				drive(-power, 0, 0);
+				drive(power, 0, 0);
 			}
 		}
 		drive(0, 0, 0);
@@ -198,7 +253,7 @@ public class Chassis {
 		opMode.telemetry.addData("Status", "Turning to " + degrees + "°");
 		opMode.telemetry.update();
 
-		setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 		PIDController pidController = new PIDController(Constants.Drivetrain.TURNING_PID_KP, Constants.Drivetrain.TURNING_PID_KI, Constants.Drivetrain.TURNING_PID_KD);
 		pidController.setTolerance(1);
@@ -210,15 +265,82 @@ public class Chassis {
 
 		loop:
 		while (true) {
+
 			double pidOutput = pidController.calculate(getAngle(), targetAngle);
 			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.TURNING_PID_KF * (pidController.atSetpoint() ? 0 : 1));
-			drive(0, 0, MathUtils.clamp(-output, -maxPower, maxPower));
+//			double output = Constants.Drivetrain.TURNING_PID_KF;
+			drive(0, 0, MathUtils.clamp(output, -maxPower, maxPower));
+
+			opMode.telemetry.addData("Power", output);
+			opMode.telemetry.addData("Angle", getAngle());
+			opMode.telemetry.update();
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
 				drive(0, 0, 0);
 				break loop;
 			}
 		}
+	}
+
+	public void turnWithEncoder(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage, double timeout) {
+		opMode.telemetry.addData("Status", "Turning for " + (distance * 50) + " units");
+		opMode.telemetry.update();
+
+		speedUpPercentage = Math.abs(speedUpPercentage);
+		slowDownPercentage = Math.abs(slowDownPercentage);
+		maxSpeed = Math.abs(maxSpeed);
+		if (distance == 0) return;
+		boolean forwards = distance > 0;
+//		distance *= Constants.Drivetrain.TICKS_PER_INCH; // Sets it to be the distance in ticks
+		distance = Math.abs(distance * 50);
+
+		setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+//		setTargetPosition((int) distance);
+		lm1.setTargetPosition((int) -distance * (forwards ? 1 : -1));
+		lm2.setTargetPosition((int) -distance * (forwards ? 1 : -1));
+		rm1.setTargetPosition((int) distance * (forwards ? 1 : -1));
+		rm2.setTargetPosition((int) distance * (forwards ? 1 : -1));
+
+		double percentage;
+		double power;
+		Timer timer = new Timer();
+		timer.start();
+		while (Math.abs(getRightDrivePosition()) < Math.abs(distance) && !timer.hasElapsed(timeout)) {
+			opMode.telemetry.addData("LM1", lm1.getCurrentPosition());
+			opMode.telemetry.addData("LM2", lm2.getCurrentPosition());
+			opMode.telemetry.addData("RM1", rm1.getCurrentPosition());
+			opMode.telemetry.addData("RM2", rm2.getCurrentPosition());
+			opMode.telemetry.update();
+			percentage = Math.abs(getDrivePosition() / distance);
+			if (percentage <= speedUpPercentage) {
+				// Speed up
+				power = (maxSpeed / speedUpPercentage) * percentage;
+			} else if (percentage >= 1 - slowDownPercentage) {
+				// Slow down
+				power = -(maxSpeed / slowDownPercentage) * percentage;
+			} else {
+				// Full power
+				power = maxSpeed;
+			}
+			power = MathUtils.clamp(power, 0.1, maxSpeed);
+			if (forwards) {
+				// Drive forwards
+				drive(0, 0, power);
+			} else {
+				// Drive backwards
+				drive(0, 0, power);
+			}
+		}
+		drive(0, 0, 0);
+	}
+
+	public double getLeftDrivePosition() {
+		return (lm1.getCurrentPosition() + lm2.getCurrentPosition()) / 2;
+	}
+
+	public double getRightDrivePosition() {
+		return (rm1.getCurrentPosition() + rm2.getCurrentPosition()) / 2;
 	}
 
 }

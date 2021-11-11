@@ -50,4 +50,13 @@ public class Timer {
             return get() > seconds;
         }
     }
+
+    public static void delay(double seconds) {
+        Timer timer = new Timer();
+        timer.start();
+        while(!timer.hasElapsed(seconds)){
+
+        }
+    }
+
 }
