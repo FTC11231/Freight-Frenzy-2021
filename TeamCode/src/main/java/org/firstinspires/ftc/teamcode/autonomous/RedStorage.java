@@ -81,6 +81,7 @@ public class RedStorage extends LinearOpMode {
 		chassis.driveForward(-20, 1, 0.3, 0.05, 5);
 		chassis.driveForward(-5, 0.6, 0.05, 0.1, 5);
 		carousel.motor.setPower(0.8);
+		chassis.driveForward(-5, 0.2, 0.1, 0.1, 1);
 		Timer.delay(10);
 		carousel.motor.setPower(0);
 		chassis.driveForward(5, 0.7, 0.05, 0.05, 5);

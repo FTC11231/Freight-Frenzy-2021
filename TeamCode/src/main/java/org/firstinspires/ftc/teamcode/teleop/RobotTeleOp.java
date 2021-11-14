@@ -79,11 +79,7 @@ public class RobotTeleOp extends OpMode {
 
 	@Override
 	public void init_loop() {
-		Orientation angles = chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-		telemetry.addData("axis 1", angles.firstAngle);
-		telemetry.addData("axis 2", angles.secondAngle);
-		telemetry.addData("axis 3", angles.thirdAngle);
-		telemetry.update();
+
 	}
 
 	@Override
@@ -95,10 +91,10 @@ public class RobotTeleOp extends OpMode {
 	@Override
 	public void loop() {
 		telemetry.addData("Status", "Running (Version: " + versionNumber + ")");
-//		telemetry.addData("Final angle", chassis.getAngle());
-//		telemetry.addData("Axis 1", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).firstAngle);
-//		telemetry.addData("Axis 2", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).secondAngle);
-//		telemetry.addData("Axis 3", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
+		telemetry.addData("Final angle", chassis.getAngle());
+		telemetry.addData("X", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).firstAngle);
+		telemetry.addData("Y", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).secondAngle);
+		telemetry.addData("Z", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
 
 		// Chassis (Base)
 		double throttleDrive = gamepad1.right_trigger - gamepad1.left_trigger;
@@ -116,10 +112,10 @@ public class RobotTeleOp extends OpMode {
 			carousel.motor.setPower(0); // Don't turn the carousel
 		}
 
-		turretMotor.setPower(gamepad2.right_stick_x * 0.75  );
+		turretMotor.setPower(gamepad2.right_stick_x * 0.60);
 
 		if (-gamepad2.left_stick_y >= 0) {
-			double multiplier = 0.2;
+			double multiplier = 0.15;
 			arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
 			if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
 				arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
@@ -127,7 +123,7 @@ public class RobotTeleOp extends OpMode {
 				arm.motorTwo.setPower(0.1);
 			}
 		} else {
-			double multiplier = 0.08;
+			double multiplier = 0.06;
 			arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
 			if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
 				arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
