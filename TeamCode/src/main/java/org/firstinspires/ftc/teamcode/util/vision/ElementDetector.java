@@ -34,4 +34,16 @@ public class ElementDetector {
 		});
 	}
 
+	public void setRectOne(int x, int y, int width, int height) {
+		pipeline.setRectOne(x, y, width, height);
+	}
+
+	public void setRectTwo(int x, int y, int width, int height) {
+		pipeline.setRectTwo(x, y, width, height);
+	}
+
+	public void setRectThree(int x, int y, int width, int height) {
+		pipeline.setRectThree(x, y, width, height);
+	}
+
 }
