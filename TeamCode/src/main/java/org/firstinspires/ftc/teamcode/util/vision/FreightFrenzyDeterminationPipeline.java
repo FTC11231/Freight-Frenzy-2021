@@ -33,13 +33,13 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 	private final Scalar GREEN = new Scalar(0, 255, 0, 100);
 
 	// Declare points for the rectangles we're checking
-	private Point regionOnePointA;
-	private Point regionOnePointB;
-	private Point regionTwoPointA;
-	private Point regionTwoPointB;
-	private Point regionThreePointA;
-	private Point regionThreePointB;
-	private int distanceThreshold;
+	private Point regionOnePointA = new Point();
+	private Point regionOnePointB = new Point();
+	private Point regionTwoPointA = new Point();
+	private Point regionTwoPointB = new Point();
+	private Point regionThreePointA = new Point();
+	private Point regionThreePointB = new Point();
+	private int distanceThreshold = 0;
 
 	// Vars to make this all work
 	private Mat region1_Cb; // Rectangle 1
@@ -62,10 +62,6 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 
 	@Override
 	public void init(Mat firstFrame) {
-		setRectOne(38, 80, 33, 34);
-		setRectTwo(140, 93, 29, 32);
-		setRectThree(232, 100, 35, 35);
-		distanceThreshold = 220;
 
 		inputToCb(firstFrame);
 		region1_Cb = firstFrame.submat(new Rect(regionOnePointA, regionOnePointB));
@@ -81,7 +77,7 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 		region2_Cb = input.submat(new Rect(regionTwoPointA, regionTwoPointB));
 		region3_Cb = input.submat(new Rect(regionThreePointA, regionThreePointB));
 		// Scalar yellowColor = new Scalar(184, 193, 15);
-		Scalar yellowColor = new Scalar(220, 175, 31);
+		Scalar yellowColor = new Scalar(163, 164, 67);
 		// Compare the average color of each rectangle to yellow
 		dist1 = (int) getColorDifference(Core.mean(region1_Cb), yellowColor);
 		dist2 = (int) getColorDifference(Core.mean(region2_Cb), yellowColor);
