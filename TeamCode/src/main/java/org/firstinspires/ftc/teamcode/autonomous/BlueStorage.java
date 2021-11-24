@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.Timer;
@@ -74,19 +75,26 @@ public class BlueStorage extends LinearOpMode {
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
 
-		waitForStart();
+		while (!isStarted() && !isStopRequested()) {
+			telemetry.addData("Position", elementDetector.getPosition());
+			telemetry.update();
+		}
+
 		if (!opModeIsActive()) return;
 
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 
 		// Autonomous code goes here
-		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = FreightFrenzyDeterminationPipeline.ElementPosition.LEFT;
+		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = elementDetector.getPosition();
+//		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = FreightFrenzyDeterminationPipeline.ElementPosition.LEFT;
+		telemetry.addData("Position", elementPosition);
+		telemetry.update();
 		switch (elementPosition) {
 			case LEFT:
 				hub();
 				Timer.delay(0.1);
 				arm.setPosition(20, 0.3);
-				chassis.driveForward(10, 0.8, 0.2, 0.2, 5); // Drive into the hub
+				chassis.driveForward(10, 0.3, 0.2, 0.2, 5); // Drive into the hub
 				gripper.openGripper(); // Open gripper
 				Timer.delay(1); // Wait for gripper to open
 				chassis.driveForward(-18, 0.8, 0.3, 0.3, 5); // Drive away from the hub
@@ -98,7 +106,7 @@ public class BlueStorage extends LinearOpMode {
 				hub();
 				Timer.delay(0.1);
 				arm.setPosition(50, 0.3);
-				chassis.driveForward(6, 0.8, 0.2, 0.2, 5); // Drive into the hub
+				chassis.driveForward(6, 0.3, 0.2, 0.2, 5); // Drive into the hub
 				gripper.openGripper(); // Open gripper
 				Timer.delay(1); // Wait for gripper to open
 				chassis.driveForward(-14, 0.8, 0.3, 0.3, 5); // Drive away from the hub
@@ -110,10 +118,10 @@ public class BlueStorage extends LinearOpMode {
 				hub();
 				Timer.delay(0.1);
 				arm.setPosition(80, 0.3);
-				chassis.driveForward(8, 0.8, 0.2, 0.2, 5); // Drive into the hub
+				chassis.driveForward(7, 0.3, 0.2, 0.2, 5); // Drive into the hub
 				gripper.openGripper(); // Open gripper
 				Timer.delay(1); // Wait for gripper to open
-				chassis.driveForward(-16, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				chassis.driveForward(-15, 0.8, 0.3, 0.3, 5); // Drive away from the hub
 				arm.setPosition(25, 0.05); // Move the arm down
 				Timer.delay(0.5);
 				carouselPark();
@@ -151,6 +159,8 @@ public class BlueStorage extends LinearOpMode {
 		carousel.motor.setPower(0); // Turn the carousel wheel off
 		chassis.turn(-19, 0.5, 5); // Turn towards the storage unit
 		chassis.driveForward(18, 0.5, 0.2, 0.3, 5); // Drive into the storage unit
+		chassis.turn(90, 0.5, 5);
+		chassis.driveForward(-4, 0.3, 0.2, 0.2, 5);
 	}
 
 }

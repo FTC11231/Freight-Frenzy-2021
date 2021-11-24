@@ -107,7 +107,7 @@ public class Chassis {
 
 		double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
 
-		opMode.telemetry.addData("deltaAngle", deltaAngle);
+//		opMode.telemetry.addData("deltaAngle", deltaAngle);
 
 		if (deltaAngle < -180)
 			deltaAngle += 360;
@@ -175,15 +175,15 @@ public class Chassis {
 		drive(Math.abs(speed), 0, 0);
 
 		while (lm1.isBusy() && lm2.isBusy() && rm1.isBusy() && rm2.isBusy()) {
-			opMode.telemetry.addData("LM1", lm1.getCurrentPosition());
-			opMode.telemetry.addData("LM2", lm2.getCurrentPosition());
-			opMode.telemetry.addData("RM1", rm1.getCurrentPosition());
-			opMode.telemetry.addData("RM2", rm2.getCurrentPosition());
+//			opMode.telemetry.addData("LM1", lm1.getCurrentPosition());
+//			opMode.telemetry.addData("LM2", lm2.getCurrentPosition());
+//			opMode.telemetry.addData("RM1", rm1.getCurrentPosition());
+//			opMode.telemetry.addData("RM2", rm2.getCurrentPosition());
 //			opMode.telemetry.addData("LM1", lm1.());
 //			opMode.telemetry.addData("LM2", lm2.getTargetPosition());
 //			opMode.telemetry.addData("RM1", rm1.getTargetPosition());
 //			opMode.telemetry.addData("RM2", rm2.getTargetPosition());
-			opMode.telemetry.update();
+//			opMode.telemetry.update();
 		}
 
 		drive(0, 0, 0);
@@ -197,8 +197,8 @@ public class Chassis {
 	 * @param speedUpPercentage The percentage the distance will be at before starting to ramp up or down.
 	 */
 	public void driveForward(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage, double timeout) {
-		opMode.telemetry.addData("Status", "Driving for " + distance + " inches");
-		opMode.telemetry.update();
+//		opMode.telemetry.addData("Status", "Driving for " + distance + " inches");
+//		opMode.telemetry.update();
 
 		speedUpPercentage = Math.abs(speedUpPercentage);
 		slowDownPercentage = Math.abs(slowDownPercentage);
@@ -217,15 +217,15 @@ public class Chassis {
 		Timer timer = new Timer();
 		timer.start();
 		while (Math.abs(getDrivePosition()) < distance && !this.opMode.gamepad1.a && !timer.hasElapsed(timeout)) {
-			opMode.telemetry.addData("LM1", lm1.getCurrentPosition());
-			opMode.telemetry.addData("LM2", lm2.getCurrentPosition());
-			opMode.telemetry.addData("RM1", rm1.getCurrentPosition());
-			opMode.telemetry.addData("RM2", rm2.getCurrentPosition());
+//			opMode.telemetry.addData("LM1", lm1.getCurrentPosition());
+//			opMode.telemetry.addData("LM2", lm2.getCurrentPosition());
+//			opMode.telemetry.addData("RM1", rm1.getCurrentPosition());
+//			opMode.telemetry.addData("RM2", rm2.getCurrentPosition());
 //			opMode.telemetry.addData("LM1", lm1.());
 //			opMode.telemetry.addData("LM2", lm2.getTargetPosition());
 //			opMode.telemetry.addData("RM1", rm1.getTargetPosition());
 //			opMode.telemetry.addData("RM2", rm2.getTargetPosition());
-			opMode.telemetry.update();
+//			opMode.telemetry.update();
 			percentage = Math.abs(getDrivePosition() / distance);
 			if (percentage <= speedUpPercentage) {
 				// Speed up
@@ -258,8 +258,8 @@ public class Chassis {
 	 * @param timeoutSeconds The time the robot will turn for before stopping since the angle is close enough.
 	 */
 	public void turn(double degrees, double maxPower, double timeoutSeconds) {
-		opMode.telemetry.addData("Status", "Turning to " + degrees + "°");
-		opMode.telemetry.update();
+//		opMode.telemetry.addData("Status", "Turning to " + degrees + "°");
+//		opMode.telemetry.update();
 
 		setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -291,8 +291,8 @@ public class Chassis {
 	}
 
 	public void turnWithEncoder(double distance, double maxSpeed, double speedUpPercentage, double slowDownPercentage, double timeout) {
-		opMode.telemetry.addData("Status", "Turning for " + (distance * 50) + " units");
-		opMode.telemetry.update();
+//		opMode.telemetry.addData("Status", "Turning for " + (distance * 50) + " units");
+//		opMode.telemetry.update();
 
 		speedUpPercentage = Math.abs(speedUpPercentage);
 		slowDownPercentage = Math.abs(slowDownPercentage);
@@ -315,11 +315,11 @@ public class Chassis {
 		Timer timer = new Timer();
 		timer.start();
 		while (Math.abs(getRightDrivePosition()) < Math.abs(distance) && !timer.hasElapsed(timeout)) {
-			opMode.telemetry.addData("LM1", lm1.getCurrentPosition());
-			opMode.telemetry.addData("LM2", lm2.getCurrentPosition());
-			opMode.telemetry.addData("RM1", rm1.getCurrentPosition());
-			opMode.telemetry.addData("RM2", rm2.getCurrentPosition());
-			opMode.telemetry.update();
+//			opMode.telemetry.addData("LM1", lm1.getCurrentPosition());
+//			opMode.telemetry.addData("LM2", lm2.getCurrentPosition());
+//			opMode.telemetry.addData("RM1", rm1.getCurrentPosition());
+//			opMode.telemetry.addData("RM2", rm2.getCurrentPosition());
+//			opMode.telemetry.update();
 			percentage = Math.abs(getDrivePosition() / distance);
 			if (percentage <= speedUpPercentage) {
 				// Speed up

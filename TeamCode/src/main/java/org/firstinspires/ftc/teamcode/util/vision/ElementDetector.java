@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util.vision;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class ElementDetector {
@@ -24,7 +25,7 @@ public class ElementDetector {
 		webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 			@Override
 			public void onOpened() {
-
+				webcam.startStreaming(320,240, OpenCvCameraRotation.UPRIGHT);
 			}
 
 			@Override
@@ -52,6 +53,10 @@ public class ElementDetector {
 
 	public void setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType detectionType) {
 		pipeline.setDetectionType(detectionType);
+	}
+
+	public FreightFrenzyDeterminationPipeline.ElementPosition getPosition() {
+		return pipeline.getPosition();
 	}
 
 }
