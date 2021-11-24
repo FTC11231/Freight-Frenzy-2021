@@ -38,6 +38,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.util.Constants;
+import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
@@ -45,20 +46,17 @@ import org.firstinspires.ftc.teamcode.util.hardware.TurretArm;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
 import org.firstinspires.ftc.teamcode.util.hardware.Turret;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Tele-Op", group = "Iterative Opmode")
-public class RobotTeleOp extends OpMode {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Tele-Op (A)", group = "Iterative Opmode")
+public class TeleopTeamA extends OpMode {
 
 	private final String versionNumber = "v0.5";
 	private Chassis chassis;
-//	private Turret turret;
 	private Arm arm;
 	private Carousel carousel;
 	private Gripper gripper;
-//	private TurretArm turretArm;
 
 	private DcMotor turretMotor;
-
-	private double armTargetPos;
+	private Timer carouselTimer;
 
 	@Override
 	public void init() {
@@ -72,6 +70,7 @@ public class RobotTeleOp extends OpMode {
 		turretMotor = hardwareMap.get(DcMotor.class, "turret");
 
 		gripper.openGripper();
+		carouselTimer = new Timer();
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
@@ -84,6 +83,7 @@ public class RobotTeleOp extends OpMode {
 
 	@Override
 	public void start() {
+		carouselTimer.start();
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 		telemetry.update();
 	}
@@ -92,28 +92,42 @@ public class RobotTeleOp extends OpMode {
 	public void loop() {
 		telemetry.addData("Status", "Running (Version: " + versionNumber + ")");
 		telemetry.addData("Final angle", chassis.getAngle());
-		telemetry.addData("X", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).firstAngle);
-		telemetry.addData("Y", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).secondAngle);
-		telemetry.addData("Z", chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
+		Orientation angles = chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+		telemetry.addData("X", angles.thirdAngle);
+		telemetry.addData("Y", angles.secondAngle);
+		telemetry.addData("Z", angles.firstAngle);
 
 		// Chassis (Base)
 		double throttleDrive = gamepad1.right_trigger - gamepad1.left_trigger;
-		double driveMultiplier = gamepad1.a ? 1 : 0.75; // If pressing a bumper, slow down
-		chassis.drive(throttleDrive * driveMultiplier,
+		double driveMultiplier = 0.75;
+		if (gamepad1.a) {
+			driveMultiplier = 12;
+		}
+		if (gamepad1.left_bumper || gamepad1.right_bumper) {
+			driveMultiplier *= 0.75;
+		}
+		chassis.drive(-gamepad1.left_stick_y * driveMultiplier,
 				gamepad1.left_stick_x * driveMultiplier,
 				gamepad1.right_stick_x * driveMultiplier);
 
 		// Carousel (Base)
+//		double carouselPower = carouselTimer.get() * 3;
+//		telemetry.addData("Timer", carouselTimer.get());
+//		telemetry.addData("Power", carouselPower);
 		if (gamepad1.b) {
 			carousel.motor.setPower(1); // Turn the carousel (Red side, B is red)
 		} else if (gamepad1.x) {
-			carousel.motor.setPower(-1);
+			carousel.motor.setPower(-1); // Turn the carousel (Blue side, X is blue)
 		} else {
 			carousel.motor.setPower(0); // Don't turn the carousel
+//			carouselTimer.stop();
+//			carouselTimer.start(); // Set the timer to 0 for when we start turning the carousel
 		}
 
+		// Turret (Operator)
 		turretMotor.setPower(gamepad2.right_stick_x * 0.60);
 
+		// Arm (Operator)
 		if (-gamepad2.left_stick_y >= 0) {
 			double multiplier = 0.15;
 			arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
@@ -135,13 +149,10 @@ public class RobotTeleOp extends OpMode {
 		// Gripper (Operator)
 		if (gamepad2.right_bumper) {
 			gripper.closeGripper(); // Close the gripper
-//			gamepad1.rumble(1000);
 		}
 		if (gamepad2.left_bumper) {
 			gripper.openGripper(); // Open the gripper
 		}
-
-//		arm.update();
 
 		telemetry.update();
 	}
