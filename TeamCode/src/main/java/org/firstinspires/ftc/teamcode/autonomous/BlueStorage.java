@@ -30,15 +30,17 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
 import org.firstinspires.ftc.teamcode.util.hardware.Turret;
+import org.firstinspires.ftc.teamcode.util.vision.ElementDetector;
+import org.firstinspires.ftc.teamcode.util.vision.FreightFrenzyDeterminationPipeline;
 
 @Autonomous(name = "Blue Storage", group = "Linear Opmode")
 public class BlueStorage extends LinearOpMode {
@@ -46,19 +48,28 @@ public class BlueStorage extends LinearOpMode {
 	private String versionNumber = "v0.1";
 
 	private Chassis chassis;
-	private Turret turret;
+//	private Turret turret;
 	private Arm arm;
 	private Gripper gripper;
 	private Carousel carousel;
+
+	private ElementDetector elementDetector;
 
 	@Override
 	public void runOpMode() {
 		// Initialization code goes here
 		chassis = new Chassis(this);
-		turret = new Turret(this, true);
+//		turret = new Turret(this, true);
 		arm = new Arm(this, true);
 		gripper = new Gripper(this);
 		carousel = new Carousel(this);
+
+		elementDetector = new ElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
+		elementDetector.setRectOne(0, 0, 10, 10);
+		elementDetector.setRectTwo(15, 130, 25, 55);
+		elementDetector.setRectThree(150, 130, 30, 55);
+		elementDetector.setDistanceThreshold(340);
+		elementDetector.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.LEFT_NOT_VISIBLE);
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
@@ -69,30 +80,77 @@ public class BlueStorage extends LinearOpMode {
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 
 		// Autonomous code goes here
-		gripper.closeGripper();
-		Timer.delay(2);
-		arm.motorOne.setPower(-0.2);
-		arm.motorTwo.setPower(0.2);
-		Timer.delay(0.25);
-		arm.motorOne.setPower(0);
-		arm.motorTwo.setPower(0.1);
+		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = FreightFrenzyDeterminationPipeline.ElementPosition.LEFT;
+		switch (elementPosition) {
+			case LEFT:
+				hub();
+				Timer.delay(0.1);
+				arm.setPosition(20, 0.3);
+				chassis.driveForward(10, 0.8, 0.2, 0.2, 5); // Drive into the hub
+				gripper.openGripper(); // Open gripper
+				Timer.delay(1); // Wait for gripper to open
+				chassis.driveForward(-18, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				arm.setPosition(25, 0.05); // Move the arm down
+				Timer.delay(0.5);
+				carouselPark();
+				break;
+			case CENTER:
+				hub();
+				Timer.delay(0.1);
+				arm.setPosition(50, 0.3);
+				chassis.driveForward(6, 0.8, 0.2, 0.2, 5); // Drive into the hub
+				gripper.openGripper(); // Open gripper
+				Timer.delay(1); // Wait for gripper to open
+				chassis.driveForward(-14, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				arm.setPosition(25, 0.05); // Move the arm down
+				Timer.delay(0.5);
+				carouselPark();
+				break;
+			case RIGHT:
+				hub();
+				Timer.delay(0.1);
+				arm.setPosition(80, 0.3);
+				chassis.driveForward(8, 0.8, 0.2, 0.2, 5); // Drive into the hub
+				gripper.openGripper(); // Open gripper
+				Timer.delay(1); // Wait for gripper to open
+				chassis.driveForward(-16, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				arm.setPosition(25, 0.05); // Move the arm down
+				Timer.delay(0.5);
+				carouselPark();
+				break;
+		}
 
-		chassis.driveForward(24, 1, 0.1, 0.1, 5);
-		chassis.turnWithEncoder(8.8, 1, 0.1, 0.1, 5);
-		chassis.driveForward(-20, 1, 0.3, 0.05, 5);
-		chassis.driveForward(-5, 0.6, 0.05, 0.1, 5);
-		carousel.motor.setPower(-0.8);
-		chassis.driveForward(-5, 0.2, 0.1, 0.1, 1);
-		Timer.delay(10);
-		carousel.motor.setPower(0);
-		chassis.driveForward(5, 0.7, 0.05, 0.05, 5);
-		chassis.turnWithEncoder(-10, -7.5, 0.1, 0.1, 5);
-		chassis.driveForward(12, 0.9, 0.1, 0.1, 5);
 
 		arm.setPower(0);
-		Timer.delay(2);
 
 		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
 		telemetry.update();
 	}
+
+	public void hub() {
+		gripper.closeGripper();
+		Timer.delay(1);
+		arm.setPosition(15,0.6);
+
+		chassis.driveForward(34, 0.75, 0.2, 0.2, 5); // Drive towards the hub
+		Timer.delay(0.1); // Delay for safety
+		chassis.turn(90, 0.8, 5); // Turn to the hub
+	}
+
+	public void carouselPark() {
+		chassis.turn(0, 0.8, 5); // Turn to carousel
+		chassis.driveForward(-25, 0.95, 0.2, 0.2, 5); // Drive back to carousel
+		chassis.turn(45, 0.8, 5); // Turn to more precisely get carousel
+		carousel.motor.setPower(-0.6); // Start turning the carousel wheel
+		chassis.driveForward(-4, 0.5, 0.05, 0.05, 5); // Drive back into carousel
+		chassis.drive(-0.1, 0, 0); // Drive back into the carousel fully
+		Timer.delay(2); // Wait for the chassis to be fully on the carousel
+		chassis.drive(0, 0, 0); // Stop driving towarsd the carousel
+		Timer.delay(5); // Wait for the duck to fall off
+		chassis.driveForward(5, 0.4, 0.2, 0.2, 5); // Drive away from the carousel
+		carousel.motor.setPower(0); // Turn the carousel wheel off
+		chassis.turn(-19, 0.5, 5); // Turn towards the storage unit
+		chassis.driveForward(18, 0.5, 0.2, 0.3, 5); // Drive into the storage unit
+	}
+
 }

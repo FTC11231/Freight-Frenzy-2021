@@ -12,7 +12,7 @@ public class Constants {
 		public static final double TICKS_PER_INCH = TICKS_PER_REV * GEAR_RATIO / (WHEEL_DIAMETER * Math.PI);
 
 		public static final double TURNING_PID_KF = 0.1;
-		public static final double TURNING_PID_KP = 0.008; //0.008
+		public static final double TURNING_PID_KP = 0.010; //0.008
 		public static final double TURNING_PID_KI = 0.0;
 		public static final double TURNING_PID_KD = 0.0; //0.0009
 	}
@@ -34,7 +34,7 @@ public class Constants {
 		public static final double TICKS_PER_REV = 288.0;
 		public static final double GEAR_RATIO = 1.0 / 1.0;
 		public static final double TICKS_PER_DEGREE = TICKS_PER_REV * GEAR_RATIO / 360.0; // D was -30
-		public static final PIDFCoefficients MOTOR_ONE_PIDF = new PIDFCoefficients(35.0, 0.0, 0.0, 150.0, MotorControlAlgorithm.PIDF);
+		public static final PIDFCoefficients MOTOR_ONE_PIDF = new PIDFCoefficients(20.0, 0.0, 0.0, 150.0, MotorControlAlgorithm.PIDF);
 		public static final PIDFCoefficients MOTOR_TWO_PIDF = new PIDFCoefficients(0.0, 0.0, 0.0, 150.0, MotorControlAlgorithm.PIDF);
 		public static final double CHANGE_RATE_LOWER_LIMIT = 2.5;
 		public static final double CHANGE_RATE_UPPER_LIMIT = 2.5;

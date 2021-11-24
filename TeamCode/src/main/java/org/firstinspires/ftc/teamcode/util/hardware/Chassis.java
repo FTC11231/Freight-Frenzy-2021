@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util.hardware;
 import androidx.core.math.MathUtils;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -47,18 +48,24 @@ public class Chassis {
 		this.imu = this.opMode.hardwareMap.get(BNO055IMU.class, "imu");
 
 
-
+		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+		parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+		parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+		parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+		parameters.loggingEnabled      = true;
+		parameters.loggingTag          = "IMU";
+		parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
 //		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+//		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 //		parameters.loggingEnabled = false;
-		parameters.loggingEnabled = false;
+//		parameters.loggingEnabled = false;
 //		parameters.mode = BNO055IMU.SensorMode.IMU;
-		parameters.mode = BNO055IMU.SensorMode.IMU;
+//		parameters.mode = BNO055IMU.SensorMode.IMU;
 //		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+//		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
 //		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+//		parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
 		this.imu.initialize(parameters);
 
 		drive(0, 0, 0);
@@ -96,9 +103,9 @@ public class Chassis {
 		// returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
 		// 180 degrees. We detect this transition and track the total cumulative angle of rotation.
 
-		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-		double deltaAngle = angles.secondAngle - lastAngles.secondAngle;
+		double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
 
 		opMode.telemetry.addData("deltaAngle", deltaAngle);
 
@@ -239,6 +246,7 @@ public class Chassis {
 				drive(power, 0, 0);
 			}
 		}
+		setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		drive(0, 0, 0);
 	}
 
@@ -256,7 +264,7 @@ public class Chassis {
 		setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 		PIDController pidController = new PIDController(Constants.Drivetrain.TURNING_PID_KP, Constants.Drivetrain.TURNING_PID_KI, Constants.Drivetrain.TURNING_PID_KD);
-		pidController.setTolerance(1);
+		pidController.setTolerance(2);
 
 		double targetAngle = degrees;
 
@@ -269,11 +277,11 @@ public class Chassis {
 			double pidOutput = pidController.calculate(getAngle(), targetAngle);
 			double output = pidOutput + (Math.signum(pidOutput) * Constants.Drivetrain.TURNING_PID_KF * (pidController.atSetpoint() ? 0 : 1));
 //			double output = Constants.Drivetrain.TURNING_PID_KF;
-			drive(0, 0, MathUtils.clamp(output, -maxPower, maxPower));
+			drive(0, 0, MathUtils.clamp(-output, -maxPower, maxPower));
 
-			opMode.telemetry.addData("Power", output);
-			opMode.telemetry.addData("Angle", getAngle());
-			opMode.telemetry.update();
+//			opMode.telemetry.addData("Power", output);
+//			opMode.telemetry.addData("Angle", getAngle());
+//			opMode.telemetry.update();
 
 			if (pidController.atSetpoint() || timer.hasElapsed(timeoutSeconds)) {
 				drive(0, 0, 0);

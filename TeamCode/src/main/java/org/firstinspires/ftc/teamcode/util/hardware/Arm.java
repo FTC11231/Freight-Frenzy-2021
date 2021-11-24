@@ -71,14 +71,13 @@ public class Arm {
 	 *
 	 * @param degrees The angle the arm will turn to.
 	 */
-	public void setPosition(double degrees) {
-//		this.motorOne.setTargetPosition((int) -(degrees * Constants.Arm.TICKS_PER_DEGREE));
-//		this.motorTwo.setTargetPosition((int) (degrees * Constants.Arm.TICKS_PER_DEGREE));
-//		this.motorOne.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-//		this.motorTwo.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-//		this.motorOne.setPower(1);
-//		this.motorTwo.setPower(1);
-		desiredAngle = degrees;
+	public void setPosition(double degrees, double power) {
+		this.motorOne.setTargetPosition((int) -(degrees * Constants.Arm.TICKS_PER_DEGREE));
+		this.motorTwo.setTargetPosition((int) (degrees * Constants.Arm.TICKS_PER_DEGREE));
+		this.motorOne.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+		this.motorTwo.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+		this.motorOne.setPower(power);
+		this.motorTwo.setPower(power);
 	}
 
 	/**
@@ -86,14 +85,13 @@ public class Arm {
 	 *
 	 * @param position The position (enum) that the arm will turn to.
 	 */
-	public void setPosition(Position position) {
-//		this.motorOne.setTargetPosition((int) -(position.getDegrees() * Constants.Arm.TICKS_PER_DEGREE));
-//		this.motorTwo.setTargetPosition((int) (position.getDegrees() * Constants.Arm.TICKS_PER_DEGREE));
-//		this.motorOne.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-//		this.motorTwo.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-//		this.motorOne.setPower(1);
-//		this.motorTwo.setPower(1);
-		desiredAngle = position.getDegrees();
+	public void setPosition(Position position, double power) {
+		this.motorOne.setTargetPosition((int) -(position.getDegrees() * Constants.Arm.TICKS_PER_DEGREE));
+		this.motorTwo.setTargetPosition((int) (position.getDegrees() * Constants.Arm.TICKS_PER_DEGREE));
+		this.motorOne.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+		this.motorTwo.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+		this.motorOne.setPower(power);
+		this.motorTwo.setPower(power);
 	}
 
 	/**

@@ -68,21 +68,20 @@ public class BlueWarehouse extends LinearOpMode {
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 
 		// Autonomous code goes here
-		gripper.closeGripper();
-		Timer.delay(2);
-		arm.motorOne.setPower(-0.2);
-		arm.motorTwo.setPower(0.2);
-		Timer.delay(0.25);
-		arm.motorOne.setPower(0);
-		arm.motorTwo.setPower(0.1);
+//		gripper.closeGripper();
+//		Timer.delay(2);
+//		arm.motorOne.setPower(-0.2);
+//		arm.motorTwo.setPower(0.2);
+//		Timer.delay(0.25);
+//		arm.motorOne.setPower(0);
+//		arm.motorTwo.setPower(0.1);
 
-		chassis.driveForward(18, 0.8, 0.1, 0.1, 5);
-		chassis.turnWithEncoder(-18, 0.8, 0.1, 0.1, 5);
-		chassis.driveForward(-50, 1, 0.1, 0.1, 8);
-		chassis.driveForward(-20, 0.45, 0.1, 0.1, 5);
+		chassis.drive(-0.1, 0, 0);
+		Timer.delay(1);
+		chassis.drive(0, 0, 0);
 
-		arm.setPower(0);
-		Timer.delay(2);
+//		arm.setPower(0);
+//		Timer.delay(2);
 
 		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
 		telemetry.update();

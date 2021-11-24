@@ -98,7 +98,6 @@ public class TeleopTeamA extends OpMode {
 		telemetry.addData("Z", angles.firstAngle);
 
 		// Chassis (Base)
-		double throttleDrive = gamepad1.right_trigger - gamepad1.left_trigger;
 		double driveMultiplier = 0.75;
 		if (gamepad1.a) {
 			driveMultiplier = 12;
