@@ -33,15 +33,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
 import org.firstinspires.ftc.teamcode.util.hardware.Turret;
-import org.firstinspires.ftc.teamcode.util.vision.ElementDetector;
-import org.firstinspires.ftc.teamcode.util.vision.FreightFrenzyDeterminationPipeline;
 
 @Autonomous(name = "Blue Storage", group = "Linear Opmode")
 public class BlueStorage extends LinearOpMode {
@@ -54,8 +51,6 @@ public class BlueStorage extends LinearOpMode {
 	private Gripper gripper;
 	private Carousel carousel;
 
-	private ElementDetector vision;
-
 	@Override
 	public void runOpMode() {
 		// Initialization code goes here
@@ -64,13 +59,6 @@ public class BlueStorage extends LinearOpMode {
 		arm = new Arm(this, true);
 		gripper = new Gripper(this);
 		carousel = new Carousel(this);
-
-		vision = new ElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
-		vision.setRectOne(0, 0, 10, 10);
-		vision.setRectTwo(10, 0, 10, 10);
-		vision.setRectThree(20, 0, 10, 10);
-		vision.setDistanceThreshold(220);
-		vision.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.LEFT_NOT_VISIBLE);
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
