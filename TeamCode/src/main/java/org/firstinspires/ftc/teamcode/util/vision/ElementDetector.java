@@ -46,4 +46,12 @@ public class ElementDetector {
 		pipeline.setRectThree(x, y, width, height);
 	}
 
+	public void setDistanceThreshold(int threshold) {
+		pipeline.setDistanceThreshold(threshold);
+	}
+
+	public void setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType detectionType) {
+		pipeline.setDetectionType(detectionType);
+	}
+
 }

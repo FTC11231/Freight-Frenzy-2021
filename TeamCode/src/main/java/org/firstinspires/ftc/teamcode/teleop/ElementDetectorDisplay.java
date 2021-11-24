@@ -27,12 +27,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.util.vision;
+package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.vision.FreightFrenzyDeterminationPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -52,15 +53,20 @@ public class ElementDetectorDisplay extends LinearOpMode {
 
 		this.webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
+		pipeline.setRectOne(0, 0, 10, 10);
+		pipeline.setRectTwo(10, 0, 10, 10);
+		pipeline.setRectThree(20, 0, 10, 10);
+		pipeline.setDistanceThreshold(220);
+
 		startStreaming();
 
 		waitForStart();
 
 		while (opModeIsActive()) {
 			telemetry.addData("[POSITION]", pipeline.getPosition());
-			telemetry.addData("[LEFT]", pipeline.avg1);
-			telemetry.addData("[CENTER]", pipeline.avg2);
-			telemetry.addData("[RIGHT]", pipeline.avg3);
+			telemetry.addData("[LEFT]", pipeline.dist1);
+			telemetry.addData("[CENTER]", pipeline.dist2);
+			telemetry.addData("[RIGHT]", pipeline.dist3);
 			telemetry.update();
 
 			sleep(50);
