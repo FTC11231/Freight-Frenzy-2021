@@ -32,12 +32,14 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
-import org.firstinspires.ftc.teamcode.util.hardware.Turret;
+import org.firstinspires.ftc.teamcode.util.vision.ElementDetector;
+import org.firstinspires.ftc.teamcode.util.vision.FreightFrenzyDeterminationPipeline;
 
 @Autonomous(name = "Red Warehouse", group = "Linear Opmode")
 public class RedWarehouse extends LinearOpMode {
@@ -45,46 +47,91 @@ public class RedWarehouse extends LinearOpMode {
 	private String versionNumber = "v0.1";
 
 	private Chassis chassis;
-	private Turret turret;
+//	private Turret turret;
 	private Arm arm;
 	private Gripper gripper;
 	private Carousel carousel;
+
+	private ElementDetector elementDetector;
 
 	@Override
 	public void runOpMode() {
 		// Initialization code goes here
 		chassis = new Chassis(this);
-		turret = new Turret(this, true);
+//		turret = new Turret(this, true);
 		arm = new Arm(this, true);
 		gripper = new Gripper(this);
 		carousel = new Carousel(this);
 
+		elementDetector = new ElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
+		elementDetector.setSettings(ElementDetector.StartingType.RED);
+
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
 
-		waitForStart();
+		while (!isStarted() && !isStopRequested()) {
+			telemetry.addData("Position", elementDetector.getPosition());
+			telemetry.update();
+		}
+
 		if (!opModeIsActive()) return;
 
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 
 		// Autonomous code goes here
-		gripper.closeGripper();
-		Timer.delay(2);
-		arm.motorOne.setPower(-0.2);
-		arm.motorTwo.setPower(0.2);
-		Timer.delay(0.25);
-		arm.motorOne.setPower(0);
-		arm.motorTwo.setPower(0.1);
+		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = elementDetector.getPosition();
+//		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = FreightFrenzyDeterminationPipeline.ElementPosition.LEFT;
+		telemetry.addData("Position", elementPosition);
+		telemetry.update();
+		hub();
+		Timer.delay(0.1, this);
+		switch (elementPosition) {
+			case LEFT:
+				arm.setPosition(20, 0.3);
+				chassis.driveForward(8, 0.3, 0.2, 0.2, 5); // Drive into the hub
+				gripper.openGripper(); // Open gripper
+				Timer.delay(1, this); // Wait for gripper to open
+				chassis.driveForward(-8, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				break;
+			case CENTER:
+				arm.setPosition(50, 0.3);
+				chassis.driveForward(7, 0.3, 0.2, 0.2, 5); // Drive into the hub
+				gripper.openGripper(); // Open gripper
+				Timer.delay(1, this); // Wait for gripper to open
+				chassis.driveForward(-7, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				break;
+			case RIGHT:
+				arm.setPosition(70, 0.3);
+				chassis.driveForward(8, 0.3, 0.2, 0.2, 5); // Drive into the hub
+				gripper.openGripper(); // Open gripper
+				Timer.delay(1, this); // Wait for gripper to open
+				chassis.driveForward(-8, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				break;
+		}
+		arm.setPosition(10, 0.05); // Move the arm down
+		Timer.delay(0.5, this);
+		parkWarehouse();
 
-		chassis.driveForward(18, 0.8, 0.1, 0.1, 5);
-		chassis.turnWithEncoder(18, 0.8, 0.1, 0.1, 5);
-		chassis.driveForward(-50, 1, 0.1, 0.1, 8);
-		chassis.driveForward(-20, 0.45, 0.1, 0.1, 5);
 
 		arm.setPower(0);
-		Timer.delay(2);
 
 		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
 		telemetry.update();
 	}
+
+	public void hub() {
+		gripper.closeGripper();
+		Timer.delay(1, this);
+		arm.setPosition(15,0.6);
+
+		chassis.driveForward(19, 0.8, 0.2, 0.2, 5); // Drive towards the hub
+		Timer.delay(0.1, this); // Delay for safety
+		chassis.turn(45, 0.8, 5); // Turn to the hub
+	}
+
+	public void parkWarehouse() {
+		chassis.turn(90, 0.8, 5); // Turn towards warehouse
+		// TODO: Park in warehouse
+	}
+
 }
