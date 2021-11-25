@@ -78,8 +78,10 @@ public class RedStorage extends LinearOpMode {
 			if (gamepad1.b) {
 				parkInWarehouse = false;
 			}
-			telemetry.addData("Position", elementDetector.getPosition());
-			telemetry.addLine();
+			if (elementDetector.isActive()) {
+				telemetry.addData("Position", elementDetector.getPosition());
+				telemetry.addLine();
+			}
 			telemetry.addData("Parking position", parkInWarehouse ? "Warehouse" : "Storage Unit");
 			telemetry.update();
 		}
@@ -128,7 +130,6 @@ public class RedStorage extends LinearOpMode {
 		} else {
 			parkWarehouse();
 		}
-
 
 		arm.setPower(0);
 

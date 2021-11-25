@@ -78,8 +78,10 @@ public class BlueStorage extends LinearOpMode {
 			if (gamepad1.b) {
 				parkInWarehouse = false;
 			}
-			telemetry.addData("Position", elementDetector.getPosition());
-			telemetry.addLine();
+			if (elementDetector.isActive()) {
+				telemetry.addData("Position", elementDetector.getPosition());
+				telemetry.addLine();
+			}
 			telemetry.addData("Parking position", parkInWarehouse ? "Warehouse" : "Storage Unit");
 			telemetry.update();
 		}

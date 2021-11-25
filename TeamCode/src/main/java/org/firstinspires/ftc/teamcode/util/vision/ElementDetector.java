@@ -69,17 +69,17 @@ public class ElementDetector {
 		switch (startingType) {
 			case RED:
 				pipeline.setRectOne(40, 130, 25, 55);
-				pipeline.setRectTwo(173, 130, 25, 55);
-				pipeline.setRectThree(300, 130, 20, 55);
+				pipeline.setRectTwo(173, 144, 25, 41);
+				pipeline.setRectThree(300, 158, 20, 28);
 				pipeline.setDistanceThreshold(95);
 				pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.ALL_VISIBLE);
 				pipeline.setYellowColor(new Scalar(137, 150, 72, 233));
 				break;
 			case BLUE:
 				pipeline.setRectOne(0, 0, 0, 0);
-				pipeline.setRectTwo(15, 130, 33, 55);
-				pipeline.setRectThree(150, 130, 30, 55);
-				pipeline.setDistanceThreshold(95);
+				pipeline.setRectTwo(30, 130, 22, 55);
+				pipeline.setRectThree(165, 130, 20, 55);
+				pipeline.setDistanceThreshold(85);
 				pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.LEFT_NOT_VISIBLE);
 				pipeline.setYellowColor(new Scalar(137, 150, 72, 233));
 				break;
@@ -88,6 +88,10 @@ public class ElementDetector {
 
 	public void setYellowColor(Scalar scalar) {
 		pipeline.setYellowColor(scalar);
+	}
+
+	public boolean isActive() {
+		return pipeline.region1_Cb != null;
 	}
 
 }

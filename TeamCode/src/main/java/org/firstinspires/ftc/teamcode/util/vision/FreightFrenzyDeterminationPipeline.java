@@ -52,7 +52,7 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 	public int dist2; // Average yellow value of rectangle 2 (Avg of R and G)
 	public int dist3; // Average yellow value of rectangle 3 (Avg of R and G)
 	private int smallestDistance; // Highest average of rectangles 1, 2, and 3
-	private volatile ElementPosition position = ElementPosition.LEFT;
+	private volatile ElementPosition position = ElementPosition.RIGHT;
 
 	// This function takes the RGB frame, converts to YCrCb,
 	// and extracts the Cb channel to the 'Cb' variable
@@ -120,28 +120,28 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 		Imgproc.rectangle(
 				input,
 				new Point(0, 0),
-				new Point(40, 40),
+				new Point(10, 10),
 				Core.mean(region1_Cb),
 				-1
 		);
 		Imgproc.rectangle(
 				input,
-				new Point(40, 0),
-				new Point(80, 40),
+				new Point(10, 0),
+				new Point(20, 10),
 				Core.mean(region2_Cb),
 				-1
 		);
 		Imgproc.rectangle(
 				input,
-				new Point(80, 0),
-				new Point(120, 40),
+				new Point(20, 0),
+				new Point(30, 10),
 				Core.mean(region3_Cb),
 				-1
 		);
 		Imgproc.rectangle(
 				input,
-				new Point(120, 0),
-				new Point(160, 40),
+				new Point(30, 0),
+				new Point(40, 10),
 				yellowColor,
 				-1
 		);

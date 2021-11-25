@@ -58,11 +58,11 @@ public class ElementDetectorDisplay extends LinearOpMode {
 
 		this.webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
-		pipeline.setRectOne(40, 130, 25, 55);
-		pipeline.setRectTwo(173, 130, 25, 55);
-		pipeline.setRectThree(300, 130, 20, 55);
-		pipeline.setDistanceThreshold(95);
-		pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.ALL_VISIBLE);
+		pipeline.setRectOne(0, 0, 0, 0);
+		pipeline.setRectTwo(30, 130, 22, 55);
+		pipeline.setRectThree(165, 130, 20, 55);
+		pipeline.setDistanceThreshold(85);
+		pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.LEFT_NOT_VISIBLE);
 		pipeline.setYellowColor(new Scalar(137, 150, 72, 233));
 
 		startStreaming();
@@ -74,20 +74,14 @@ public class ElementDetectorDisplay extends LinearOpMode {
 			telemetry.addData("[LEFT]", pipeline.dist1);
 			telemetry.addData("[CENTER]", pipeline.dist2);
 			telemetry.addData("[RIGHT]", pipeline.dist3);
-			if (gamepad1.a) {
-				matsDone = true;
-			}
-			if (matsDone) {
-				Scalar c1 = Core.mean(pipeline.region2_Cb);
+			if (pipeline.region1_Cb != null) {
+				telemetry.addLine();
+				Scalar c1 = Core.mean(pipeline.region1_Cb);
 				telemetry.addData("R1", c1.val[0]);
-				telemetry.addData("G1", c1.val[1]);
-				telemetry.addData("B1", c1.val[2]);
-				telemetry.addData("A1", c1.val[3]);
-				Scalar c2 = Core.mean(pipeline.region3_Cb);
+				Scalar c2 = Core.mean(pipeline.region2_Cb);
 				telemetry.addData("R2", c2.val[0]);
-				telemetry.addData("G2", c2.val[1]);
-				telemetry.addData("B2", c2.val[2]);
-				telemetry.addData("A2", c2.val[3]);
+				Scalar c3 = Core.mean(pipeline.region3_Cb);
+				telemetry.addData("R3", c3.val[0]);
 			}
 			telemetry.update();
 

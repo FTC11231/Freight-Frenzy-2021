@@ -70,7 +70,9 @@ public class BlueWarehouse extends LinearOpMode {
 		telemetry.update();
 
 		while (!isStarted() && !isStopRequested()) {
-			telemetry.addData("Position", elementDetector.getPosition());
+			if (elementDetector.isActive()) {
+				telemetry.addData("Position", elementDetector.getPosition());
+			}
 			telemetry.update();
 		}
 
