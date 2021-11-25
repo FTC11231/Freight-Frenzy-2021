@@ -64,7 +64,7 @@ public class Timer {
 	public static void delay(double seconds, LinearOpMode lop) {
 		Timer timer = new Timer();
 		timer.start();
-		while (!timer.hasElapsed(seconds) && !lop.isStopRequested()) {
+		while (!timer.hasElapsed(seconds) && !lop.isStopRequested() && lop.opModeIsActive()) {
 
 		}
 	}

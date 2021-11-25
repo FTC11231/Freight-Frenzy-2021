@@ -1,12 +1,18 @@
 package org.firstinspires.ftc.teamcode.util.vision;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.opencv.core.Scalar;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class ElementDetector {
+
+	public enum StartingType {
+		BLUE, RED
+	}
+
 	private OpenCvWebcam webcam;
 	private FreightFrenzyDeterminationPipeline pipeline;
 
@@ -57,6 +63,31 @@ public class ElementDetector {
 
 	public FreightFrenzyDeterminationPipeline.ElementPosition getPosition() {
 		return pipeline.getPosition();
+	}
+
+	public void setSettings(StartingType startingType) {
+		switch (startingType) {
+			case RED:
+				pipeline.setRectOne(40, 130, 25, 55);
+				pipeline.setRectTwo(173, 130, 25, 55);
+				pipeline.setRectThree(300, 130, 20, 55);
+				pipeline.setDistanceThreshold(95);
+				pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.ALL_VISIBLE);
+				pipeline.setYellowColor(new Scalar(137, 150, 72, 233));
+				break;
+			case BLUE:
+				pipeline.setRectOne(0, 0, 0, 0);
+				pipeline.setRectTwo(15, 130, 33, 55);
+				pipeline.setRectThree(150, 130, 30, 55);
+				pipeline.setDistanceThreshold(95);
+				pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.LEFT_NOT_VISIBLE);
+				pipeline.setYellowColor(new Scalar(137, 150, 72, 233));
+				break;
+		}
+	}
+
+	public void setYellowColor(Scalar scalar) {
+		pipeline.setYellowColor(scalar);
 	}
 
 }

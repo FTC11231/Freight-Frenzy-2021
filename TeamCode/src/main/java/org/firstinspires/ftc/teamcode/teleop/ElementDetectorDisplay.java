@@ -34,6 +34,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.vision.FreightFrenzyDeterminationPipeline;
+import org.opencv.core.Core;
+import org.opencv.core.Scalar;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -41,8 +43,11 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 @TeleOp(name = "Vision", group = "Linear Opmode")
 public class ElementDetectorDisplay extends LinearOpMode {
+
 	private OpenCvWebcam webcam;
 	private FreightFrenzyDeterminationPipeline pipeline;
+
+	private boolean matsDone = false;
 
 	@Override
 	public void runOpMode() {
@@ -53,11 +58,12 @@ public class ElementDetectorDisplay extends LinearOpMode {
 
 		this.webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
-		pipeline.setRectOne(0, 0, 10, 10);
-		pipeline.setRectTwo(15, 130, 25, 55);
-		pipeline.setRectThree(150, 130, 30, 55);
-		pipeline.setDistanceThreshold(340);
-		pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.LEFT_NOT_VISIBLE);
+		pipeline.setRectOne(40, 130, 25, 55);
+		pipeline.setRectTwo(173, 130, 25, 55);
+		pipeline.setRectThree(300, 130, 20, 55);
+		pipeline.setDistanceThreshold(95);
+		pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.ALL_VISIBLE);
+		pipeline.setYellowColor(new Scalar(137, 150, 72, 233));
 
 		startStreaming();
 
@@ -68,6 +74,21 @@ public class ElementDetectorDisplay extends LinearOpMode {
 			telemetry.addData("[LEFT]", pipeline.dist1);
 			telemetry.addData("[CENTER]", pipeline.dist2);
 			telemetry.addData("[RIGHT]", pipeline.dist3);
+			if (gamepad1.a) {
+				matsDone = true;
+			}
+			if (matsDone) {
+				Scalar c1 = Core.mean(pipeline.region2_Cb);
+				telemetry.addData("R1", c1.val[0]);
+				telemetry.addData("G1", c1.val[1]);
+				telemetry.addData("B1", c1.val[2]);
+				telemetry.addData("A1", c1.val[3]);
+				Scalar c2 = Core.mean(pipeline.region3_Cb);
+				telemetry.addData("R2", c2.val[0]);
+				telemetry.addData("G2", c2.val[1]);
+				telemetry.addData("B2", c2.val[2]);
+				telemetry.addData("A2", c2.val[3]);
+			}
 			telemetry.update();
 
 			sleep(50);

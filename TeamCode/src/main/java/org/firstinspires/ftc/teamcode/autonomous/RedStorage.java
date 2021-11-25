@@ -32,12 +32,14 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
-import org.firstinspires.ftc.teamcode.util.hardware.Turret;
+import org.firstinspires.ftc.teamcode.util.vision.ElementDetector;
+import org.firstinspires.ftc.teamcode.util.vision.FreightFrenzyDeterminationPipeline;
 
 @Autonomous(name = "Red Storage", group = "Linear Opmode")
 public class RedStorage extends LinearOpMode {
@@ -45,53 +47,138 @@ public class RedStorage extends LinearOpMode {
 	private String versionNumber = "v0.1";
 
 	private Chassis chassis;
-	private Turret turret;
+//	private Turret turret;
 	private Arm arm;
 	private Gripper gripper;
 	private Carousel carousel;
+
+	private ElementDetector elementDetector;
+
+	private boolean parkInWarehouse = true;
 
 	@Override
 	public void runOpMode() {
 		// Initialization code goes here
 		chassis = new Chassis(this);
-		turret = new Turret(this, true);
+//		turret = new Turret(this, true);
 		arm = new Arm(this, true);
 		gripper = new Gripper(this);
 		carousel = new Carousel(this);
 
+		elementDetector = new ElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
+		elementDetector.setSettings(ElementDetector.StartingType.RED);
+
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
 
-		waitForStart();
+		while (!isStarted() && !isStopRequested()) {
+			if (gamepad1.a) {
+				parkInWarehouse = true;
+			}
+			if (gamepad1.b) {
+				parkInWarehouse = false;
+			}
+			telemetry.addData("Position", elementDetector.getPosition());
+			telemetry.addLine();
+			telemetry.addData("Parking position", parkInWarehouse ? "Warehouse" : "Storage Unit");
+			telemetry.update();
+		}
+
 		if (!opModeIsActive()) return;
 
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 
 		// Autonomous code goes here
-		gripper.closeGripper();
-		Timer.delay(2);
-		arm.motorOne.setPower(-0.2);
-		arm.motorTwo.setPower(0.2);
-		Timer.delay(0.25);
-		arm.motorOne.setPower(0);
-		arm.motorTwo.setPower(0.1);
+		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = elementDetector.getPosition();
+//		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = FreightFrenzyDeterminationPipeline.ElementPosition.LEFT;
+		telemetry.addData("Position", elementPosition);
+		telemetry.update();
+		hub();
+		switch (elementPosition) {
+			case LEFT:
+				Timer.delay(0.1, this);
+				arm.setPosition(20, 0.3);
+				chassis.driveForward(10, 0.3, 0.2, 0.2, 5); // Drive into the hub
+				gripper.openGripper(); // Open gripper
+				Timer.delay(1, this); // Wait for gripper to open
+				chassis.driveForward(-18, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				break;
+			case CENTER:
+				Timer.delay(0.1, this);
+				arm.setPosition(50, 0.3);
+				chassis.driveForward(6, 0.3, 0.2, 0.2, 5); // Drive into the hub
+				gripper.openGripper(); // Open gripper
+				Timer.delay(1, this); // Wait for gripper to open
+				chassis.driveForward(-14, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				break;
+			case RIGHT:
+				Timer.delay(0.1, this);
+				arm.setPosition(73, 0.3);
+				chassis.driveForward(9, 0.3, 0.2, 0.2, 5); // Drive into the hub
+				gripper.openGripper(); // Open gripper
+				Timer.delay(1, this); // Wait for gripper to open
+				chassis.driveForward(-17, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				break;
+		}
+		arm.setPosition(10, 0.05); // Move the arm down
+		Timer.delay(0.5, this);
+		carousel();
+		if (!parkInWarehouse) {
+			parkStorage();
+		} else {
+			parkWarehouse();
+		}
 
-		chassis.driveForward(24, 1, 0.1, 0.1, 5);
-		chassis.turnWithEncoder(-8.8, 1, 0.1, 0.1, 5);
-		chassis.driveForward(-20, 1, 0.3, 0.05, 5);
-		chassis.driveForward(-5, 0.6, 0.05, 0.1, 5);
-		carousel.motor.setPower(0.8);
-		chassis.driveForward(-5, 0.2, 0.1, 0.1, 1);
-		Timer.delay(10);
-		carousel.motor.setPower(0);
-		chassis.driveForward(5, 0.7, 0.05, 0.05, 5);
-		chassis.turnWithEncoder(10, -7.5, 0.1, 0.1, 5);
-		chassis.driveForward(12, 0.9, 0.1, 0.1, 5);
 
 		arm.setPower(0);
-		Timer.delay(2);
 
 		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
 		telemetry.update();
 	}
+
+	public void hub() {
+		gripper.closeGripper();
+		Timer.delay(1, this);
+		arm.setPosition(15,0.6);
+
+		chassis.driveForward(34, 0.75, 0.2, 0.2, 5); // Drive towards the hub
+		Timer.delay(0.1, this); // Delay for safety
+		chassis.turn(-90, 0.8, 5); // Turn to the hub
+	}
+
+	public void carousel() {
+		chassis.turn(0, 0.8, 5); // Turn to carousel
+		chassis.driveForward(-25, 0.95, 0.2, 0.2, 5); // Drive back to carousel
+		chassis.turn(-45, 0.8, 5); // Turn to more precisely get carousel
+		carousel.motor.setPower(0.6); // Start turning the carousel wheel
+		chassis.driveForward(-4, 0.5, 0.05, 0.05, 5); // Drive back into carousel
+		chassis.drive(-0.1, 0, 0); // Drive back into the carousel fully
+		Timer.delay(2, this); // Wait for the chassis to be fully on the carousel
+		chassis.drive(0, 0, 0); // Stop driving towarsd the carousel
+//		telemetry.addData("State", 1);
+//		telemetry.update();
+		Timer.delay(3, this); // Wait for the duck to fall off
+//		telemetry.addData("State", 2);
+//		telemetry.update();
+	}
+
+	public void parkStorage() {
+		chassis.driveForward(5, 0.4, 0.2, 0.2, 5); // Drive away from the carousel
+//		telemetry.addData("State", 3);
+//		telemetry.update();
+		carousel.motor.setPower(0); // Turn the carousel wheel off
+		chassis.turn(19, 0.5, 5); // Turn towards the storage unit
+		chassis.driveForward(18, 0.5, 0.2, 0.3, 5); // Drive into the storage unit
+		chassis.turn(-90, 0.5, 5);
+		chassis.driveForward(-4, 0.3, 0.2, 0.2, 5);
+	}
+
+	public void parkWarehouse() {
+		chassis.driveForward(20, 0.8, 0.2, 0.2, 5); // Drive away from the carousel
+		carousel.motor.setPower(0); // Turn the carousel wheel off
+		chassis.turn(90, 0.8, 5); // Turn towards the warehouse
+		chassis.driveForward(-24, 1, 0.1, 0.1, 5);
+		// TODO: Park in warehouse
+	}
+
 }
