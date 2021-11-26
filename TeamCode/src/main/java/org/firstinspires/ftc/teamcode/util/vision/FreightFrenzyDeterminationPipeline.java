@@ -75,7 +75,16 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 		diff2 = (int) Math.abs(yellowHue - Core.mean(region2_Cb).val[0]);
 		diff3 = (int) Math.abs(yellowHue - Core.mean(region3_Cb).val[0]);
 
-		if (detectionType == DetectionType.LEFT_NOT_VISIBLE) {
+		if (detectionType == DetectionType.ALL_VISIBLE) {
+			int closestVal = Math.min(Math.min(diff1, diff2), diff3);
+			if (closestVal == diff1) {
+				position = ElementPosition.LEFT;
+			} else if (closestVal == diff2) {
+				position = ElementPosition.CENTER;
+			} else {
+				position = ElementPosition.RIGHT;
+			}
+		} else if (detectionType == DetectionType.LEFT_NOT_VISIBLE) {
 			int closestVal = Math.min(diff2, diff3);
 			if (closestVal < threshold) {
 				if (closestVal == diff2) {
@@ -86,7 +95,7 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 			} else {
 				position = ElementPosition.LEFT;
 			}
-		} else if (detectionType == DetectionType.RIGHT_NOT_VISIBLE) {
+		} else {
 			int closestVal = Math.min(diff1, diff2);
 			if (closestVal < threshold) {
 				if (closestVal == diff1) {
@@ -94,15 +103,6 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 				} else {
 					position = ElementPosition.CENTER;
 				}
-			} else {
-				position = ElementPosition.RIGHT;
-			}
-		} else {
-			int closestVal = Math.min(Math.min(diff1, diff2), diff3);
-			if (closestVal == diff1) {
-				position = ElementPosition.LEFT;
-			} else if (closestVal == diff2) {
-				position = ElementPosition.CENTER;
 			} else {
 				position = ElementPosition.RIGHT;
 			}
