@@ -61,9 +61,8 @@ public class ElementDetectorDisplay extends LinearOpMode {
 		pipeline.setRectOne(0, 0, 0, 0);
 		pipeline.setRectTwo(30, 130, 22, 55);
 		pipeline.setRectThree(165, 130, 20, 55);
-		pipeline.setDistanceThreshold(85);
+		pipeline.setThreshold(30);
 		pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.LEFT_NOT_VISIBLE);
-		pipeline.setYellowColor(new Scalar(137, 150, 72, 233));
 
 		startStreaming();
 
@@ -71,9 +70,9 @@ public class ElementDetectorDisplay extends LinearOpMode {
 
 		while (opModeIsActive()) {
 			telemetry.addData("[POSITION]", pipeline.getPosition());
-			telemetry.addData("[LEFT]", pipeline.dist1);
-			telemetry.addData("[CENTER]", pipeline.dist2);
-			telemetry.addData("[RIGHT]", pipeline.dist3);
+			telemetry.addData("[LEFT]", pipeline.diff1);
+			telemetry.addData("[CENTER]", pipeline.diff2);
+			telemetry.addData("[RIGHT]", pipeline.diff3);
 			if (pipeline.region1_Cb != null) {
 				telemetry.addLine();
 				Scalar c1 = Core.mean(pipeline.region1_Cb);

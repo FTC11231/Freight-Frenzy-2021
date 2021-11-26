@@ -39,54 +39,46 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 	private Point regionTwoPointB = new Point();
 	private Point regionThreePointA = new Point();
 	private Point regionThreePointB = new Point();
-	private int distanceThreshold = 0;
-	private Scalar yellowColor;
+	private int threshold = 0;
+	private int yellowHue = 0;
 
 	// Vars to make this all work
 	public Mat region1_Cb; // Rectangle 1
 	public Mat region2_Cb; // Rectangle 2
 	public Mat region3_Cb; // Rectangle 3
-	private Mat YCrCb = new Mat();
-	private Mat Cb = new Mat();
-	public int dist1; // Average yellow value of rectangle 1 (Avg of R and G)
-	public int dist2; // Average yellow value of rectangle 2 (Avg of R and G)
-	public int dist3; // Average yellow value of rectangle 3 (Avg of R and G)
-	private int smallestDistance; // Highest average of rectangles 1, 2, and 3
+	private Mat RGB = new Mat();
+	private Mat HSV = new Mat();
+	public int diff1; // Average yellow value of rectangle 1 (Avg of R and G)
+	public int diff2; // Average yellow value of rectangle 2 (Avg of R and G)
+	public int diff3; // Average yellow value of rectangle 3 (Avg of R and G)
 	private volatile ElementPosition position = ElementPosition.RIGHT;
 
-	// This function takes the RGB frame, converts to YCrCb,
-	// and extracts the Cb channel to the 'Cb' variable
-	private void inputToCb(Mat input) {
-		Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
-		Core.extractChannel(YCrCb, Cb, 1);
-	}
-
 	@Override
-	public void init(Mat firstFrame) {
-
-		inputToCb(firstFrame);
-		region1_Cb = firstFrame.submat(new Rect(regionOnePointA, regionOnePointB));
-		region2_Cb = firstFrame.submat(new Rect(regionTwoPointA, regionTwoPointB));
-		region3_Cb = firstFrame.submat(new Rect(regionThreePointA, regionThreePointB));
+	public void init(Mat input) {
+		RGB = input;
+		Imgproc.cvtColor(RGB, HSV, Imgproc.COLOR_RGB2HSV_FULL);
+		region1_Cb = input.submat(new Rect(regionOnePointA, regionOnePointB));
+		region2_Cb = input.submat(new Rect(regionTwoPointA, regionTwoPointB));
+		region3_Cb = input.submat(new Rect(regionThreePointA, regionThreePointB));
 	}
 
 	@Override
 	public Mat processFrame(Mat input) {
-		inputToCb(input);
+		RGB = input;
+		Imgproc.cvtColor(RGB, HSV, Imgproc.COLOR_RGB2HSV_FULL);
 		// Move the rectangles' colors into the region materials
-		region1_Cb = input.submat(new Rect(regionOnePointA, regionOnePointB));
-		region2_Cb = input.submat(new Rect(regionTwoPointA, regionTwoPointB));
-		region3_Cb = input.submat(new Rect(regionThreePointA, regionThreePointB));
+		region1_Cb = HSV.submat(new Rect(regionOnePointA, regionOnePointB));
+		region2_Cb = HSV.submat(new Rect(regionTwoPointA, regionTwoPointB));
+		region3_Cb = HSV.submat(new Rect(regionThreePointA, regionThreePointB));
 		// Compare the average color of each rectangle to yellow
-		dist1 = (int) getColorDifference(Core.mean(region1_Cb), yellowColor);
-		dist2 = (int) getColorDifference(Core.mean(region2_Cb), yellowColor);
-		dist3 = (int) getColorDifference(Core.mean(region3_Cb), yellowColor);
-		smallestDistance = Math.min(Math.min(dist1, dist2), dist3);
+		diff1 = (int) Math.abs(yellowHue - Core.mean(region1_Cb).val[0]);
+		diff2 = (int) Math.abs(yellowHue - Core.mean(region2_Cb).val[0]);
+		diff3 = (int) Math.abs(yellowHue - Core.mean(region3_Cb).val[0]);
 
 		if (detectionType == DetectionType.LEFT_NOT_VISIBLE) {
-			smallestDistance = Math.min(dist2, dist3);
-			if (smallestDistance < distanceThreshold) {
-				if (smallestDistance == dist2) {
+			int closestVal = Math.min(diff2, diff3);
+			if (closestVal < threshold) {
+				if (closestVal == diff2) {
 					position = ElementPosition.CENTER;
 				} else {
 					position = ElementPosition.RIGHT;
@@ -95,9 +87,9 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 				position = ElementPosition.LEFT;
 			}
 		} else if (detectionType == DetectionType.RIGHT_NOT_VISIBLE) {
-			smallestDistance = Math.min(dist1, dist2);
-			if (smallestDistance < distanceThreshold) {
-				if (smallestDistance == dist1) {
+			int closestVal = Math.min(diff1, diff2);
+			if (closestVal < threshold) {
+				if (closestVal == diff1) {
 					position = ElementPosition.LEFT;
 				} else {
 					position = ElementPosition.CENTER;
@@ -106,10 +98,10 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 				position = ElementPosition.RIGHT;
 			}
 		} else {
-			smallestDistance = Math.min(Math.min(dist1, dist2), dist3);
-			if (smallestDistance == dist1) {
+			int closestVal = Math.min(Math.min(diff1, diff2), diff3);
+			if (closestVal == diff1) {
 				position = ElementPosition.LEFT;
-			} else if (smallestDistance == dist2) {
+			} else if (closestVal == diff2) {
 				position = ElementPosition.CENTER;
 			} else {
 				position = ElementPosition.RIGHT;
@@ -138,6 +130,14 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 				Core.mean(region3_Cb),
 				-1
 		);
+
+		Scalar yellowColor;
+		if (position == ElementPosition.CENTER) {
+			yellowColor = Core.mean(region3_Cb);
+		} else {
+			yellowColor = Core.mean(region2_Cb);
+		}
+		yellowColor.val[0] = yellowHue;
 		Imgproc.rectangle(
 				input,
 				new Point(30, 0),
@@ -158,8 +158,7 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 			if (detectionType != DetectionType.RIGHT_NOT_VISIBLE) {
 				drawRectOutline(input, regionThreePointA, regionThreePointB, RED, lineThickness);
 			}
-		} else if (smallestDistance == dist2) {
-			position = ElementPosition.CENTER;
+		} else if (position == ElementPosition.CENTER) {
 			if (detectionType != DetectionType.LEFT_NOT_VISIBLE) {
 				drawRectOutline(input, regionOnePointA, regionOnePointB, RED, lineThickness);
 			}
@@ -168,7 +167,6 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 				drawRectOutline(input, regionThreePointA, regionThreePointB, RED, lineThickness);
 			}
 		} else {
-			position = ElementPosition.RIGHT;
 			if (detectionType != DetectionType.LEFT_NOT_VISIBLE) {
 				drawRectOutline(input, regionOnePointA, regionOnePointB, RED, lineThickness);
 			}
@@ -227,25 +225,12 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 		);
 	}
 
-	public double getColorDifference(Scalar c1, Scalar c2) {
-		// Returns the distance between the colors
-		double distOne = Math.abs((double) c1.val[0] - (double) c2.val[0]);
-		double distTwo = Math.abs((double) c1.val[1] - (double) c2.val[1]);
-		double distThree = Math.abs((double) c1.val[2] - (double) c2.val[2]);
-		double distFour = Math.abs((double) c1.val[3] - (double) c2.val[3]);
-		return distOne + distTwo + distThree + distFour;
-	}
-
-	public void setDistanceThreshold(int threshold) {
-		this.distanceThreshold = threshold;
+	public void setThreshold(int threshold) {
+		this.threshold = threshold;
 	}
 
 	public void setDetectionType(DetectionType detectionType) {
 		this.detectionType = detectionType;
-	}
-
-	public void setYellowColor(Scalar scalar) {
-		this.yellowColor = scalar;
 	}
 
 }
