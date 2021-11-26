@@ -54,7 +54,7 @@ public class RedStorage extends LinearOpMode {
 
 	private ElementDetector elementDetector;
 
-	private boolean parkInWarehouse = true;
+	private boolean parkInWarehouse = false;
 
 	@Override
 	public void runOpMode() {

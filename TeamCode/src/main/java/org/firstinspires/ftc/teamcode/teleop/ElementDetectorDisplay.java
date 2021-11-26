@@ -58,11 +58,11 @@ public class ElementDetectorDisplay extends LinearOpMode {
 
 		this.webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
-		pipeline.setRectOne(0, 0, 0, 0);
-		pipeline.setRectTwo(30, 130, 22, 55);
-		pipeline.setRectThree(165, 130, 20, 55);
+		pipeline.setRectOne(40, 130, 25, 55);
+		pipeline.setRectTwo(173, 144, 25, 41);
+		pipeline.setRectThree(300, 158, 20, 28);
 		pipeline.setThreshold(30);
-		pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.LEFT_NOT_VISIBLE);
+		pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.ALL_VISIBLE);
 
 		startStreaming();
 
