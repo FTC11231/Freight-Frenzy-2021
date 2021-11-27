@@ -33,7 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.util.vision.FreightFrenzyDeterminationPipeline;
+import org.firstinspires.ftc.teamcode.util.vision.shipping_element.ShippingElementPipeline;
 import org.opencv.core.Core;
 import org.opencv.core.Scalar;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -45,14 +45,14 @@ import org.openftc.easyopencv.OpenCvWebcam;
 public class ElementDetectorDisplay extends LinearOpMode {
 
 	private OpenCvWebcam webcam;
-	private FreightFrenzyDeterminationPipeline pipeline;
+	private ShippingElementPipeline pipeline;
 
 	private boolean matsDone = false;
 
 	@Override
 	public void runOpMode() {
 		this.webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "barcodeCam"));
-		this.pipeline = new FreightFrenzyDeterminationPipeline();
+		this.pipeline = new ShippingElementPipeline();
 
 		this.webcam.setPipeline(pipeline);
 
@@ -62,7 +62,7 @@ public class ElementDetectorDisplay extends LinearOpMode {
 		pipeline.setRectTwo(173, 144, 25, 41);
 		pipeline.setRectThree(300, 158, 20, 28);
 		pipeline.setThreshold(30);
-		pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.ALL_VISIBLE);
+		pipeline.setDetectionType(ShippingElementPipeline.DetectionType.ALL_VISIBLE);
 
 		startStreaming();
 

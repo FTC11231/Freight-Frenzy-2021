@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.vision;
+package org.firstinspires.ftc.teamcode.util.vision.auto_box;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;

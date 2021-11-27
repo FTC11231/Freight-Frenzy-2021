@@ -38,8 +38,8 @@ import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
-import org.firstinspires.ftc.teamcode.util.vision.ElementDetector;
-import org.firstinspires.ftc.teamcode.util.vision.FreightFrenzyDeterminationPipeline;
+import org.firstinspires.ftc.teamcode.util.vision.shipping_element.ShippingElementDetector;
+import org.firstinspires.ftc.teamcode.util.vision.shipping_element.ShippingElementPipeline;
 
 @Autonomous(name = "Red Warehouse", group = "Linear Opmode")
 public class RedWarehouse extends LinearOpMode {
@@ -52,7 +52,7 @@ public class RedWarehouse extends LinearOpMode {
 	private Gripper gripper;
 	private Carousel carousel;
 
-	private ElementDetector elementDetector;
+	private ShippingElementDetector shippingElementDetector;
 
 	@Override
 	public void runOpMode() {
@@ -63,15 +63,15 @@ public class RedWarehouse extends LinearOpMode {
 		gripper = new Gripper(this);
 		carousel = new Carousel(this);
 
-		elementDetector = new ElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
-		elementDetector.setSettings(ElementDetector.StartingType.RED);
+		shippingElementDetector = new ShippingElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
+		shippingElementDetector.setSettings(ShippingElementDetector.StartingType.RED);
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
 
 		while (!isStarted() && !isStopRequested()) {
-			if (elementDetector.isActive()) {
-				telemetry.addData("Position", elementDetector.getPosition());
+			if (shippingElementDetector.isActive()) {
+				telemetry.addData("Position", shippingElementDetector.getPosition());
 			}
 			telemetry.update();
 		}
@@ -81,7 +81,7 @@ public class RedWarehouse extends LinearOpMode {
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 
 		// Autonomous code goes here
-		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = elementDetector.getPosition();
+		ShippingElementPipeline.ElementPosition elementPosition = shippingElementDetector.getPosition();
 //		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = FreightFrenzyDeterminationPipeline.ElementPosition.LEFT;
 		telemetry.addData("Position", elementPosition);
 		telemetry.update();

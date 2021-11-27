@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.vision;
+package org.firstinspires.ftc.teamcode.util.vision.shipping_element;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -6,18 +6,18 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-public class ElementDetector {
+public class ShippingElementDetector {
 
 	public enum StartingType {
 		BLUE, RED
 	}
 
 	private OpenCvWebcam webcam;
-	private FreightFrenzyDeterminationPipeline pipeline;
+	private ShippingElementPipeline pipeline;
 
-	public ElementDetector(WebcamName webcam) {
+	public ShippingElementDetector(WebcamName webcam) {
 		this.webcam = OpenCvCameraFactory.getInstance().createWebcam(webcam);
-		this.pipeline = new FreightFrenzyDeterminationPipeline();
+		this.pipeline = new ShippingElementPipeline();
 
 		this.webcam.setPipeline(pipeline);
 
@@ -56,11 +56,11 @@ public class ElementDetector {
 		pipeline.setThreshold(30);
 	}
 
-	public void setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType detectionType) {
+	public void setDetectionType(ShippingElementPipeline.DetectionType detectionType) {
 		pipeline.setDetectionType(detectionType);
 	}
 
-	public FreightFrenzyDeterminationPipeline.ElementPosition getPosition() {
+	public ShippingElementPipeline.ElementPosition getPosition() {
 		return pipeline.getPosition();
 	}
 
@@ -71,14 +71,14 @@ public class ElementDetector {
 				pipeline.setRectTwo(173, 144, 25, 41);
 				pipeline.setRectThree(300, 158, 20, 28);
 				pipeline.setThreshold(30);
-				pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.ALL_VISIBLE);
+				pipeline.setDetectionType(ShippingElementPipeline.DetectionType.ALL_VISIBLE);
 				break;
 			case BLUE:
 				pipeline.setRectOne(0, 0, 0, 0);
 				pipeline.setRectTwo(30, 130, 22, 55);
 				pipeline.setRectThree(165, 130, 20, 55);
 				pipeline.setThreshold(30);
-				pipeline.setDetectionType(FreightFrenzyDeterminationPipeline.DetectionType.LEFT_NOT_VISIBLE);
+				pipeline.setDetectionType(ShippingElementPipeline.DetectionType.LEFT_NOT_VISIBLE);
 				break;
 		}
 	}

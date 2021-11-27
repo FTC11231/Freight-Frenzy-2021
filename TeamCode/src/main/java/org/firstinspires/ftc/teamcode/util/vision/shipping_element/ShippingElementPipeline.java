@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.vision;
+package org.firstinspires.ftc.teamcode.util.vision.shipping_element;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -8,7 +8,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
+public class ShippingElementPipeline extends OpenCvPipeline {
 
 	public ElementPosition getPosition() {
 		return this.position;

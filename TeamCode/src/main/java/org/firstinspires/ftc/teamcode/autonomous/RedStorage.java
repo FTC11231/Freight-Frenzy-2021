@@ -38,8 +38,8 @@ import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
-import org.firstinspires.ftc.teamcode.util.vision.ElementDetector;
-import org.firstinspires.ftc.teamcode.util.vision.FreightFrenzyDeterminationPipeline;
+import org.firstinspires.ftc.teamcode.util.vision.shipping_element.ShippingElementDetector;
+import org.firstinspires.ftc.teamcode.util.vision.shipping_element.ShippingElementPipeline;
 
 @Autonomous(name = "Red Storage", group = "Linear Opmode")
 public class RedStorage extends LinearOpMode {
@@ -52,7 +52,7 @@ public class RedStorage extends LinearOpMode {
 	private Gripper gripper;
 	private Carousel carousel;
 
-	private ElementDetector elementDetector;
+	private ShippingElementDetector shippingElementDetector;
 
 	private boolean parkInWarehouse = true;
 	private Timer warehouseTimer = new Timer();
@@ -66,8 +66,8 @@ public class RedStorage extends LinearOpMode {
 		gripper = new Gripper(this);
 		carousel = new Carousel(this);
 
-		elementDetector = new ElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
-		elementDetector.setSettings(ElementDetector.StartingType.RED);
+		shippingElementDetector = new ShippingElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
+		shippingElementDetector.setSettings(ShippingElementDetector.StartingType.RED);
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
@@ -79,8 +79,8 @@ public class RedStorage extends LinearOpMode {
 			if (gamepad1.b) {
 				parkInWarehouse = false;
 			}
-			if (elementDetector.isActive()) {
-				telemetry.addData("Position", elementDetector.getPosition());
+			if (shippingElementDetector.isActive()) {
+				telemetry.addData("Position", shippingElementDetector.getPosition());
 				telemetry.addLine();
 			}
 			telemetry.addData("Parking position", parkInWarehouse ? "Warehouse" : "Storage Unit");
@@ -93,7 +93,7 @@ public class RedStorage extends LinearOpMode {
 
 		// Autonomous code goes here
 //		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = elementDetector.getPosition();
-		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = FreightFrenzyDeterminationPipeline.ElementPosition.RIGHT;		telemetry.addData("Position", elementPosition);
+		ShippingElementPipeline.ElementPosition elementPosition = ShippingElementPipeline.ElementPosition.RIGHT;		telemetry.addData("Position", elementPosition);
 		telemetry.update();
 		warehouseTimer.start();
 		hub();

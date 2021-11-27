@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.vision;
+package org.firstinspires.ftc.teamcode.util.vision.auto_box;
 
 import java.util.ArrayList;
 import java.util.List;

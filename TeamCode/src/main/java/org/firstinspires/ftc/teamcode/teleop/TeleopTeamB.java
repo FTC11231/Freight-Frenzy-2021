@@ -41,7 +41,7 @@ import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
-import org.firstinspires.ftc.teamcode.util.vision.FreightDetector;
+import org.firstinspires.ftc.teamcode.util.vision.auto_box.FreightDetector;
 
 @TeleOp(name = "Tele-Op (B)", group = "Iterative Opmode")
 public class TeleopTeamB extends OpMode {
