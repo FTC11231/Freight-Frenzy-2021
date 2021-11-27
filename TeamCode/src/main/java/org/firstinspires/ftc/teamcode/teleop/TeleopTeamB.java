@@ -64,11 +64,9 @@ public class TeleopTeamB extends OpMode {
 	@Override
 	public void init() {
 		chassis = new Chassis(this);
-//		turret = new Turret(this, true);
 		arm = new Arm(this, true);
 		carousel = new Carousel(this);
 		gripper = new Gripper(this);
-//		turretArm = new TurretArm(this);
 
 		vision = new FreightDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
 
@@ -121,17 +119,12 @@ public class TeleopTeamB extends OpMode {
 				turn * driveMultiplier);
 
 		// Carousel (Base)
-//		double carouselPower = carouselTimer.get() * 3;
-//		telemetry.addData("Timer", carouselTimer.get());
-//		telemetry.addData("Power", carouselPower);
 		if (gamepad1.b) {
 			carousel.motor.setPower(1); // Turn the carousel (Red side, B is red)
 		} else if (gamepad1.x) {
 			carousel.motor.setPower(-1); // Turn the carousel (Blue side, X is blue)
 		} else {
 			carousel.motor.setPower(0); // Don't turn the carousel
-//			carouselTimer.stop();
-//			carouselTimer.start(); // Set the timer to 0 for when we start turning the carousel
 		}
 
 		// Turret (Operator)
