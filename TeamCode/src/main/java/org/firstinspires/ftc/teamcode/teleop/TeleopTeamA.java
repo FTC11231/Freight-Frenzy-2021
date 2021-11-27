@@ -36,21 +36,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
-import org.firstinspires.ftc.teamcode.util.hardware.TurretArm;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
-import org.firstinspires.ftc.teamcode.util.hardware.Turret;
 import org.firstinspires.ftc.teamcode.util.vision.FreightDetector;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Tele-Op (A)", group = "Iterative Opmode")
+@TeleOp(name = "Tele-Op (A)", group = "Iterative Opmode")
 public class TeleopTeamA extends OpMode {
 
 	private final String versionNumber = "v0.5";
@@ -60,9 +53,12 @@ public class TeleopTeamA extends OpMode {
 	private Gripper gripper;
 
 	private DcMotor turretMotor;
-	private Timer carouselTimer;
 
 	private FreightDetector vision;
+
+	private boolean pushingArmDown = false;
+	private boolean armSetPos = false;
+	private Timer armResetTimer = new Timer();
 
 	@Override
 	public void init() {
@@ -76,7 +72,6 @@ public class TeleopTeamA extends OpMode {
 		turretMotor = hardwareMap.get(DcMotor.class, "turret");
 
 		gripper.openGripper();
-		carouselTimer = new Timer();
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
@@ -89,20 +84,12 @@ public class TeleopTeamA extends OpMode {
 
 	@Override
 	public void start() {
-		carouselTimer.start();
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 		telemetry.update();
 	}
 
 	@Override
 	public void loop() {
-		telemetry.addData("Status", "Running (Version: " + versionNumber + ")");
-		telemetry.addData("Final angle", chassis.getAngle());
-		Orientation angles = chassis.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-		telemetry.addData("X", angles.thirdAngle);
-		telemetry.addData("Y", angles.secondAngle);
-		telemetry.addData("Z", angles.firstAngle);
-
 		// Chassis (Base)
 		double driveMultiplier = 0.75;
 		if (gamepad1.a) {
@@ -132,21 +119,48 @@ public class TeleopTeamA extends OpMode {
 		turretMotor.setPower(gamepad2.right_stick_x * 0.60);
 
 		// Arm (Operator)
-		if (-gamepad2.left_stick_y >= 0) {
-			double multiplier = 0.15;
-			arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
-			if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
-				arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
-			} else {
-				arm.motorTwo.setPower(0.1);
-			}
+		if (gamepad2.dpad_up) {
+			armSetPos = true;
+			pushingArmDown = false;
+		}
+		if (gamepad2.dpad_down) {
+			pushingArmDown = true;
+			armSetPos = false;
+		}
+		if (Math.abs(gamepad2.left_stick_y) > 0.1) {
+			pushingArmDown = false;
+			armSetPos = false;
+		}
+		if (armResetTimer.hasElapsed(1) || gamepad2.a) {
+			arm.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		}
+		if (pushingArmDown) {
+			armResetTimer.start();
+			arm.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+			arm.motorOne.setPower(-0.05);
+			arm.motorTwo.setPower(-0.05);
+		} else if (armSetPos) {
+			armResetTimer.stop();
+			arm.setPosition(73, 0.3);
 		} else {
-			double multiplier = 0.06;
-			arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
-			if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
-				arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
+			armResetTimer.stop();
+			arm.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+			if (-gamepad2.left_stick_y >= 0) {
+				double multiplier = 0.15;
+				arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
+				if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
+					arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
+				} else {
+					arm.motorTwo.setPower(0.1);
+				}
 			} else {
-				arm.motorTwo.setPower(0.1);
+				double multiplier = 0.06;
+				arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
+				if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
+					arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
+				} else {
+					arm.motorTwo.setPower(0.1);
+				}
 			}
 		}
 

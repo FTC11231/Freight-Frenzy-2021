@@ -126,4 +126,9 @@ public class Arm {
 		this.motorTwo.setPower(-power);
 	}
 
+	public void setRunMode(DcMotor.RunMode runMode) {
+		this.motorOne.setMode(runMode);
+		this.motorTwo.setMode(runMode);
+	}
+
 }
