@@ -193,6 +193,8 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 	public void setRectThree(int x, int y, int width, int height) {
 		regionThreePointA = new Point(x, y);
 		regionThreePointB = new Point(x + width, y + height);
+		Mat mat;
+//		mat.size
 	}
 
 	public void setThreshold(int threshold) {
