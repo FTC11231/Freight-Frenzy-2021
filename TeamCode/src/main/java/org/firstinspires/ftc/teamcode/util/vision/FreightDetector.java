@@ -37,7 +37,8 @@ public class FreightDetector {
 	}
 
 	public double calculateTurnPower() {
-		return -pipeline.getPosition();
+		return (pipeline.getPosition() + 80.0) / 100.0;
+
 	}
 
 	public int getPosition() {

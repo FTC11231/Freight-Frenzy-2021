@@ -29,10 +29,13 @@
 
 package org.firstinspires.ftc.teamcode.teleop;
 
+import androidx.core.math.MathUtils;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -45,6 +48,7 @@ import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.TurretArm;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
 import org.firstinspires.ftc.teamcode.util.hardware.Turret;
+import org.firstinspires.ftc.teamcode.util.vision.FreightDetector;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Tele-Op (A)", group = "Iterative Opmode")
 public class TeleopTeamA extends OpMode {
@@ -58,6 +62,8 @@ public class TeleopTeamA extends OpMode {
 	private DcMotor turretMotor;
 	private Timer carouselTimer;
 
+	private FreightDetector vision;
+
 	@Override
 	public void init() {
 		chassis = new Chassis(this);
@@ -65,7 +71,9 @@ public class TeleopTeamA extends OpMode {
 		arm = new Arm(this, true);
 		carousel = new Carousel(this);
 		gripper = new Gripper(this);
-//		turretArm = new TurretArm(this);
+//		turretArm =
+
+		vision = new FreightDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
 
 		turretMotor = hardwareMap.get(DcMotor.class, "turret");
 
@@ -105,9 +113,13 @@ public class TeleopTeamA extends OpMode {
 		if (gamepad1.left_bumper || gamepad1.right_bumper) {
 			driveMultiplier *= 0.75;
 		}
+		double turn = gamepad1.right_stick_x;
+		if (gamepad1.y) {
+			turn = MathUtils.clamp(vision.calculateTurnPower() * 0.6, -0.6, 0.6);
+		}
 		chassis.drive(-gamepad1.left_stick_y * driveMultiplier,
 				gamepad1.left_stick_x * driveMultiplier,
-				gamepad1.right_stick_x * driveMultiplier);
+				turn * driveMultiplier);
 
 		// Carousel (Base)
 //		double carouselPower = carouselTimer.get() * 3;

@@ -15,7 +15,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 public class FreightPipeline extends OpenCvPipeline {
 
 	public int getPosition() {
-		return this.position + (int) (frameSize.width / 2);
+		return this.position - (int) (frameSize.width / 2);
 	}
 
 	// Colors
@@ -51,6 +51,10 @@ public class FreightPipeline extends OpenCvPipeline {
 
 		Imgproc.findContours(mask, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
+		if (contours.size() == 0) {
+			position = (int) (input.size().width / 2);
+			return input;
+		}
 		int maxSize = 0;
 		int maxSizeIndex = 0;
 		for (int i = 0; i < contours.size(); i++) {
@@ -60,9 +64,9 @@ public class FreightPipeline extends OpenCvPipeline {
 			}
 		}
 		Rect boundingBox = Imgproc.boundingRect(new MatOfPoint(contours.get(maxSizeIndex).toArray()));
-		int centerX = (boundingBox.x * 2 + boundingBox.width) / 2;
-		int centerY = (boundingBox.y * 2 + boundingBox.height) / 2;
-		position = centerX;
+		int centerX = (boundingBox.x + boundingBox.x + boundingBox.width) / 2;
+		int centerY = (boundingBox.y + boundingBox.y + boundingBox.height) / 2;
+		position = boundingBox.x;
 
 		Imgproc.drawContours(input, contours, maxSizeIndex, GREEN);
 		Imgproc.rectangle(input, boundingBox, RED);

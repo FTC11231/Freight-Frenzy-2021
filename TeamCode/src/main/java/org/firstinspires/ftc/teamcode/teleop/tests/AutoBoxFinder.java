@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode.teleop.tests;
 
+import androidx.core.math.MathUtils;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -37,8 +39,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.vision.FreightDetector;
 
-@TeleOp(name = "Template Tele-Op", group = "Iterative Opmode")
-@Disabled
+@TeleOp(name = "Auto-box", group = "Iterative Opmode")
 public class AutoBoxFinder extends OpMode {
 
 	private String versionNumber = "v0.1'";
@@ -68,8 +69,15 @@ public class AutoBoxFinder extends OpMode {
 	@Override
 	public void loop() {
 		if (gamepad1.a) {
-			chassis.drive(0, 0, vision.calculateTurnPower() * 0.2);
+			chassis.drive(-gamepad1.left_stick_y,
+					gamepad1.left_stick_x,
+					MathUtils.clamp(vision.calculateTurnPower() * 0.6, -0.6, 0.6));
+		} else {
+			chassis.drive(-gamepad1.left_stick_y,
+					gamepad1.left_stick_x, gamepad1.right_stick_x);
 		}
+		telemetry.addData("Turn power", vision.calculateTurnPower() * 0.6);
+		telemetry.addData("Position", vision.getPosition());
 	}
 
 	@Override

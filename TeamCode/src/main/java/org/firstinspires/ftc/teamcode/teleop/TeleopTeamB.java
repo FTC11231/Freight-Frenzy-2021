@@ -29,10 +29,13 @@
 
 package org.firstinspires.ftc.teamcode.teleop;
 
+import androidx.core.math.MathUtils;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -42,6 +45,7 @@ import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
+import org.firstinspires.ftc.teamcode.util.vision.FreightDetector;
 
 @TeleOp(name = "Tele-Op (B)", group = "Iterative Opmode")
 public class TeleopTeamB extends OpMode {
@@ -55,6 +59,8 @@ public class TeleopTeamB extends OpMode {
 	private DcMotor turretMotor;
 	private Timer carouselTimer;
 
+	private FreightDetector vision;
+
 	@Override
 	public void init() {
 		chassis = new Chassis(this);
@@ -63,6 +69,8 @@ public class TeleopTeamB extends OpMode {
 		carousel = new Carousel(this);
 		gripper = new Gripper(this);
 //		turretArm = new TurretArm(this);
+
+		vision = new FreightDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
 
 		turretMotor = hardwareMap.get(DcMotor.class, "turret");
 
@@ -103,9 +111,14 @@ public class TeleopTeamB extends OpMode {
 		if (gamepad1.left_bumper || gamepad1.right_bumper) {
 			driveMultiplier *= 0.75;
 		}
+		double turn = gamepad1.right_stick_x;
+		if (gamepad1.y) {
+			turn = MathUtils.clamp(vision.calculateTurnPower() * 0.6, -0.6, 0.6);
+		}
+
 		chassis.drive(throttleDrive * driveMultiplier,
 				gamepad1.left_stick_x * driveMultiplier,
-				gamepad1.right_stick_x * driveMultiplier);
+				turn * driveMultiplier);
 
 		// Carousel (Base)
 //		double carouselPower = carouselTimer.get() * 3;
