@@ -47,7 +47,7 @@ public class RedWarehouse extends LinearOpMode {
 	private String versionNumber = "v0.1";
 
 	private Chassis chassis;
-//	private Turret turret;
+	//	private Turret turret;
 	private Arm arm;
 	private Gripper gripper;
 	private Carousel carousel;
@@ -90,7 +90,6 @@ public class RedWarehouse extends LinearOpMode {
 		switch (elementPosition) {
 			case LEFT:
 				arm.setPosition(20, 0.3);
-				chassis.turn(52, 0.7, 5);
 				chassis.driveForward(8, 0.3, 0.2, 0.2, 5); // Drive into the hub
 				gripper.openGripper(); // Open gripper
 				Timer.delay(1, this); // Wait for gripper to open
@@ -98,7 +97,6 @@ public class RedWarehouse extends LinearOpMode {
 				break;
 			case CENTER:
 				arm.setPosition(50, 0.3);
-				chassis.turn(52, 0.7, 5);
 				chassis.driveForward(7, 0.3, 0.2, 0.2, 5); // Drive into the hub
 				gripper.openGripper(); // Open gripper
 				Timer.delay(1, this); // Wait for gripper to open
@@ -106,7 +104,6 @@ public class RedWarehouse extends LinearOpMode {
 				break;
 			case RIGHT:
 				arm.setPosition(70, 0.3);
-				chassis.turn(52, 0.7, 5);
 				chassis.driveForward(8, 0.3, 0.2, 0.2, 5); // Drive into the hub
 				gripper.openGripper(); // Open gripper
 				Timer.delay(1, this); // Wait for gripper to open
@@ -129,14 +126,19 @@ public class RedWarehouse extends LinearOpMode {
 		Timer.delay(1, this);
 		arm.setPosition(15,0.6);
 
-		chassis.driveForward(19, 0.8, 0.2, 0.2, 5); // Drive towards the hub
+		chassis.driveForward(17, 0.8, 0.2, 0.2, 5); // Drive towards the hub
 		Timer.delay(0.1, this); // Delay for safety
-		chassis.turn(38, 0.8, 5); // Turn to the hub
+		chassis.turn(45, 0.8, 5); // Turn to the hub
 	}
 
 	public void parkWarehouse() {
 		chassis.turn(90, 0.8, 5); // Turn towards warehouse
 		// TODO: Park in warehouse
+		chassis.driveForward(-60, 1, 0.1, 0.1, 5);
+		chassis.turn(90, 0.8, 5);
+		chassis.drive(-0.5, 0, 0);
+		Timer.delay(1);
+		chassis.drive(0, 0, 0);
 	}
 
 }

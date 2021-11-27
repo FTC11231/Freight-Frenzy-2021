@@ -47,14 +47,15 @@ public class RedStorage extends LinearOpMode {
 	private String versionNumber = "v0.1";
 
 	private Chassis chassis;
-//	private Turret turret;
+	//	private Turret turret;
 	private Arm arm;
 	private Gripper gripper;
 	private Carousel carousel;
 
 	private ElementDetector elementDetector;
 
-	private boolean parkInWarehouse = false;
+	private boolean parkInWarehouse = true;
+	private Timer warehouseTimer = new Timer();
 
 	@Override
 	public void runOpMode() {
@@ -91,10 +92,10 @@ public class RedStorage extends LinearOpMode {
 		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
 
 		// Autonomous code goes here
-		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = elementDetector.getPosition();
-//		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = FreightFrenzyDeterminationPipeline.ElementPosition.LEFT;
-		telemetry.addData("Position", elementPosition);
+//		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = elementDetector.getPosition();
+		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = FreightFrenzyDeterminationPipeline.ElementPosition.RIGHT;		telemetry.addData("Position", elementPosition);
 		telemetry.update();
+		warehouseTimer.start();
 		hub();
 		switch (elementPosition) {
 			case LEFT:
@@ -125,11 +126,14 @@ public class RedStorage extends LinearOpMode {
 		arm.setPosition(10, 0.05); // Move the arm down
 		Timer.delay(0.5, this);
 		carousel();
-		if (!parkInWarehouse) {
+		telemetry.addData("Time", warehouseTimer.get());
+		telemetry.update();
+		if (!parkInWarehouse || warehouseTimer.hasElapsed(23)) {
 			parkStorage();
 		} else {
 			parkWarehouse();
 		}
+
 
 		arm.setPower(0);
 
@@ -142,14 +146,14 @@ public class RedStorage extends LinearOpMode {
 		Timer.delay(1, this);
 		arm.setPosition(15,0.6);
 
-		chassis.driveForward(34, 0.75, 0.2, 0.2, 5); // Drive towards the hub
+		chassis.driveForward(28, 0.75, 0.1, 0.1, 5); // Drive towards the hub
 		Timer.delay(0.1, this); // Delay for safety
 		chassis.turn(-90, 0.8, 5); // Turn to the hub
 	}
 
 	public void carousel() {
 		chassis.turn(0, 0.8, 5); // Turn to carousel
-		chassis.driveForward(-25, 0.95, 0.2, 0.2, 5); // Drive back to carousel
+		chassis.driveForward(-19, 0.95, 0.1, 0.15, 5); // Drive back to carousel
 		chassis.turn(-45, 0.8, 5); // Turn to more precisely get carousel
 		carousel.motor.setPower(0.6); // Start turning the carousel wheel
 		chassis.driveForward(-4, 0.5, 0.05, 0.05, 5); // Drive back into carousel
@@ -159,6 +163,7 @@ public class RedStorage extends LinearOpMode {
 //		telemetry.addData("State", 1);
 //		telemetry.update();
 		Timer.delay(3, this); // Wait for the duck to fall off
+		arm.setPosition(15,0.6);
 //		telemetry.addData("State", 2);
 //		telemetry.update();
 	}
@@ -178,8 +183,16 @@ public class RedStorage extends LinearOpMode {
 		chassis.driveForward(20, 0.8, 0.2, 0.2, 5); // Drive away from the carousel
 		carousel.motor.setPower(0); // Turn the carousel wheel off
 		chassis.turn(90, 0.8, 5); // Turn towards the warehouse
-		chassis.driveForward(-24, 1, 0.1, 0.1, 5);
-		// TODO: Park in warehouse
+		chassis.driveForward(-18, 1, 0.1, 0.1, 5);
+		while (!warehouseTimer.hasElapsed(25.5)) {
+			telemetry.addData("Timer", warehouseTimer.get());
+			telemetry.update();
+		}
+		chassis.driveForward(-70, 1, 0.1, 0.1, 5);
+		chassis.turn(90, 0.8, 5);
+		chassis.drive(-0.5, 0, 0);
+		Timer.delay(1);
+		chassis.drive(0, 0, 0);
 	}
 
 }

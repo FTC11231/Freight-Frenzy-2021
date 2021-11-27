@@ -146,7 +146,7 @@ public class TeleopTeamA extends OpMode {
 			armResetTimer.stop();
 			arm.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 			if (-gamepad2.left_stick_y >= 0) {
-				double multiplier = 0.15;
+				double multiplier = 0.4;
 				arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
 				if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
 					arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
@@ -154,7 +154,7 @@ public class TeleopTeamA extends OpMode {
 					arm.motorTwo.setPower(0.1);
 				}
 			} else {
-				double multiplier = 0.06;
+				double multiplier = 0.1;
 				arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
 				if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
 					arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
