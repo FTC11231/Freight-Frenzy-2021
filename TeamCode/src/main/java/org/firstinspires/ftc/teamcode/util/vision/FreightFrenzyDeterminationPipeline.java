@@ -75,6 +75,7 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 		diff2 = (int) Math.abs(yellowHue - Core.mean(region2_Cb).val[0]);
 		diff3 = (int) Math.abs(yellowHue - Core.mean(region3_Cb).val[0]);
 
+
 		if (detectionType == DetectionType.ALL_VISIBLE) {
 			int closestVal = Math.min(Math.min(diff1, diff2), diff3);
 			if (closestVal == diff1) {
@@ -152,27 +153,27 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 		int lineThickness = 2;
 		if (position == ElementPosition.LEFT) {
 			if (detectionType != DetectionType.LEFT_NOT_VISIBLE) {
-				drawRectOutline(input, regionOnePointA, regionOnePointB, GREEN, lineThickness);
+				Imgproc.rectangle(input, regionOnePointA, regionOnePointB, GREEN, lineThickness);
 			}
-			drawRectOutline(input, regionTwoPointA, regionTwoPointB, RED, lineThickness);
+			Imgproc.rectangle(input, regionTwoPointA, regionTwoPointB, RED, lineThickness);
 			if (detectionType != DetectionType.RIGHT_NOT_VISIBLE) {
-				drawRectOutline(input, regionThreePointA, regionThreePointB, RED, lineThickness);
+				Imgproc.rectangle(input, regionThreePointA, regionThreePointB, RED, lineThickness);
 			}
 		} else if (position == ElementPosition.CENTER) {
 			if (detectionType != DetectionType.LEFT_NOT_VISIBLE) {
-				drawRectOutline(input, regionOnePointA, regionOnePointB, RED, lineThickness);
+				Imgproc.rectangle(input, regionOnePointA, regionOnePointB, RED, lineThickness);
 			}
-			drawRectOutline(input, regionTwoPointA, regionTwoPointB, GREEN, lineThickness);
+			Imgproc.rectangle(input, regionTwoPointA, regionTwoPointB, GREEN, lineThickness);
 			if (detectionType != DetectionType.RIGHT_NOT_VISIBLE) {
-				drawRectOutline(input, regionThreePointA, regionThreePointB, RED, lineThickness);
+				Imgproc.rectangle(input, regionThreePointA, regionThreePointB, RED, lineThickness);
 			}
 		} else {
 			if (detectionType != DetectionType.LEFT_NOT_VISIBLE) {
-				drawRectOutline(input, regionOnePointA, regionOnePointB, RED, lineThickness);
+				Imgproc.rectangle(input, regionOnePointA, regionOnePointB, RED, lineThickness);
 			}
-			drawRectOutline(input, regionTwoPointA, regionTwoPointB, RED, lineThickness);
+			Imgproc.rectangle(input, regionTwoPointA, regionTwoPointB, RED, lineThickness);
 			if (detectionType != DetectionType.RIGHT_NOT_VISIBLE) {
-				drawRectOutline(input, regionThreePointA, regionThreePointB, GREEN, lineThickness);
+				Imgproc.rectangle(input, regionThreePointA, regionThreePointB, GREEN, lineThickness);
 			}
 		}
 
@@ -192,37 +193,6 @@ public class FreightFrenzyDeterminationPipeline extends OpenCvPipeline {
 	public void setRectThree(int x, int y, int width, int height) {
 		regionThreePointA = new Point(x, y);
 		regionThreePointB = new Point(x + width, y + height);
-	}
-
-	public void drawRectOutline(Mat input, Point p1, Point p2, Scalar color, int thickness) {
-		Imgproc.line(
-				input,
-				new Point(p1.x, p1.y),
-				new Point(p2.x, p1.y),
-				color,
-				thickness
-		);
-		Imgproc.line(
-				input,
-				new Point(p1.x, p1.y),
-				new Point(p1.x, p2.y),
-				color,
-				thickness
-		);
-		Imgproc.line(
-				input,
-				new Point(p1.x, p2.y),
-				new Point(p2.x, p2.y),
-				color,
-				thickness
-		);
-		Imgproc.rectangle(
-				input,
-				new Point(p2.x, p1.y),
-				new Point(p2.x, p2.y),
-				color,
-				thickness
-		);
 	}
 
 	public void setThreshold(int threshold) {
