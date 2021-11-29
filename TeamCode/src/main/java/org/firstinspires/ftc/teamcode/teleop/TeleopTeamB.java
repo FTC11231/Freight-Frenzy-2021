@@ -56,9 +56,14 @@ public class TeleopTeamB extends OpMode {
 
 	private FreightDetector vision;
 
-	private boolean pushingArmDown = false;
-	private boolean armSetPos = false;
 	private Timer armResetTimer = new Timer();
+
+	private enum ArmStates {
+		MANUAL,
+		PUSHING_DOWN,
+		LEVEL_3
+	}
+	private ArmStates armState;
 
 	@Override
 	public void init() {
@@ -122,48 +127,44 @@ public class TeleopTeamB extends OpMode {
 
 		// Arm (Operator)
 		if (gamepad2.dpad_up) {
-			armSetPos = true;
-			pushingArmDown = false;
+			armState = ArmStates.LEVEL_3;
 		}
 		if (gamepad2.dpad_down) {
-			pushingArmDown = true;
-			armSetPos = false;
+			armState = ArmStates.PUSHING_DOWN;
 		}
 		if (Math.abs(gamepad2.left_stick_y) > 0.1) {
-			pushingArmDown = false;
-			armSetPos = false;
+			armState = ArmStates.MANUAL;
 		}
 		if (armResetTimer.hasElapsed(1) || gamepad2.a) {
 			arm.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		}
-		if (pushingArmDown) {
-			armResetTimer.start();
-			arm.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-			arm.motorOne.setPower(-0.05);
-			arm.motorTwo.setPower(-0.05);
-		} else if (armSetPos) {
-			armResetTimer.stop();
-			arm.setPosition(73, 0.3);
-		} else {
-			armResetTimer.stop();
-			arm.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-			if (-gamepad2.left_stick_y >= 0) {
-				double multiplier = 0.15;
+		switch (armState) {
+			case PUSHING_DOWN:
+				armResetTimer.start();
+				arm.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+				arm.motorOne.setPower(-0.05);
+				arm.motorTwo.setPower(-0.05);
+				break;
+			case LEVEL_3:
+				armResetTimer.stop();
+				arm.setPosition(73, 0.3);
+				break;
+			case MANUAL:
+				armResetTimer.stop();
+				arm.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+				double multiplier;
+				if (-gamepad2.left_stick_y >= 0) {
+					multiplier = 0.4;
+				} else {
+					multiplier = 0.1;
+				}
 				arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
 				if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
 					arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
 				} else {
 					arm.motorTwo.setPower(0.1);
 				}
-			} else {
-				double multiplier = 0.06;
-				arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
-				if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
-					arm.motorTwo.setPower(-gamepad2.left_stick_y * multiplier);
-				} else {
-					arm.motorTwo.setPower(0.1);
-				}
-			}
+				break;
 		}
 
 		// Gripper (Operator)
