@@ -65,6 +65,13 @@ public class TeleopTeamA extends OpMode {
 	}
 	private ArmStates armState;
 
+	private enum Team {
+		A,
+		B
+	}
+	private Team team = Team.A;
+	private boolean aLastFrame = false;
+
 	@Override
 	public void init() {
 		chassis = new Chassis(this);
@@ -84,7 +91,17 @@ public class TeleopTeamA extends OpMode {
 
 	@Override
 	public void init_loop() {
-
+		if (gamepad1.a && !aLastFrame) {
+			switch (team) {
+				case A:
+					team = Team.B;
+					break;
+				case B:
+					team = Team.A;
+					break;
+			}
+		}
+		aLastFrame = gamepad1.a;
 	}
 
 	@Override
@@ -107,7 +124,16 @@ public class TeleopTeamA extends OpMode {
 		if (gamepad1.y) {
 			turn = MathUtils.clamp(vision.calculateTurnPower() * 0.6, -0.6, 0.6);
 		}
-		chassis.drive(-gamepad1.left_stick_y * driveMultiplier,
+		double forwards = 0.0;
+		switch (team) {
+			case A:
+				forwards = -gamepad1.left_stick_y;
+				break;
+			case B:
+				forwards = gamepad1.right_trigger - gamepad1.left_trigger;
+				break;
+		}
+		chassis.drive(forwards * driveMultiplier,
 				gamepad1.left_stick_x * driveMultiplier,
 				turn * driveMultiplier);
 
@@ -178,7 +204,7 @@ public class TeleopTeamA extends OpMode {
 
 	@Override
 	public void stop() {
-		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
+		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
 		telemetry.update();
 	}
 
