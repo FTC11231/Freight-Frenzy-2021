@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.vision.shipping_element;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.opencv.core.Mat;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -85,6 +86,18 @@ public class ShippingElementDetector {
 
 	public boolean isActive() {
 		return pipeline.isActive();
+	}
+
+	public Mat[] getRegions() {
+		return pipeline.getRegions();
+	}
+
+	public int[] getCounts() {
+		return pipeline.getCounts();
+	}
+
+	public void setMaskVisibility(boolean showMask) {
+		pipeline.setMaskVisibility(showMask);
 	}
 
 }

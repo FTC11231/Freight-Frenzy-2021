@@ -27,62 +27,63 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.teleop.tests;
-
-import androidx.core.math.MathUtils;
+package org.firstinspires.ftc.teamcode.teleop.demos;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
-import org.firstinspires.ftc.teamcode.util.vision.auto_box.FreightDetector;
+import org.firstinspires.ftc.teamcode.util.vision.shipping_element.ShippingElementDetector;
+import org.firstinspires.ftc.teamcode.util.vision.shipping_element.ShippingElementPipeline;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
-@TeleOp(name = "Auto-box", group = "Iterative Opmode")
-public class AutoBoxFinder extends OpMode {
+@TeleOp(name = "TSE Vision Demo", group = "Linear Opmode")
+public class ShippingElementVisionDemo extends OpMode {
 
-	private String versionNumber = "v0.1'";
-	private FreightDetector vision;
+	private OpenCvWebcam webcam;
+	private ShippingElementDetector vision;
 
-	private Chassis chassis;
+	private boolean aLastFrame = false;
+	private boolean showMask = false;
+
+	private boolean yLastFrame = false;
+	private ShippingElementDetector.StartingType startingType;
 
 	@Override
 	public void init() {
-		vision = new FreightDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
-		chassis = new Chassis(this);
-		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
-		telemetry.update();
-	}
+		this.vision = new ShippingElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
 
-	@Override
-	public void init_loop() {
-
-	}
-
-	@Override
-	public void start() {
-		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
-		telemetry.update();
+		vision.setSettings(ShippingElementDetector.StartingType.RED);
 	}
 
 	@Override
 	public void loop() {
-		if (gamepad1.a) {
-			chassis.drive(-gamepad1.left_stick_y,
-					gamepad1.left_stick_x,
-					MathUtils.clamp(vision.calculateTurnPower() * 0.6, -0.6, 0.6));
-		} else {
-			chassis.drive(-gamepad1.left_stick_y,
-					gamepad1.left_stick_x, gamepad1.right_stick_x);
+		if (gamepad1.a && !aLastFrame) {
+			showMask = !showMask;
 		}
-		telemetry.addData("Turn power", vision.calculateTurnPower() * 0.6);
-		telemetry.addData("Position", vision.getPosition());
-	}
+		vision.setMaskVisibility(showMask);
 
-	@Override
-	public void stop() {
-		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
+		if (gamepad1.y && !yLastFrame) {
+			if (startingType == ShippingElementDetector.StartingType.BLUE) {
+				startingType = ShippingElementDetector.StartingType.RED;
+			} else {
+				startingType = ShippingElementDetector.StartingType.BLUE;
+			}
+		}
+
+		telemetry.addData("Position", vision.getPosition());
+		telemetry.addData("Left", vision.getCounts()[0]);
+		telemetry.addData("Center", vision.getCounts()[1]);
+		telemetry.addData("Right", vision.getCounts()[2]);
+		telemetry.addLine();
+		telemetry.addData("Showing mask", showMask);
 		telemetry.update();
+
+		aLastFrame = gamepad1.a;
+		yLastFrame = gamepad1.y;
 	}
 
 }

@@ -39,9 +39,12 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 	private Point regionTwoPointB = new Point();
 	private Point regionThreePointA = new Point();
 	private Point regionThreePointB = new Point();
-	public Scalar lowerYellow = new Scalar(18, 131, 29);
-	public Scalar upperYellow = new Scalar(58, 255, 255);
+	private Scalar lowerYellow = new Scalar(18, 131, 29);
+	private Scalar upperYellow = new Scalar(58, 255, 255);
 	private int threshold = 0;
+
+	// Boolean for debugging and demo-ing
+	private boolean showMask = false;
 
 	// Vars to make this all work
 	private Mat regionOne; // Rectangle 1
@@ -50,9 +53,9 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 	private Mat RGB = new Mat();
 	private Mat HSV = new Mat();
 	private Mat mask = new Mat();
-	public int countOne; // Average yellow value of rectangle 1 (Avg of R and G)
-	public int countTwo; // Average yellow value of rectangle 2 (Avg of R and G)
-	public int countThree; // Average yellow value of rectangle 3 (Avg of R and G)
+	private int countOne; // Average yellow value of rectangle 1 (Avg of R and G)
+	private int countTwo; // Average yellow value of rectangle 2 (Avg of R and G)
+	private int countThree; // Average yellow value of rectangle 3 (Avg of R and G)
 	private volatile ElementPosition position = ElementPosition.RIGHT;
 
 	@Override
@@ -167,7 +170,11 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 			}
 		}
 
-		return RGB;
+		if (showMask) {
+			return mask;
+		} else {
+			return RGB;
+		}
 	}
 
 	public void setRectOne(int x, int y, int width, int height) {
@@ -201,6 +208,14 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 
 	public Mat[] getRegions() {
 		return new Mat[] {regionOne, regionTwo, regionThree};
+	}
+
+	public int[] getCounts() {
+		return new int[] {countOne, countTwo, countThree};
+	}
+
+	public void setMaskVisibility(boolean showMask) {
+		this.showMask = showMask;
 	}
 
 }

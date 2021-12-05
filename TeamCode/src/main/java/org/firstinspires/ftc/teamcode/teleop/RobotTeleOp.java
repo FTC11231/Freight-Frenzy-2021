@@ -43,8 +43,8 @@ import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
 import org.firstinspires.ftc.teamcode.util.vision.auto_box.FreightDetector;
 
-@TeleOp(name = "Tele-Op (A)", group = "Iterative Opmode")
-public class TeleopTeamA extends OpMode {
+@TeleOp(name = "Tele-Op", group = "Iterative Opmode")
+public class RobotTeleOp extends OpMode {
 
 	private final String versionNumber = "v0.5";
 	private Chassis chassis;

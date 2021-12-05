@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.vision.auto_box;
 
+import androidx.core.math.MathUtils;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -37,12 +39,16 @@ public class FreightDetector {
 	}
 
 	public double calculateTurnPower() {
-		return (pipeline.getPosition() + 80.0) / 100.0;
+		return MathUtils.clamp((pipeline.getPosition() + 80.0) / (500.0 / 3.0), -0.6, 0.6);
 
 	}
 
 	public int getPosition() {
 		return pipeline.getPosition();
+	}
+
+	public void setMaskVisibility(boolean showMask) {
+		pipeline.setMaskVisibility(showMask);
 	}
 
 }

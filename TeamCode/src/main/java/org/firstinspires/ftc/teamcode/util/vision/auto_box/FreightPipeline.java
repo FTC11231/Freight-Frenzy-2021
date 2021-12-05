@@ -27,8 +27,10 @@ public class FreightPipeline extends OpenCvPipeline {
 
 	private Size frameSize = new Size();
 
-	public Scalar lowerOrange = new Scalar(0.0, 141.0, 0.0);
-	public Scalar upperOrange = new Scalar(255.0, 230.0, 95.0);
+	private Scalar lowerOrange = new Scalar(0.0, 141.0, 0.0);
+	private Scalar upperOrange = new Scalar(255.0, 230.0, 95.0);
+
+	private boolean showMask;
 
 	@Override
 	public void init(Mat input) {
@@ -72,4 +74,9 @@ public class FreightPipeline extends OpenCvPipeline {
 		Imgproc.rectangle(input, boundingBox, RED);
 		return input;
 	}
+
+	public void setMaskVisibility(boolean showMask) {
+		this.showMask = showMask;
+	}
+
 }
