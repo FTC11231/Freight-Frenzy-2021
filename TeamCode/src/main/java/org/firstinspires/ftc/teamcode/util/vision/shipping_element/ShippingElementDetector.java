@@ -84,7 +84,7 @@ public class ShippingElementDetector {
 	}
 
 	public boolean isActive() {
-		return pipeline.region1_Cb != null;
+		return pipeline.isActive();
 	}
 
 }

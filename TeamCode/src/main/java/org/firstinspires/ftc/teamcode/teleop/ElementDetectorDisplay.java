@@ -70,16 +70,16 @@ public class ElementDetectorDisplay extends LinearOpMode {
 
 		while (opModeIsActive()) {
 			telemetry.addData("[POSITION]", pipeline.getPosition());
-			telemetry.addData("[LEFT]", pipeline.diff1);
-			telemetry.addData("[CENTER]", pipeline.diff2);
-			telemetry.addData("[RIGHT]", pipeline.diff3);
-			if (pipeline.region1_Cb != null) {
+			telemetry.addData("[LEFT]", pipeline.countOne);
+			telemetry.addData("[CENTER]", pipeline.countTwo);
+			telemetry.addData("[RIGHT]", pipeline.countThree);
+			if (pipeline.isActive()) {
 				telemetry.addLine();
-				Scalar c1 = Core.mean(pipeline.region1_Cb);
+				Scalar c1 = Core.mean(pipeline.getRegions()[0]);
 				telemetry.addData("R1", c1.val[0]);
-				Scalar c2 = Core.mean(pipeline.region2_Cb);
+				Scalar c2 = Core.mean(pipeline.getRegions()[1]);
 				telemetry.addData("R2", c2.val[0]);
-				Scalar c3 = Core.mean(pipeline.region3_Cb);
+				Scalar c3 = Core.mean(pipeline.getRegions()[2]);
 				telemetry.addData("R3", c3.val[0]);
 			}
 			telemetry.update();
