@@ -64,7 +64,7 @@ public class RedWarehouse extends LinearOpMode {
 		carousel = new Carousel(this);
 
 		shippingElementDetector = new ShippingElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
-		shippingElementDetector.setSettings(ShippingElementDetector.StartingType.RED);
+		shippingElementDetector.setSettings(ShippingElementDetector.VisionPreset.RED);
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();

@@ -9,7 +9,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 public class ShippingElementDetector {
 
-	public enum StartingType {
+	public enum VisionPreset {
 		BLUE, RED
 	}
 
@@ -65,8 +65,8 @@ public class ShippingElementDetector {
 		return pipeline.getPosition();
 	}
 
-	public void setSettings(StartingType startingType) {
-		switch (startingType) {
+	public void setSettings(VisionPreset visionPreset) {
+		switch (visionPreset) {
 			case RED:
 				pipeline.setRectOne(40, 130, 25, 55);
 				pipeline.setRectTwo(173, 144, 25, 41);
@@ -93,11 +93,7 @@ public class ShippingElementDetector {
 	}
 
 	public int[] getCounts() {
-		return pipeline.getCounts();
-	}
-
-	public void setMaskVisibility(boolean showMask) {
-		pipeline.setMaskVisibility(showMask);
+		return pipeline.getDiffs();
 	}
 
 }

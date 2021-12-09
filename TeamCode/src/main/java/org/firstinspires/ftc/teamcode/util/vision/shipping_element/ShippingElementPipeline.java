@@ -39,64 +39,56 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 	private Point regionTwoPointB = new Point();
 	private Point regionThreePointA = new Point();
 	private Point regionThreePointB = new Point();
-	private Scalar lowerYellow = new Scalar(18, 131, 29);
-	private Scalar upperYellow = new Scalar(58, 255, 255);
 	private int threshold = 0;
-
-	// Boolean for debugging and demo-ing
-	private boolean showMask = false;
+	private int yellowHue = 0;
 
 	// Vars to make this all work
-	private Mat regionOne; // Rectangle 1
-	private Mat regionTwo; // Rectangle 2
-	private Mat regionThree; // Rectangle 3
+	public Mat regionOne; // Rectangle 1
+	public Mat regionTwo; // Rectangle 2
+	public Mat regionThree; // Rectangle 3
 	private Mat RGB = new Mat();
 	private Mat HSV = new Mat();
-	private Mat mask = new Mat();
-	private int countOne; // Average yellow value of rectangle 1 (Avg of R and G)
-	private int countTwo; // Average yellow value of rectangle 2 (Avg of R and G)
-	private int countThree; // Average yellow value of rectangle 3 (Avg of R and G)
+	public int diffOne; // Average yellow value of rectangle 1 (Avg of R and G)
+	public int diffTwo; // Average yellow value of rectangle 2 (Avg of R and G)
+	public int diffThree; // Average yellow value of rectangle 3 (Avg of R and G)
 	private volatile ElementPosition position = ElementPosition.RIGHT;
 
 	@Override
 	public void init(Mat input) {
 		RGB = input;
 		Imgproc.cvtColor(RGB, HSV, Imgproc.COLOR_RGB2HSV_FULL);
-		regionOne = mask.submat(new Rect(regionOnePointA, regionOnePointB));
-		regionTwo = mask.submat(new Rect(regionTwoPointA, regionTwoPointB));
-		regionThree = mask.submat(new Rect(regionThreePointA, regionThreePointB));
+		regionOne = input.submat(new Rect(regionOnePointA, regionOnePointB));
+		regionTwo = input.submat(new Rect(regionTwoPointA, regionTwoPointB));
+		regionThree = input.submat(new Rect(regionThreePointA, regionThreePointB));
 	}
 
 	@Override
 	public Mat processFrame(Mat input) {
 		RGB = input;
-		// Convert RGB to HSV for more reliable readings
 		Imgproc.cvtColor(RGB, HSV, Imgproc.COLOR_RGB2HSV_FULL);
-		// Create a mask of yellow/orange colors
-		Core.inRange(HSV, lowerYellow, upperYellow, mask);
 		// Move the rectangles' colors into the region materials
-		regionOne = mask.submat(new Rect(regionOnePointA, regionOnePointB));
-		regionTwo = mask.submat(new Rect(regionTwoPointA, regionTwoPointB));
-		regionThree = mask.submat(new Rect(regionThreePointA, regionThreePointB));
+		regionOne = HSV.submat(new Rect(regionOnePointA, regionOnePointB));
+		regionTwo = HSV.submat(new Rect(regionTwoPointA, regionTwoPointB));
+		regionThree = HSV.submat(new Rect(regionThreePointA, regionThreePointB));
 		// Compare the average color of each rectangle to yellow
-		countOne = Core.countNonZero(regionOne);
-		countTwo = Core.countNonZero(regionTwo);
-		countThree = Core.countNonZero(regionThree);
+		diffOne = (int) Math.abs(yellowHue - Core.mean(regionOne).val[0]);
+		diffTwo = (int) Math.abs(yellowHue - Core.mean(regionTwo).val[0]);
+		diffThree = (int) Math.abs(yellowHue - Core.mean(regionThree).val[0]);
 
 
 		if (detectionType == DetectionType.ALL_VISIBLE) {
-			int maxCount = Math.max(Math.max(countOne, countTwo), countThree);
-			if (maxCount == countOne) {
+			int closestVal = Math.min(Math.min(diffOne, diffTwo), diffThree);
+			if (closestVal == diffOne) {
 				position = ElementPosition.LEFT;
-			} else if (maxCount == countTwo) {
+			} else if (closestVal == diffTwo) {
 				position = ElementPosition.CENTER;
 			} else {
 				position = ElementPosition.RIGHT;
 			}
 		} else if (detectionType == DetectionType.LEFT_NOT_VISIBLE) {
-			int maxCount = Math.max(countTwo, countThree);
-			if (maxCount > threshold) {
-				if (maxCount == countTwo) {
+			int closestVal = Math.min(diffTwo, diffThree);
+			if (closestVal < threshold) {
+				if (closestVal == diffTwo) {
 					position = ElementPosition.CENTER;
 				} else {
 					position = ElementPosition.RIGHT;
@@ -105,9 +97,9 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 				position = ElementPosition.LEFT;
 			}
 		} else {
-			int maxCount = Math.max(countOne, countTwo);
-			if (maxCount > threshold) {
-				if (maxCount == countOne) {
+			int closestVal = Math.min(diffOne, diffTwo);
+			if (closestVal < threshold) {
+				if (closestVal == diffOne) {
 					position = ElementPosition.LEFT;
 				} else {
 					position = ElementPosition.CENTER;
@@ -119,24 +111,39 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 
 		// Draw rectangles of each mat average and the color we're comparing that to
 		Imgproc.rectangle(
-				RGB,
+				input,
 				new Point(0, 0),
 				new Point(10, 10),
 				Core.mean(regionOne),
 				-1
 		);
 		Imgproc.rectangle(
-				RGB,
+				input,
 				new Point(10, 0),
 				new Point(20, 10),
 				Core.mean(regionTwo),
 				-1
 		);
 		Imgproc.rectangle(
-				RGB,
+				input,
 				new Point(20, 0),
 				new Point(30, 10),
 				Core.mean(regionThree),
+				-1
+		);
+
+		Scalar yellowColor;
+		if (position == ElementPosition.CENTER) {
+			yellowColor = Core.mean(regionThree);
+		} else {
+			yellowColor = Core.mean(regionTwo);
+		}
+		yellowColor.val[0] = yellowHue;
+		Imgproc.rectangle(
+				input,
+				new Point(30, 0),
+				new Point(40, 10),
+				yellowColor,
 				-1
 		);
 
@@ -146,35 +153,31 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 		int lineThickness = 2;
 		if (position == ElementPosition.LEFT) {
 			if (detectionType != DetectionType.LEFT_NOT_VISIBLE) {
-				Imgproc.rectangle(RGB, regionOnePointA, regionOnePointB, GREEN, lineThickness);
+				Imgproc.rectangle(input, regionOnePointA, regionOnePointB, GREEN, lineThickness);
 			}
-			Imgproc.rectangle(RGB, regionTwoPointA, regionTwoPointB, RED, lineThickness);
+			Imgproc.rectangle(input, regionTwoPointA, regionTwoPointB, RED, lineThickness);
 			if (detectionType != DetectionType.RIGHT_NOT_VISIBLE) {
-				Imgproc.rectangle(RGB, regionThreePointA, regionThreePointB, RED, lineThickness);
+				Imgproc.rectangle(input, regionThreePointA, regionThreePointB, RED, lineThickness);
 			}
 		} else if (position == ElementPosition.CENTER) {
 			if (detectionType != DetectionType.LEFT_NOT_VISIBLE) {
-				Imgproc.rectangle(RGB, regionOnePointA, regionOnePointB, RED, lineThickness);
+				Imgproc.rectangle(input, regionOnePointA, regionOnePointB, RED, lineThickness);
 			}
-			Imgproc.rectangle(RGB, regionTwoPointA, regionTwoPointB, GREEN, lineThickness);
+			Imgproc.rectangle(input, regionTwoPointA, regionTwoPointB, GREEN, lineThickness);
 			if (detectionType != DetectionType.RIGHT_NOT_VISIBLE) {
-				Imgproc.rectangle(RGB, regionThreePointA, regionThreePointB, RED, lineThickness);
+				Imgproc.rectangle(input, regionThreePointA, regionThreePointB, RED, lineThickness);
 			}
 		} else {
 			if (detectionType != DetectionType.LEFT_NOT_VISIBLE) {
-				Imgproc.rectangle(RGB, regionOnePointA, regionOnePointB, RED, lineThickness);
+				Imgproc.rectangle(input, regionOnePointA, regionOnePointB, RED, lineThickness);
 			}
-			Imgproc.rectangle(RGB, regionTwoPointA, regionTwoPointB, RED, lineThickness);
+			Imgproc.rectangle(input, regionTwoPointA, regionTwoPointB, RED, lineThickness);
 			if (detectionType != DetectionType.RIGHT_NOT_VISIBLE) {
-				Imgproc.rectangle(RGB, regionThreePointA, regionThreePointB, GREEN, lineThickness);
+				Imgproc.rectangle(input, regionThreePointA, regionThreePointB, GREEN, lineThickness);
 			}
 		}
 
-		if (showMask) {
-			return mask;
-		} else {
-			return RGB;
-		}
+		return input;
 	}
 
 	public void setRectOne(int x, int y, int width, int height) {
@@ -210,12 +213,8 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 		return new Mat[] {regionOne, regionTwo, regionThree};
 	}
 
-	public int[] getCounts() {
-		return new int[] {countOne, countTwo, countThree};
-	}
-
-	public void setMaskVisibility(boolean showMask) {
-		this.showMask = showMask;
+	public int[] getDiffs() {
+		return new int[] {diffOne, diffTwo, diffThree};
 	}
 
 }

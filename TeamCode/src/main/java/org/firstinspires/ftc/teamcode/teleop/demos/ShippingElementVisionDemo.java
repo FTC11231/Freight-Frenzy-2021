@@ -34,10 +34,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.vision.shipping_element.ShippingElementDetector;
-import org.firstinspires.ftc.teamcode.util.vision.shipping_element.ShippingElementPipeline;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @TeleOp(name = "TSE Vision Demo", group = "Linear Opmode")
@@ -49,28 +45,22 @@ public class ShippingElementVisionDemo extends OpMode {
 	private boolean aLastFrame = false;
 	private boolean showMask = false;
 
-	private boolean yLastFrame = false;
-	private ShippingElementDetector.StartingType startingType;
+	private ShippingElementDetector.VisionPreset visionPreset;
 
 	@Override
 	public void init() {
 		this.vision = new ShippingElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
 
-		vision.setSettings(ShippingElementDetector.StartingType.RED);
+		vision.setSettings(ShippingElementDetector.VisionPreset.RED);
 	}
 
 	@Override
 	public void loop() {
 		if (gamepad1.a && !aLastFrame) {
-			showMask = !showMask;
-		}
-		vision.setMaskVisibility(showMask);
-
-		if (gamepad1.y && !yLastFrame) {
-			if (startingType == ShippingElementDetector.StartingType.BLUE) {
-				startingType = ShippingElementDetector.StartingType.RED;
+			if (visionPreset == ShippingElementDetector.VisionPreset.BLUE) {
+				visionPreset = ShippingElementDetector.VisionPreset.RED;
 			} else {
-				startingType = ShippingElementDetector.StartingType.BLUE;
+				visionPreset = ShippingElementDetector.VisionPreset.BLUE;
 			}
 		}
 
@@ -79,11 +69,10 @@ public class ShippingElementVisionDemo extends OpMode {
 		telemetry.addData("Center", vision.getCounts()[1]);
 		telemetry.addData("Right", vision.getCounts()[2]);
 		telemetry.addLine();
-		telemetry.addData("Showing mask", showMask);
+		telemetry.addData("Preset", visionPreset);
 		telemetry.update();
 
 		aLastFrame = gamepad1.a;
-		yLastFrame = gamepad1.y;
 	}
 
 }

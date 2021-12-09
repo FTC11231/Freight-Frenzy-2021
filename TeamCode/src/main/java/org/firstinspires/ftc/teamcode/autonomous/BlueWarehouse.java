@@ -64,7 +64,7 @@ public class BlueWarehouse extends LinearOpMode {
 		carousel = new Carousel(this);
 
 		shippingElementDetector = new ShippingElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
-		shippingElementDetector.setSettings(ShippingElementDetector.StartingType.BLUE);
+		shippingElementDetector.setSettings(ShippingElementDetector.VisionPreset.BLUE);
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
