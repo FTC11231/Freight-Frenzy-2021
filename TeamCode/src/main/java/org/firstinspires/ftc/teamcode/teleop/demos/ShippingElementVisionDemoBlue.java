@@ -36,8 +36,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.vision.shipping_element.ShippingElementDetector;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@TeleOp(name = "TSE Vision Demo", group = "Linear Opmode")
-public class ShippingElementVisionDemo extends OpMode {
+@TeleOp(name = "TSE Vision Demo (BLUE)", group = "Linear Opmode")
+public class ShippingElementVisionDemoBlue extends OpMode {
 
 	private OpenCvWebcam webcam;
 	private ShippingElementDetector vision;
@@ -51,7 +51,7 @@ public class ShippingElementVisionDemo extends OpMode {
 	public void init() {
 		this.vision = new ShippingElementDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
 
-		vision.setSettings(ShippingElementDetector.VisionPreset.RED);
+		vision.setSettings(ShippingElementDetector.VisionPreset.BLUE);
 	}
 
 	@Override

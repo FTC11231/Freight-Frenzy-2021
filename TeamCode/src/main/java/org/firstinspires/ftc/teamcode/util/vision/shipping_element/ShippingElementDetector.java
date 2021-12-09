@@ -72,6 +72,7 @@ public class ShippingElementDetector {
 				pipeline.setRectTwo(173, 144, 25, 41);
 				pipeline.setRectThree(300, 158, 20, 28);
 				pipeline.setThreshold(30);
+				pipeline.setYellowHue(30);
 				pipeline.setDetectionType(ShippingElementPipeline.DetectionType.ALL_VISIBLE);
 				break;
 			case BLUE:
@@ -79,6 +80,7 @@ public class ShippingElementDetector {
 				pipeline.setRectTwo(30, 130, 22, 55);
 				pipeline.setRectThree(165, 130, 20, 55);
 				pipeline.setThreshold(30);
+				pipeline.setYellowHue(30);
 				pipeline.setDetectionType(ShippingElementPipeline.DetectionType.LEFT_NOT_VISIBLE);
 				break;
 		}

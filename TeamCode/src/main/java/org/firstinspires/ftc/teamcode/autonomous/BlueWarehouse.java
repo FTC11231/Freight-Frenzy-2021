@@ -82,7 +82,7 @@ public class BlueWarehouse extends LinearOpMode {
 
 		// Autonomous code goes here
 		ShippingElementPipeline.ElementPosition elementPosition = shippingElementDetector.getPosition();
-//		FreightFrenzyDeterminationPipeline.ElementPosition elementPosition = FreightFrenzyDeterminationPipeline.ElementPosition.LEFT;
+//		ShippingElementPipeline.ElementPosition elementPosition = ShippingElementPipeline.ElementPosition.LEFT; // Override vision
 		telemetry.addData("Position", elementPosition);
 		telemetry.update();
 		hub();
@@ -133,7 +133,6 @@ public class BlueWarehouse extends LinearOpMode {
 
 	public void parkWarehouse() {
 		chassis.turn(-90, 0.8, 5); // Turn towards warehouse
-		// TODO: Park in warehouse
 		chassis.driveForward(-60, 1, 0.1, 0.1, 5);
 		chassis.turn(-90, 0.8, 5);
 		chassis.drive(-0.5, 0, 0);

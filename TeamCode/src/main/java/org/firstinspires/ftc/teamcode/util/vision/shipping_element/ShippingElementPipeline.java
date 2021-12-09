@@ -201,6 +201,10 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 		this.threshold = threshold;
 	}
 
+	public void setYellowHue(int hue) {
+		this.yellowHue = hue;
+	}
+
 	public void setDetectionType(DetectionType detectionType) {
 		this.detectionType = detectionType;
 	}

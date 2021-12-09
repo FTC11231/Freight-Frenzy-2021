@@ -84,6 +84,8 @@ public class RobotTeleOp extends OpMode {
 		turretMotor = hardwareMap.get(DcMotor.class, "turret");
 
 		gripper.openGripper();
+		team = Team.A;
+		armState = ArmStates.MANUAL;
 
 		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
 		telemetry.update();
@@ -102,6 +104,8 @@ public class RobotTeleOp extends OpMode {
 			}
 		}
 		aLastFrame = gamepad1.a;
+		telemetry.addData("Team", team);
+		telemetry.update();
 	}
 
 	@Override
@@ -166,21 +170,21 @@ public class RobotTeleOp extends OpMode {
 			case PUSHING_DOWN:
 				armResetTimer.start();
 				arm.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-				arm.motorOne.setPower(-0.05);
-				arm.motorTwo.setPower(-0.05);
+				arm.motorOne.setPower(0);
+				arm.motorTwo.setPower(0);
 				break;
 			case LEVEL_3:
 				armResetTimer.stop();
-				arm.setPosition(73, 0.3);
+				arm.setPosition(83, 0.5);
 				break;
 			case MANUAL:
 				armResetTimer.stop();
 				arm.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 				double multiplier;
 				if (-gamepad2.left_stick_y >= 0) {
-					multiplier = 0.4;
+					multiplier = 0.65;
 				} else {
-					multiplier = 0.1;
+					multiplier = 0.2;
 				}
 				arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
 				if (Math.abs(gamepad2.left_stick_y) >= 0.1) {
