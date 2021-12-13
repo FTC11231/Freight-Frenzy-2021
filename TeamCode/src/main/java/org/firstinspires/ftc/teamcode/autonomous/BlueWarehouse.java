@@ -123,7 +123,7 @@ public class BlueWarehouse extends LinearOpMode {
 
 	public void hub() {
 		gripper.closeGripper();
-		Timer.delay(1, this);
+		Timer.delay(2, this);
 		arm.setPosition(15,0.6);
 
 		chassis.driveForward(17, 0.8, 0.2, 0.2, 5); // Drive towards the hub
