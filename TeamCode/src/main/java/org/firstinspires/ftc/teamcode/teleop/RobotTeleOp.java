@@ -41,6 +41,7 @@ import org.firstinspires.ftc.teamcode.util.hardware.Arm;
 import org.firstinspires.ftc.teamcode.util.hardware.Carousel;
 import org.firstinspires.ftc.teamcode.util.hardware.Chassis;
 import org.firstinspires.ftc.teamcode.util.hardware.Gripper;
+import org.firstinspires.ftc.teamcode.util.hardware.Turret;
 import org.firstinspires.ftc.teamcode.util.vision.auto_box.FreightDetector;
 
 @TeleOp(name = "Tele-Op", group = "Iterative Opmode")
@@ -51,12 +52,14 @@ public class RobotTeleOp extends OpMode {
 	private Arm arm;
 	private Carousel carousel;
 	private Gripper gripper;
+	private Turret turret;
 
-	private DcMotor turretMotor;
+//	private DcMotor turretMotor;
 
 	private FreightDetector vision;
 
 	private Timer armResetTimer = new Timer();
+	private double turretPosition = 90.0;
 
 	private enum ArmStates {
 		MANUAL,
@@ -78,10 +81,9 @@ public class RobotTeleOp extends OpMode {
 		arm = new Arm(this, true);
 		carousel = new Carousel(this);
 		gripper = new Gripper(this);
+		turret = new Turret(this, true);
 
 		vision = new FreightDetector(hardwareMap.get(WebcamName.class, "barcodeCam"));
-
-		turretMotor = hardwareMap.get(DcMotor.class, "turret");
 
 		gripper.openGripper();
 		team = Team.A;
@@ -93,17 +95,17 @@ public class RobotTeleOp extends OpMode {
 
 	@Override
 	public void init_loop() {
-		if (gamepad1.a && !aLastFrame) {
-			switch (team) {
-				case A:
-					team = Team.B;
-					break;
-				case B:
-					team = Team.A;
-					break;
-			}
-		}
-		aLastFrame = gamepad1.a;
+//		if (gamepad1.a && !aLastFrame) {
+//			switch (team) {
+//				case A:
+//					team = Team.B;
+//					break;
+//				case B:
+//					team = Team.A;
+//					break;
+//			}
+//		}
+//		aLastFrame = gamepad1.a;
 		telemetry.addData("Team", team);
 		telemetry.update();
 	}
@@ -151,7 +153,17 @@ public class RobotTeleOp extends OpMode {
 		}
 
 		// Turret (Operator)
-		turretMotor.setPower(gamepad2.right_stick_x * 0.60);
+		turret.setPower(gamepad2.right_stick_x * 0.60);
+//		if (gamepad2.b) {
+//			turretPosition += gamepad2.right_stick_x * -2.0;
+//			turret.setPosition(turretPosition);
+//		} else {
+//			turret.setPower(gamepad2.right_stick_x * 0.60);
+//		}
+////		turret.setPower(gamepad2.right_stick_x * 0.60);
+//		telemetry.addData("Turret target rotation", turretPosition);
+//		telemetry.addData("Turret target position", turret.motor.getTargetPosition());
+//		telemetry.addData("Turret position", turret.motor.getCurrentPosition());
 
 		// Arm (Operator)
 		if (gamepad2.dpad_up) {

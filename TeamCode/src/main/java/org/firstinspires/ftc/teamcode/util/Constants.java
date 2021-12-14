@@ -27,7 +27,7 @@ public class Constants {
 		public static final double TICKS_PER_REV = 288.0;
 		public static final double GEAR_RATIO = 1.0 / 1.0;
 		public static final double TICKS_PER_DEGREE = TICKS_PER_REV * GEAR_RATIO / 360.0;
-		public static final PIDFCoefficients PIDF_COEFFICIENTS = new PIDFCoefficients(0.01, 0.0, 0.1, 0.0, MotorControlAlgorithm.PIDF);
+		public static final PIDFCoefficients PIDF_COEFFICIENTS = new PIDFCoefficients(75.0, 0.0, 0.0, 10.0, MotorControlAlgorithm.PIDF);
 	}
 
 	public static class Arm {

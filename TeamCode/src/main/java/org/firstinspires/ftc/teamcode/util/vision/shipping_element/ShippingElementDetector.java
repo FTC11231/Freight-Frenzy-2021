@@ -68,9 +68,9 @@ public class ShippingElementDetector {
 	public void setSettings(VisionPreset visionPreset) {
 		switch (visionPreset) {
 			case RED:
-				pipeline.setRectOne(25, 140, 25, 55);
-				pipeline.setRectTwo(150, 144, 25, 41);
-				pipeline.setRectThree(260, 143, 40, 40);
+				pipeline.setRectOne(40, 140, 25, 55);
+				pipeline.setRectTwo(165, 144, 25, 41);
+				pipeline.setRectThree(275, 143, 40, 40);
 				pipeline.setThreshold(30);
 				pipeline.setYellowHue(40);
 				pipeline.setDetectionType(ShippingElementPipeline.DetectionType.ALL_VISIBLE);
@@ -78,7 +78,7 @@ public class ShippingElementDetector {
 			case BLUE:
 				pipeline.setRectOne(0, 0, 0, 0);
 				pipeline.setRectTwo(30, 140, 35, 55);
-				pipeline.setRectThree(150, 140, 35, 55);
+				pipeline.setRectThree(165, 140, 35, 55);
 				pipeline.setThreshold(30);
 				pipeline.setYellowHue(40);
 				pipeline.setDetectionType(ShippingElementPipeline.DetectionType.LEFT_NOT_VISIBLE);

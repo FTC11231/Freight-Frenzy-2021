@@ -87,4 +87,9 @@ public class Turret {
 		motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 	}
 
+	public void setPower(double power) {
+		motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		motor.setPower(power);
+	}
+
 }
