@@ -31,8 +31,6 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 	// Colors
 	private final Scalar RED = new Scalar(255, 0, 0, 100);
 	private final Scalar GREEN = new Scalar(0, 255, 0, 100);
-
-	// Declare points for the rectangles we're checking
 	private Point regionOnePointA = new Point();
 	private Point regionOnePointB = new Point();
 	private Point regionTwoPointA = new Point();
@@ -40,7 +38,7 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 	private Point regionThreePointA = new Point();
 	private Point regionThreePointB = new Point();
 	private int threshold = 0;
-	private int yellowHue = 0;
+	private int yellowHue = 23;
 
 	// Vars to make this all work
 	public Mat regionOne; // Rectangle 1
@@ -71,10 +69,9 @@ public class ShippingElementPipeline extends OpenCvPipeline {
 		regionTwo = HSV.submat(new Rect(regionTwoPointA, regionTwoPointB));
 		regionThree = HSV.submat(new Rect(regionThreePointA, regionThreePointB));
 		// Compare the average color of each rectangle to yellow
-		diffOne = (int) Math.abs(yellowHue - Core.mean(regionOne).val[0]);
-		diffTwo = (int) Math.abs(yellowHue - Core.mean(regionTwo).val[0]);
-		diffThree = (int) Math.abs(yellowHue - Core.mean(regionThree).val[0]);
-
+		diffOne = (int) Math.abs((180 - Core.mean(regionOne).val[1]) + (yellowHue - Core.mean(regionOne).val[0]));
+		diffTwo = (int) Math.abs((180 - Core.mean(regionTwo).val[1]) + (yellowHue - Core.mean(regionTwo).val[0]));
+		diffThree = (int) Math.abs((180 - Core.mean(regionThree).val[1]) + (yellowHue - Core.mean(regionThree).val[0]));
 
 		if (detectionType == DetectionType.ALL_VISIBLE) {
 			int closestVal = Math.min(Math.min(diffOne, diffTwo), diffThree);
