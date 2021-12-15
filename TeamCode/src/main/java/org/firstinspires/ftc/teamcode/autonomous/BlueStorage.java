@@ -54,8 +54,25 @@ public class BlueStorage extends LinearOpMode {
 
 	private ShippingElementDetector shippingElementDetector;
 
-	private boolean parkInWarehouse = true;
+	private enum ParkingLocation {
+		WAREHOUSE,
+		STORAGE
+
+		;
+
+		public ParkingLocation getOtherLocation() {
+			if (this == WAREHOUSE) {
+				return STORAGE;
+			} else {
+				return WAREHOUSE;
+			}
+		}
+
+	}
+	private ParkingLocation parkingLocation = ParkingLocation.STORAGE;
+
 	private Timer warehouseTimer = new Timer();
+	private boolean aLastFrame = false;
 
 	@Override
 	public void runOpMode() {
@@ -73,18 +90,16 @@ public class BlueStorage extends LinearOpMode {
 		telemetry.update();
 
 		while (!isStarted() && !isStopRequested()) {
-			if (gamepad1.a) {
-				parkInWarehouse = true;
-			}
-			if (gamepad1.b) {
-				parkInWarehouse = false;
+			if (gamepad1.a && ! aLastFrame) {
+				parkingLocation = parkingLocation.getOtherLocation();
 			}
 			if (shippingElementDetector.isActive()) {
 				telemetry.addData("Position", shippingElementDetector.getPosition());
 				telemetry.addLine();
 			}
-			telemetry.addData("Parking position", parkInWarehouse ? "Warehouse" : "Storage Unit");
+			telemetry.addData("Parking position", parkingLocation);
 			telemetry.update();
+			aLastFrame = gamepad1.a;
 		}
 
 		if (!opModeIsActive()) return;
@@ -129,7 +144,7 @@ public class BlueStorage extends LinearOpMode {
 		carousel();
 		telemetry.addData("Time", warehouseTimer.get());
 		telemetry.update();
-		if (!parkInWarehouse || warehouseTimer.hasElapsed(23)) {
+		if (parkingLocation == ParkingLocation.STORAGE || warehouseTimer.hasElapsed(23)) {
 			parkStorage();
 		} else {
 			parkWarehouse();
@@ -189,18 +204,18 @@ public class BlueStorage extends LinearOpMode {
 	}
 
 	public void parkWarehouse() {
+		while (!warehouseTimer.hasElapsed(23)) {
+			telemetry.addData("Timer", warehouseTimer.get());
+			telemetry.update();
+		}
 		chassis.driveForward(20, 0.8, 0.2, 0.2, 5); // Drive away from the carousel
 		carousel.motor.setPower(0); // Turn the carousel wheel off
 		chassis.turn(-90, 0.8, 5); // Turn towards the warehouse
 		chassis.driveForward(-18, 1, 0.1, 0.1, 5);
 		chassis.turn(90, 0.4, 1.5);
-		while (!warehouseTimer.hasElapsed(25.5)) {
-			telemetry.addData("Timer", warehouseTimer.get());
-			telemetry.update();
-		}
 		chassis.driveForward(-70, 1, 0.1, 0.1, 5);
-		chassis.turn(-90, 0.8, 5);
-		chassis.drive(-0.5, 0, 0);
+		chassis.turn(90, 0.8, 5);
+		chassis.drive(0.5, 0, 0);
 		Timer.delay(1);
 		chassis.drive(0, 0, 0);
 	}

@@ -126,7 +126,8 @@ public class BlueWarehouse extends LinearOpMode {
 		Timer.delay(2, this);
 		arm.setPosition(15,0.6);
 
-		chassis.driveForward(17, 0.8, 0.2, 0.2, 5); // Drive towards the hub
+		chassis.driveForward(23, 0.8, 0.2, 0.2, 5); // Drive towards the hub (drive too much, we push the tse out of the way)
+		chassis.driveForward(-6, 0.8, 0.2, 0.2, 5); // Drive back to the hub
 		Timer.delay(0.1, this); // Delay for safety
 		chassis.turn(-45, 0.8, 5); // Turn to the hub
 	}
@@ -134,8 +135,8 @@ public class BlueWarehouse extends LinearOpMode {
 	public void parkWarehouse() {
 		chassis.turn(-90, 0.8, 5); // Turn towards warehouse
 		chassis.driveForward(-60, 1, 0.1, 0.1, 5);
-		chassis.turn(-90, 0.8, 5);
-		chassis.drive(-0.5, 0, 0);
+		chassis.turn(90, 0.8, 5);
+		chassis.drive(0.5, 0, 0);
 		Timer.delay(1);
 		chassis.drive(0, 0, 0);
 	}
