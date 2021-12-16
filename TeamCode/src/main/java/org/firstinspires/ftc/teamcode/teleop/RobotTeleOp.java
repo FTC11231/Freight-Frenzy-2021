@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode.teleop;
 
+import android.util.Log;
+
 import androidx.core.math.MathUtils;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -66,14 +68,17 @@ public class RobotTeleOp extends OpMode {
 		PUSHING_DOWN,
 		LEVEL_3
 	}
+
 	private ArmStates armState;
 
 	private enum Team {
 		A,
 		B
 	}
+
 	private Team team = Team.A;
 	private boolean aLastFrame = false;
+	private Timer carouselTimer = new Timer();
 
 	@Override
 	public void init() {
@@ -89,8 +94,8 @@ public class RobotTeleOp extends OpMode {
 		team = Team.A;
 		armState = ArmStates.MANUAL;
 
-		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
-		telemetry.update();
+//		telemetry.addData("Status", "Initialized (Version: " + versionNumber + ")");
+//		telemetry.update();
 	}
 
 	@Override
@@ -106,14 +111,15 @@ public class RobotTeleOp extends OpMode {
 //			}
 //		}
 //		aLastFrame = gamepad1.a;
-		telemetry.addData("Team", team);
-		telemetry.update();
+//		telemetry.addData("Team", team);
+//		telemetry.update();
 	}
 
 	@Override
 	public void start() {
-		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
-		telemetry.update();
+//		telemetry.addData("Status", "Started (Version: " + versionNumber + ")");
+//		telemetry.update();
+		carouselTimer.start();
 	}
 
 	@Override
@@ -131,23 +137,30 @@ public class RobotTeleOp extends OpMode {
 			turn = MathUtils.clamp(vision.calculateTurnPower() * 0.6, -0.6, 0.6);
 		}
 		double forwards = 0.0;
-		switch (team) {
-			case A:
-				forwards = -gamepad1.left_stick_y;
-				break;
-			case B:
-				forwards = gamepad1.right_trigger - gamepad1.left_trigger;
-				break;
+		if (gamepad2.y) {
+			forwards = -0.3;
+		} else {
+			switch (team) {
+				case A:
+					forwards = -gamepad1.left_stick_y;
+					break;
+				case B:
+					forwards = gamepad1.right_trigger - gamepad1.left_trigger;
+					break;
+			}
 		}
 		chassis.drive(forwards * driveMultiplier,
 				gamepad1.left_stick_x * driveMultiplier,
 				turn * driveMultiplier);
 
 		// Carousel (Base)
+		carousel.motor.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
+		// DRIVERS MEETING: Ask about getting ducks outside of the alliance station
+		// DRIVERS MEETING:
 		if (gamepad1.b) {
-			carousel.motor.setPower(1); // Turn the carousel (Red side, B is red)
+			carousel.motor.setPower(1);
 		} else if (gamepad1.x) {
-			carousel.motor.setPower(-1); // Turn the carousel (Blue side, X is blue)
+			carousel.motor.setPower(-1);
 		} else {
 			carousel.motor.setPower(0); // Don't turn the carousel
 		}
@@ -215,13 +228,13 @@ public class RobotTeleOp extends OpMode {
 			gripper.openGripper(); // Open the gripper
 		}
 
-		telemetry.update();
+//		telemetry.update();
 	}
 
 	@Override
 	public void stop() {
-		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
-		telemetry.update();
+//		telemetry.addData("Status", "Stopped (Version: " + versionNumber + ")");
+//		telemetry.update();
 	}
 
 }

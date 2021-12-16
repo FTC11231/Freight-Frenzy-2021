@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.util.Constants;
 
 public class Carousel {
 
-	public DcMotorEx motor;
+	public DcMotor motor;
 	public OpMode opMode;
 
 	/**
@@ -19,7 +19,7 @@ public class Carousel {
 	 */
 	public Carousel(OpMode opMode) {
 		this.opMode = opMode;
-		this.motor = this.opMode.hardwareMap.get(DcMotorEx.class, "carousel");
+		this.motor = this.opMode.hardwareMap.get(DcMotor.class, "carousel");
 	}
 
 	/**
@@ -27,8 +27,8 @@ public class Carousel {
 	 *
 	 * @return The velocity of the wheel.
 	 */
-	public double getVelocity() {
-		return this.motor.getVelocity() / Constants.Carousel.RPM_TO_TICKS;
-	}
+//	public double getVelocity() {
+//		return this.motor.getVelocity() / Constants.Carousel.RPM_TO_TICKS;
+//	}
 
 }

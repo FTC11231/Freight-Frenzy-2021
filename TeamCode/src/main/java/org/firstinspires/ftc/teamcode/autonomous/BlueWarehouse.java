@@ -89,25 +89,25 @@ public class BlueWarehouse extends LinearOpMode {
 		Timer.delay(0.1, this);
 		switch (elementPosition) {
 			case LEFT:
-				arm.setPosition(20, 0.3);
+				arm.setPosition(22.5, 0.3);
 				chassis.driveForward(8, 0.3, 0.2, 0.2, 5); // Drive into the hub
 				gripper.openGripper(); // Open gripper
 				Timer.delay(1, this); // Wait for gripper to open
-				chassis.driveForward(-8, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				chassis.driveForward(-5, 0.8, 0.3, 0.3, 5); // Drive away from the hub
 				break;
 			case CENTER:
 				arm.setPosition(50, 0.3);
 				chassis.driveForward(7, 0.3, 0.2, 0.2, 5); // Drive into the hub
 				gripper.openGripper(); // Open gripper
 				Timer.delay(1, this); // Wait for gripper to open
-				chassis.driveForward(-7, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				chassis.driveForward(-4, 0.8, 0.3, 0.3, 5); // Drive away from the hub
 				break;
 			case RIGHT:
 				arm.setPosition(70, 0.3);
 				chassis.driveForward(8, 0.3, 0.2, 0.2, 5); // Drive into the hub
 				gripper.openGripper(); // Open gripper
 				Timer.delay(1, this); // Wait for gripper to open
-				chassis.driveForward(-8, 0.8, 0.3, 0.3, 5); // Drive away from the hub
+				chassis.driveForward(-5, 0.8, 0.3, 0.3, 5); // Drive away from the hub
 				break;
 		}
 		arm.setPosition(10, 0.05); // Move the arm down
@@ -134,7 +134,7 @@ public class BlueWarehouse extends LinearOpMode {
 
 	public void parkWarehouse() {
 		chassis.turn(-90, 0.8, 5); // Turn towards warehouse
-		chassis.driveForward(-60, 1, 0.1, 0.1, 5);
+		chassis.driveForward(-55, 1, 0.1, 0.1, 5);
 		chassis.turn(90, 0.8, 5);
 		chassis.drive(0.5, 0, 0);
 		Timer.delay(1);

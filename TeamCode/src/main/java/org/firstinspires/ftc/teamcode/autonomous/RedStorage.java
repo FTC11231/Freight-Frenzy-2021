@@ -90,8 +90,14 @@ public class RedStorage extends LinearOpMode {
 		telemetry.update();
 
 		while (!isStarted() && !isStopRequested()) {
-			if (gamepad1.a && ! aLastFrame) {
-				parkingLocation = parkingLocation.getOtherLocation();
+//			if (gamepad1.a && ! aLastFrame) {
+//				parkingLocation = parkingLocation.getOtherLocation();
+//			}
+			if (gamepad1.x) {
+				parkingLocation = ParkingLocation.STORAGE;
+			}
+			if (gamepad1.b) {
+				parkingLocation = ParkingLocation.WAREHOUSE;
 			}
 			if (shippingElementDetector.isActive()) {
 				telemetry.addData("Position", shippingElementDetector.getPosition());
@@ -116,7 +122,7 @@ public class RedStorage extends LinearOpMode {
 		switch (elementPosition) {
 			case LEFT:
 				Timer.delay(0.1, this);
-				arm.setPosition(20, 0.3);
+				arm.setPosition(22.5, 0.3);
 				chassis.driveForward(10, 0.3, 0.2, 0.2, 5); // Drive into the hub
 				gripper.openGripper(); // Open gripper
 				Timer.delay(1, this); // Wait for gripper to open
