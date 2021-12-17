@@ -118,6 +118,7 @@ public class RedStorage extends LinearOpMode {
 		telemetry.addData("Position", elementPosition);
 		telemetry.update();
 		warehouseTimer.start();
+//		Timer.delay(3, this);
 		hub();
 		switch (elementPosition) {
 			case LEFT:
@@ -167,7 +168,7 @@ public class RedStorage extends LinearOpMode {
 		Timer.delay(2, this);
 		arm.setPosition(15,0.6);
 
-		chassis.driveForward(33, 0.75, 0.1, 0.1, 5); // Drive towards the hub
+		chassis.driveForward(34.5, 0.75, 0.1, 0.1, 5); // Drive towards the hub
 		Timer.delay(0.1, this); // Delay for safety
 		chassis.turn(-90, 0.6, 5); // Turn to the hub
 	}

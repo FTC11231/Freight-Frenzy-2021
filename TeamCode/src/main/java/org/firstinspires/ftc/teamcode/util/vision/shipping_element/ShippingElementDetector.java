@@ -77,8 +77,8 @@ public class ShippingElementDetector {
 				break;
 			case BLUE:
 				pipeline.setRectOne(0, 0, 0, 0);
-				pipeline.setRectTwo(30, 140, 35, 55);
-				pipeline.setRectThree(165, 140, 35, 55);
+				pipeline.setRectTwo(15, 140, 35, 55);
+				pipeline.setRectThree(135, 140, 35, 55);
 				pipeline.setThreshold(30);
 				pipeline.setYellowHue(40);
 				pipeline.setDetectionType(ShippingElementPipeline.DetectionType.LEFT_NOT_VISIBLE);
