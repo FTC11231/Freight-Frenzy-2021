@@ -207,9 +207,9 @@ public class RobotTeleOp extends OpMode {
 				arm.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 				double multiplier;
 				if (-gamepad2.left_stick_y >= 0) {
-					multiplier = 0.65;
+					multiplier = 0.55;
 				} else {
-					multiplier = 0.2;
+					multiplier = 0.16;
 				}
 				arm.motorOne.setPower(-gamepad2.left_stick_y * -multiplier);
 				if (Math.abs(gamepad2.left_stick_y) >= 0.1) {

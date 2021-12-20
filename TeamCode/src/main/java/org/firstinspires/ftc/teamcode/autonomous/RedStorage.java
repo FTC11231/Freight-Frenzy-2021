@@ -169,6 +169,7 @@ public class RedStorage extends LinearOpMode {
 		arm.setPosition(15,0.6);
 
 		chassis.driveForward(34.5, 0.75, 0.1, 0.1, 5); // Drive towards the hub
+
 		Timer.delay(0.1, this); // Delay for safety
 		chassis.turn(-90, 0.6, 5); // Turn to the hub
 	}
